@@ -6,9 +6,9 @@ Uruchom:  python smoke_test.py
 import sys
 
 from item_parser import parse_item
-from trade_api import TradeClient, TradeError
+from trade_api import ALL_STAT_KINDS, BASE, TradeClient, TradeError
 
-UA = "poe-boosteroid-pricecheck/0.1 (personal use)"
+UA = "poe-price-check/1.0 (+https://poepricecheck.eu)"
 
 UNIQUE_SAMPLE = """Item Class: Body Armours
 Rarity: Unique
@@ -63,7 +63,22 @@ def main() -> int:
 
     print("== slownik statystyk ==")
     index = client.stat_index()
-    print(f"wpisow: {len(index)}\n")
+    print(f"wpisow: {len(index)}")
+
+    # GGG dokłada nowe grupy statystyk przy kolejnych ligach. Grupa, ktorej nie
+    # ma w ALL_STAT_KINDS, jest dla nas niewidoczna - jej mody nigdy sie nie
+    # dopasuja, a wyszukiwanie po cichu zwroci nie to, co trzeba. Tak wlasnie
+    # przegapilismy piec grup naraz.
+
+    data = client._cached("stats", f"{BASE}/api/trade/data/stats")
+    theirs = {group.get("id") for group in data.get("result", []) if group.get("id")}
+    missing = sorted(theirs - set(ALL_STAT_KINDS))
+    if missing:
+        print(f"UWAGA: GGG ma grupy, ktorych nie znamy: {missing}")
+        print("       Dopisz je do ALL_STAT_KINDS w trade_api.py.")
+    else:
+        print(f"grupy statystyk: znamy wszystkie {len(theirs)}")
+    print()
 
     for label, sample in (("UNIKAT", UNIQUE_SAMPLE), ("RZADKI", RARE_SAMPLE)):
         print(f"== {label} ==")

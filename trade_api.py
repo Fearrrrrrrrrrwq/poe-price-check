@@ -45,9 +45,15 @@ NEGATED_WORDS = {"reduced": "increased", "less": "more"}
 NUM_IN_TEXT_RE = re.compile(r"[+-]?\d+(?:\.\d+)?")
 
 # Rodzaje statystyk w kolejnosci, w jakiej warto ich probowac przy dopasowaniu.
+# Kolejnosc ma znaczenie tylko dla szybkosci - trafienie w "explicit" jest
+# najczestsze. Lista musi obejmowac WSZYSTKIE grupy, ktore zwraca
+# /api/trade/data/stats; brakujaca grupa oznacza mody, ktorych nigdy nie
+# dopasujemy. Sprawdza to test w check_stat_kinds.py.
 ALL_STAT_KINDS = (
     "explicit", "implicit", "fractured", "crafted", "enchant",
     "veiled", "scourge", "crucible", "pseudo",
+    # Dopisane po tym, jak okazalo sie, ze GGG ma ich wiecej niz znalismy.
+    "imbued", "mercenary", "delve", "ultimatum", "sanctum",
 )
 
 # Klasy przedmiotow, na ktorych statystyka moze byc "lokalna", czyli dotyczyc
@@ -940,6 +946,11 @@ class TradeClient:
 
         if item.corrupted:
             misc["corrupted"] = {"option": "true"}
+        # Bez tego filtru wersja Foulborn miesza sie ze zwykla: dla jednego
+        # unikatu bylo 618 ofert lacznie, a tylko 57 to faktycznie Foulborny.
+        # Wycena bez filtru zanizalaby ceny kilkukrotnie.
+        if item.is_foulborn:
+            misc["mutated"] = {"option": "true"}
         if item.gem_level is not None:
             misc["gem_level"] = {"min": item.gem_level}
         # Jakosc filtrujemy tylko dla kamieni. Dla broni/pancerzy wymuszanie

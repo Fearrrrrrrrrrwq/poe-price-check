@@ -151,6 +151,11 @@ class ParsedItem:
         return "corrupted" in self.flags
 
     @property
+    def is_foulborn(self) -> bool:
+        """Odmiana Foulborn - gielda ma na nia osobny filtr 'mutated'."""
+        return "foulborn" in self.flags
+
+    @property
     def link_count(self) -> int:
         """Najdluzszy link w socketach, np. 'W-W-W-W-W-W' -> 6."""
         if not self.sockets:
@@ -297,6 +302,17 @@ def _parse_header(lines: list[str], item: ParsedItem) -> None:
         if item.base_type.startswith(prefix):
             item.base_type = item.base_type[len(prefix):]
 
+    # "Foulborn" dokleja sie do NAZWY, nie do bazy: unikat "Shackles of the
+    # Wretched" nazywa sie wtedy "Foulborn Shackles of the Wretched".
+    # Trade nie zna takiej nazwy i odpowiada bledem 400 "Unknown item name",
+    # wiec bez zdjecia prefiksu wyszukiwanie w ogole nie rusza. Sam fakt
+    # zapamietujemy jako flage - jest na to osobny filtr gieldy.
+    if item.name.startswith(FOULBORN_PREFIX):
+        item.name = item.name[len(FOULBORN_PREFIX):]
+        item.flags.add("foulborn")
+
+
+FOULBORN_PREFIX = "Foulborn "
 
 TIER_RE = re.compile(r"Tier:\s*(\d+)", re.IGNORECASE)
 GROUP_RE = re.compile(r'"([^"]+)"')

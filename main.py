@@ -250,6 +250,8 @@ class PriceChecker:
                     return
             self.check_from_text(raw, changed)
             self.checks_done += 1
+            # Licznik zasobow do logu - patrz applog.resource_snapshot().
+            print(f"[zasoby] wycena {self.checks_done}: {applog.resource_snapshot()}")
             self.telemetry.record_check(ok=True)
         except ItemParseError as exc:
             self.telemetry.record_check(ok=False)

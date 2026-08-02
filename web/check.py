@@ -229,6 +229,9 @@ for code in LANGS:
     check(f"sitemap zawiera /{code}/", f"/{code}/</loc>" in sitemap)
 check("sitemap NIE zawiera panelu admina", "/admin/" not in sitemap)
 check("sitemap ma alternatywy jezykowe", 'xhtml:link rel="alternate"' in sitemap)
+# HTML i sitemapa musza deklarowac ten sam zestaw wersji jezykowych - inaczej
+# same sobie przecza. x-default wypadl stad przy pierwszej wersji.
+check("sitemap ma x-default tak jak strony", 'hreflang="x-default"' in sitemap)
 
 print("\n=== strona wejsciowa ===")
 root = read("index.html")

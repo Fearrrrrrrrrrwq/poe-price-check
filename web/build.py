@@ -14,6 +14,7 @@ import json
 import os
 import pathlib
 import shutil
+import subprocess
 import sys
 from datetime import date
 
@@ -570,15 +571,48 @@ def not_found_page() -> str:
 """
 
 
+def content_changed() -> str:
+    """Data ostatniej zmiany TRESCI stron, nie data budowania.
+
+    Wstawianie tu dzisiejszej daty przy kazdym wdrozeniu jest kuszace, ale
+    Google przestaje ufac znacznikowi lastmod, ktory zawsze pokazuje "dzis"
+    mimo niezmienionej tresci - i po prostu zaczyna go ignorowac.
+
+    Bierzemy wiec date ostatniej zmiany plikow, ktore realnie ksztaltuja
+    strony: tekstow i szablonu. Najpierw z gita, bo to jedyne zrodlo odporne
+    na swiezy klon; gdy gita nie ma, zostaje czas modyfikacji plikow.
+    """
+    sources = [HERE / "content.py", HERE / "build.py"]
+    try:
+        stamps = []
+        for path in sources:
+            out = subprocess.run(
+                ["git", "log", "-1", "--format=%cd", "--date=short", "--", path.name],
+                cwd=HERE, capture_output=True, text=True, timeout=10)
+            if out.returncode == 0 and out.stdout.strip():
+                stamps.append(out.stdout.strip())
+        if stamps:
+            return max(stamps)
+    except (OSError, subprocess.SubprocessError):
+        pass
+    newest = max(path.stat().st_mtime for path in sources if path.exists())
+    return date.fromtimestamp(newest).isoformat()
+
+
 def sitemap() -> str:
-    today = date.today().isoformat()
+    changed = content_changed()
     entries = []
     for code in LANGS:
+        # x-default MUSI tu byc, tak samo jak w znacznikach na stronach.
+        # Bez niego sitemapa i HTML mowia co innego, a to jest dokladnie ten
+        # rodzaj sprzecznosci, ktorego Google nie rozstrzyga na nasza korzysc.
         alts = "".join(
             f'<xhtml:link rel="alternate" hreflang="{other}" '
             f'href="{SITE_URL}/{other}/"/>' for other in LANGS)
+        alts += (f'<xhtml:link rel="alternate" hreflang="x-default" '
+                 f'href="{SITE_URL}/{DEFAULT}/"/>')
         entries.append(
-            f"<url><loc>{SITE_URL}/{code}/</loc><lastmod>{today}</lastmod>"
+            f"<url><loc>{SITE_URL}/{code}/</loc><lastmod>{changed}</lastmod>"
             f"<changefreq>weekly</changefreq><priority>"
             f"{'1.0' if code == DEFAULT else '0.9'}</priority>{alts}</url>")
     return ('<?xml version="1.0" encoding="UTF-8"?>\n'

@@ -1,0 +1,115 @@
+# Budowanie i wydania.
+#
+# Kazde wydanie powstaje TUTAJ, z kodu w repozytorium - nie na czyimkolwiek
+# laptopie. To warunek konieczny, zeby SignPath Foundation mogl podpisywac
+# nasze pliki: musi istniec weryfikowalny zwiazek miedzy zrodlem a binarium.
+#
+# Wydanie robi sie tagiem:
+#   git tag v1.0.1 && git push origin v1.0.1
+
+name: build
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    name: kontrole
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Zaleznosci
+        run: pip install -r requirements.txt
+
+      # Napis wpisany na sztywno nie wywala programu - po prostu jedna linijka
+      # zostaje w cudzym jezyku. Dlatego pilnuje tego test, a nie oko.
+      - name: Tlumaczenia
+        run: python check_i18n.py
+
+      - name: Kompilacja wszystkich modulow
+        run: python -m compileall -q . -x "(web[\\/]dist|build|dist|node_modules)"
+
+  release:
+    name: wydanie
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: checks
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Zaleznosci
+        run: pip install -r requirements.txt pyinstaller
+
+      - name: Budowanie .exe
+        run: python -m PyInstaller --noconfirm poe-price-check.spec
+
+      # package.py jest jedynym miejscem, gdzie powstaje archiwum - to samo
+      # sklada plik publikowany na stronie, wiec obie drogi daja identyczna
+      # zawartosc.
+      - name: Pakowanie
+        id: pack
+        run: python package.py $env:GITHUB_OUTPUT
+
+      - name: Sprawdzenie, czy w paczce jest to, co powinno
+        run: |
+          python - <<'PY'
+          import json, zipfile
+          from paths import APP_VERSION
+          z = zipfile.ZipFile(f"dist/poe-price-check-{APP_VERSION}.zip")
+          names = z.namelist()
+          assert "poe-price-check.exe" in names, names
+          assert "CZYTAJ-TO.txt" in names, names
+          assert z.testzip() is None, "archiwum uszkodzone"
+          print("paczka w porzadku:", names)
+          PY
+
+      - name: Artefakt budowania
+        uses: actions/upload-artifact@v4
+        with:
+          name: poe-price-check-${{ github.ref_name }}
+          path: dist/poe-price-check-*.zip
+          retention-days: 14
+
+      # gh jest preinstalowany na runnerach, wiec nie wciagamy tu obcej akcji -
+      # im mniej cudzego kodu w drodze do binarium, tym lepiej.
+      - name: Wydanie na GitHubie
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $sha = "${{ steps.pack.outputs.sha256 }}"
+          $notes = @"
+          Pobierz **poe-price-check-${{ github.ref_name }}.zip**, rozpakuj i uruchom ``poe-price-check.exe``.
+
+          Windows pokaze ostrzezenie, bo plik nie ma podpisu cyfrowego:
+          **Wiecej informacji -> Uruchom mimo to**. Instrukcja jest tez w archiwum.
+
+          Suma kontrolna ``poe-price-check.exe`` (SHA-256):
+          ``````
+          $sha
+          ``````
+
+          Zbudowane automatycznie z tagu ${{ github.ref_name }}, przebieg ${{ github.run_id }}.
+          "@
+          gh release create ${{ github.ref_name }} (Get-ChildItem dist/poe-price-check-*.zip) `
+            --title "PoE Price Check ${{ github.ref_name }}" `
+            --notes $notes

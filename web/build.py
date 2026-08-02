@@ -14,10 +14,15 @@ import json
 import os
 import pathlib
 import shutil
-import zipfile
+import sys
 from datetime import date
 
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
+
 from content import C, DEFAULT, LANGS, LOCALES
+# Wersja i sklejanie archiwum siedza w package.py, zeby plik ze strony
+# i plik z wydania na GitHubie byly identyczne.
+from package import APP_VERSION, ARCHIVE_NAME, build_archive
 
 HERE = pathlib.Path(__file__).parent
 DIST = HERE / "dist"
@@ -31,8 +36,6 @@ DIST = HERE / "dist"
 # Da sie go podac zmienna srodowiskowa, zeby nie edytowac kodu przy kazdym
 # wdrozeniu:  SITE_URL=https://poe.twojadomena.pl python build.py
 SITE_URL = os.environ.get("SITE_URL", "https://poe-price-check.pages.dev").rstrip("/")
-APP_VERSION = "1.0.0"
-
 # Plik do pobrania serwujemy z wlasnej domeny. Cloudflare Pages przyjmuje pliki
 # do 25 MB, a nasz ma ~16 MB, wiec nie trzeba osobnego hostingu ani wydania
 # na GitHubie. Nazwa zawiera wersje, zeby dalo sie odroznic, co ktos pobral.
@@ -41,7 +44,7 @@ APP_VERSION = "1.0.0"
 # plikow wykonywalnych z nowych domen znacznie ostrzej niz archiwow. Samego
 # SmartScreena przy uruchomieniu to NIE zalatwia - Windows przenosi znacznik
 # pochodzenia takze na pliki wypakowane - dlatego w srodku jest instrukcja.
-DOWNLOAD_FILE = f"poe-price-check-{APP_VERSION}.zip"
+DOWNLOAD_FILE = ARCHIVE_NAME
 
 # Sciezka do gotowego .exe, ktory build.py spakuje do dist/download/.
 EXE_PATH = pathlib.Path(os.environ.get(
@@ -133,48 +136,6 @@ def json_ld(lang: str, t: dict) -> str:
     return "\n".join(
         f'<script type="application/ld+json">{json.dumps(item, ensure_ascii=False)}</script>'
         for item in (app, faq))
-
-
-def readme(checksum: str) -> str:
-    """Instrukcja w archiwum.
-
-    Wlasciwa przeszkoda nie jest pobranie, tylko okno SmartScreena przy
-    pierwszym uruchomieniu - ludzie w tym miejscu rezygnuja, bo nie wiedza,
-    ze przycisk "Wiecej informacji" w ogole tam jest. Po angielsku i polsku,
-    bo to dwie najwieksze grupy; reszte prowadzi kreator w aplikacji.
-    """
-    return "\r\n".join([
-        "PoE Price Check " + APP_VERSION,
-        SITE_URL,
-        "",
-        "=" * 66,
-        "PIERWSZE URUCHOMIENIE / FIRST RUN",
-        "=" * 66,
-        "",
-        "[PL] Windows pokaze okno 'System Windows ochronil Twoj komputer'.",
-        "     To normalne: program nie ma podpisu cyfrowego, bo certyfikat",
-        "     kosztuje kilka tysiecy zlotych rocznie, a aplikacja jest darmowa.",
-        "",
-        "     Zeby uruchomic:  Wiecej informacji  ->  Uruchom mimo to",
-        "",
-        "[EN] Windows will show 'Windows protected your PC'. That is expected:",
-        "     the program is not code-signed, because a certificate costs",
-        "     hundreds of euros a year and this tool is free.",
-        "",
-        "     To run it:  More info  ->  Run anyway",
-        "",
-        "=" * 66,
-        "",
-        "Reszte konfiguracji poprowadzi kreator w aplikacji.",
-        "The app's setup wizard will guide you through the rest.",
-        "",
-        "Suma kontrolna / checksum (SHA-256) poe-price-check.exe:",
-        checksum,
-        "",
-        "This product isn't affiliated with or endorsed by "
-        "Grinding Gear Games in any way.",
-        "",
-    ])
 
 
 def source_button(t: dict) -> str:
@@ -742,33 +703,15 @@ def build() -> None:
     # Plik do pobrania. Bez niego strona reklamowalaby cos, czego nie ma -
     # dlatego mowimy o tym glosno, a nie po cichu pomijamy.
     if EXE_PATH.exists():
-        (DIST / "download").mkdir()
-        archive = DIST / "download" / DOWNLOAD_FILE
-        checksum = hashlib.sha256(EXE_PATH.read_bytes()).hexdigest()
-
-        with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as bundle:
-            bundle.write(EXE_PATH, "poe-price-check.exe")
-            bundle.writestr("CZYTAJ-TO.txt", readme(checksum))
-
-        size_mb = archive.stat().st_size / 1048576
-        if size_mb > 25:
-            raise SystemExit(
-                f"Archiwum ma {size_mb:.1f} MB, a Cloudflare Pages przyjmuje "
-                f"najwyzej 25 MB. Potrzebny bedzie osobny hosting i DOWNLOAD_URL "
-                f"wskazujacy na niego.")
-
-        print(f"dolaczono plik do pobrania: {DOWNLOAD_FILE} ({size_mb:.1f} MB)")
+        archive, checksum = build_archive(EXE_PATH, DIST / "download")
+        print(f"dolaczono plik do pobrania: {archive.name} "
+              f"({archive.stat().st_size / 1048576:.1f} MB)")
         print(f"  suma SHA-256 pliku .exe: {checksum}")
     else:
         print(f"[uwaga] nie znalazlem {EXE_PATH} - przycisk pobierania "
               f"bedzie prowadzil donikad.\n"
               f"        Zbuduj go: python -m PyInstaller --noconfirm "
               f"poe-price-check.spec")
-
-    if SITE_URL.endswith(".pages.dev"):
-        print("[uwaga] SITE_URL wskazuje na adres testowy Cloudflare.\n"
-              "        Przed wdrozeniem na wlasna domene zbuduj z jej adresem:\n"
-              "        SITE_URL=https://poe.twojadomena.pl python build.py")
 
     pages = len(LANGS) + 3  # jezyki + strona wejsciowa + panel + logowanie
     print(f"zbudowano {pages} stron w {DIST}")

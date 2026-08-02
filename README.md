@@ -108,6 +108,16 @@ checkers works this way and has done for years, but go in knowing that.
 The client throttles itself from the `X-Rate-Limit-*` headers and honours
 `Retry-After`. Do not spam the hotkey.
 
+## Releases
+
+Every release is built by GitHub Actions from a tagged commit — see
+[`.github/workflows/build.yml`](.github/workflows/build.yml). Nothing built on a
+personal machine is published. Each release publishes the SHA-256 of the
+executable so you can check what you downloaded.
+
+How releases are approved and what would be signed:
+[SIGNING-POLICY.md](SIGNING-POLICY.md).
+
 ## Licence
 
 MIT — see [LICENSE](LICENSE).

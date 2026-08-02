@@ -60,7 +60,8 @@ DOWNLOAD_URL = os.environ.get(
 
 # Adres repozytorium. Puste = przycisk "kod zrodlowy" w ogole sie nie pokaze -
 # lepiej go nie miec niz miec taki, ktory prowadzi w 404.
-SOURCE_URL = os.environ.get("SOURCE_URL", "")
+SOURCE_URL = os.environ.get(
+    "SOURCE_URL", "https://github.com/Fearrrrrrrrrrwq/poe-price-check")
 
 # Wpis na liste preload jest praktycznie nieodwracalny - wykreslenie trwa
 # miesiacami, a do tego czasu przegladarki odmawiaja polaczenia po http z cala
@@ -116,7 +117,10 @@ def json_ld(lang: str, t: dict) -> str:
         "url": f"{SITE_URL}/{lang}/",
         "downloadUrl": DOWNLOAD_URL,
         "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"},
+        "license": "https://opensource.org/licenses/MIT",
     }
+    if SOURCE_URL:
+        app["codeRepository"] = SOURCE_URL
     faq = {
         "@context": "https://schema.org",
         "@type": "FAQPage",

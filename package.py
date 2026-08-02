@@ -92,7 +92,38 @@ def build_archive(exe: pathlib.Path, out_dir: pathlib.Path) -> tuple[pathlib.Pat
             f"Archiwum ma {size_mb:.1f} MB, a Cloudflare Pages przyjmuje "
             f"najwyzej {MAX_MB} MB. Potrzebny bedzie osobny hosting.")
 
+    # Sprawdzenie tuz po zapisie, a nie w konfiguracji CI - dzieki temu ta sama
+    # kontrola dziala lokalnie i nie da sie wydac uszkodzonej paczki.
+    with zipfile.ZipFile(archive) as check:
+        names = check.namelist()
+        if EXE_NAME not in names or "CZYTAJ-TO.txt" not in names:
+            raise SystemExit(f"Archiwum niekompletne: {names}")
+        if check.testzip() is not None:
+            raise SystemExit("Archiwum uszkodzone.")
+
     return archive, checksum
+
+
+def release_notes(version: str, checksum: str) -> str:
+    """Opis wydania. Skladamy go w Pythonie, bo PowerShell traktuje odwrocony
+    apostrof jako znak ucieczki i psulby bloki kodu w Markdownie."""
+    return "\n".join([
+        f"Pobierz **poe-price-check-{version}.zip**, rozpakuj "
+        f"i uruchom `poe-price-check.exe`.",
+        "",
+        "Windows pokaze ostrzezenie, bo plik nie ma podpisu cyfrowego:",
+        "**Wiecej informacji -> Uruchom mimo to**. Instrukcja jest tez w archiwum.",
+        "",
+        "Suma kontrolna `poe-price-check.exe` (SHA-256):",
+        "",
+        "```",
+        checksum,
+        "```",
+        "",
+        f"Zbudowane automatycznie z tagu {version} przez GitHub Actions - "
+        f"patrz [polityka podpisywania](SIGNING-POLICY.md).",
+        "",
+    ])
 
 
 def main() -> None:
@@ -103,11 +134,16 @@ def main() -> None:
     print(f"archiwum : {archive.name} ({size_mb:.1f} MB)")
     print(f"sha256   : {checksum}")
 
-    # CI potrzebuje tych wartosci w kolejnych krokach.
-    summary = pathlib.Path(sys.argv[1]) if len(sys.argv) > 1 else None
-    if summary:
-        summary.write_text(f"archive={archive}\nsha256={checksum}\n",
-                           encoding="utf-8")
+    notes = HERE / "dist" / "RELEASE-NOTES.md"
+    notes.write_text(release_notes(f"v{APP_VERSION}", checksum), encoding="utf-8")
+    print(f"opis     : {notes.name}")
+
+    # CI podaje tu sciezke do swojego pliku wyjscia i czyta stad wartosci
+    # w kolejnych krokach.
+    if len(sys.argv) > 1:
+        pathlib.Path(sys.argv[1]).write_text(
+            f"archive={archive}\nsha256={checksum}\nnotes={notes}\n",
+            encoding="utf-8")
 
 
 if __name__ == "__main__":

@@ -288,6 +288,8 @@ def page(lang: str) -> str:
   <div class="wrap">
     <nav class="langs" aria-label="{esc(t['footer_lang'])}">{lang_switch(lang)}</nav>
     <p class="disclaimer">{esc(t['footer_disclaimer'])}</p>
+    <p class="disclaimer"><a href="{SOURCE_URL}/blob/main/SIGNING-POLICY.md"
+       rel="noopener noreferrer">Code signing policy</a></p>
   </div>
 </footer>
 </body>

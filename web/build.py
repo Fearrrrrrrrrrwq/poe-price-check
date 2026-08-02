@@ -606,15 +606,23 @@ def sitemap() -> str:
         # x-default MUSI tu byc, tak samo jak w znacznikach na stronach.
         # Bez niego sitemapa i HTML mowia co innego, a to jest dokladnie ten
         # rodzaj sprzecznosci, ktorego Google nie rozstrzyga na nasza korzysc.
+        # Kazdy element w osobnej linii. Dla wyszukiwarek bez roznicy, ale
+        # przegladarka nie potrafi pokazac tego pliku jako drzewa (blokuje ja
+        # nasza wlasna polityka CSP) i sklejalaby wszystko w jeden ciag
+        # w rodzaju ".../en/2026-08-02weekly1.0" - nie do odczytania.
         alts = "".join(
-            f'<xhtml:link rel="alternate" hreflang="{other}" '
-            f'href="{SITE_URL}/{other}/"/>' for other in LANGS)
-        alts += (f'<xhtml:link rel="alternate" hreflang="x-default" '
-                 f'href="{SITE_URL}/{DEFAULT}/"/>')
+            f'  <xhtml:link rel="alternate" hreflang="{other}" '
+            f'href="{SITE_URL}/{other}/"/>\n' for other in LANGS)
+        alts += (f'  <xhtml:link rel="alternate" hreflang="x-default" '
+                 f'href="{SITE_URL}/{DEFAULT}/"/>\n')
         entries.append(
-            f"<url><loc>{SITE_URL}/{code}/</loc><lastmod>{changed}</lastmod>"
-            f"<changefreq>weekly</changefreq><priority>"
-            f"{'1.0' if code == DEFAULT else '0.9'}</priority>{alts}</url>")
+            f"<url>\n"
+            f"  <loc>{SITE_URL}/{code}/</loc>\n"
+            f"  <lastmod>{changed}</lastmod>\n"
+            f"  <changefreq>weekly</changefreq>\n"
+            f"  <priority>{'1.0' if code == DEFAULT else '0.9'}</priority>\n"
+            f"{alts}"
+            f"</url>")
     return ('<?xml version="1.0" encoding="UTF-8"?>\n'
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
             'xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'

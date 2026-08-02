@@ -173,6 +173,7 @@ class BoosteroidBridge:
         time.sleep(milliseconds / 1000.0)
 
     def _safe_read(self) -> str:
+        self._reads = getattr(self, "_reads", 0) + 1
         try:
             return self.transport.read()
         except Exception as exc:  # noqa: BLE001 - chwilowy blad sieci nie przerywa sekwencji
@@ -181,16 +182,35 @@ class BoosteroidBridge:
             self._last_read_error = exc
             return ""
 
+    # Odstep rosnie po kazdym nietrafionym odczycie.
+    #
+    # Staly odstep 0,25 s oznaczal do 48 zapytan do Google na JEDNA wycene,
+    # czyli blisko 600 po kilkunastu. Google zaczyna wtedy dlawic endpoint
+    # eksportu, odczyty zwalniaja, tekst nie zdaza w oknie z otwartym overlayem,
+    # wycena wpada w druga faze i generuje jeszcze wiecej zapytan. Samo sie
+    # napedza - stad "po kilkunastu sprawdzeniach zaczyna mulic".
+    #
+    # Tekst prawie zawsze dociera ponizej sekundy, wiec pierwsze odczyty sa
+    # gestsze niz dotad (szybsza sciezka typowa), a rzadsze dopiero pozniej,
+    # gdy i tak cos poszlo nie tak.
+    POLL_BACKOFF = 1.5
+    POLL_MAX_INTERVAL = 1.5
+
     def _poll_until_changed(self, before: str, budget_s: float) -> tuple[str, bool]:
         """Odpytuje dokument, dopoki tresc sie nie zmieni albo nie wyjdzie czas."""
         deadline = time.monotonic() + budget_s
+        interval = self.timing.poll_interval_s
         last = before
         while time.monotonic() < deadline:
             current = self._safe_read()
             if current and current != before:
                 return current, True
             last = current
-            time.sleep(self.timing.poll_interval_s)
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                break
+            time.sleep(min(interval, remaining))
+            interval = min(interval * self.POLL_BACKOFF, self.POLL_MAX_INTERVAL)
         return last, False
 
     def grab_item_text(self, verbose: bool = False) -> tuple[str, bool]:
@@ -201,13 +221,17 @@ class BoosteroidBridge:
         tyle, ile naprawde potrzeba, a nie tyle, ile zalozylismy z zapasem.
         """
         _clear_modifiers()
+        self._reads = 0
         timing = self.timing
         started = time.monotonic()
         self._last_read_error = None
 
+        # Znaczniki czasu ida do logu ZAWSZE, nie tylko w trybie diagnostycznym.
+        # Skarga "wyszukanie trwa dlugo" jest nie do zdiagnozowania bez wiedzy,
+        # ktora faza urosla: sekwencja klawiszy czy odpytywanie dokumentu.
+        # W buildzie okienkowym log i tak idzie do pliku, wiec nic to nie kosztuje.
         def stamp(label: str) -> None:
-            if verbose:
-                print(f"  [{(time.monotonic() - started) * 1000:6.0f} ms] {label}")
+            print(f"  [{(time.monotonic() - started) * 1000:6.0f} ms] {label}")
 
         # Odczyt stanu "przed" nie zalezy od klawiszy, wiec leci rownolegle
         # z kopiowaniem i otwieraniem overlaya - inaczej kosztowalby osobna
@@ -264,6 +288,9 @@ class BoosteroidBridge:
         # swiezy, nawet gdyby siedzial w nim poprzedni przedmiot.
         if not before_known:
             changed = False
+
+        stamp(f"KONIEC: {self._reads} odczytow dokumentu, "
+              f"{'tresc nowa' if changed else 'BEZ ZMIANY'}")
 
         if not text and self._last_read_error is not None:
             raise BridgeError(str(self._last_read_error))

@@ -150,7 +150,11 @@ def apply_schema() -> None:
 def ensure_project() -> None:
     say("5/8", f"projekt Pages '{PROJECT}'")
     listing = parse_json(run("pages", "project", "list", "--json", capture=True)) or []
-    if any(row.get("name") == PROJECT for row in listing):
+    # wrangler w --json oddaje naglowki kolumn tabeli ("Project Name"), a nie
+    # pola API ("name"). Sprawdzamy oba - inaczej krok "juz istnieje" nigdy sie
+    # nie wykona i powtorne wdrozenie wywala sie na tworzeniu projektu.
+    if any(row.get("name") == PROJECT or row.get("Project Name") == PROJECT
+           for row in listing):
         print("  juz istnieje")
         return
     run("pages", "project", "create", PROJECT,

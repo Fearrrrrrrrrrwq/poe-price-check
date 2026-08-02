@@ -10,7 +10,10 @@ import pathlib
 import re
 import sys
 
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
+
 from content import DEFAULT, LANGS
+from package import APP_VERSION
 
 DIST = pathlib.Path(__file__).parent / "dist"
 
@@ -39,17 +42,12 @@ for name in ["index.html", "robots.txt", "sitemap.xml", "_headers",
 for code in LANGS:
     check(f"istnieje {code}/index.html", (DIST / code / "index.html").exists())
 
-# Strona reklamuje pobranie - plik musi istniec, inaczej przycisk prowadzi w 404.
-downloads = sorted((DIST / "download").glob("*.zip")) if (DIST / "download").exists() else []
-check("plik do pobrania jest dolaczony", bool(downloads),
-      "brak archiwum w download/ - zbuduj .exe przed build.py")
-if downloads:
-    size_mb = downloads[0].stat().st_size / 1048576
-    check(f"plik miesci sie w limicie Pages ({size_mb:.1f} MB)", size_mb <= 25)
-    check("przycisk pobierania wskazuje na istniejacy plik",
-          f'href="/download/{downloads[0].name}?v=' in read(f"{DEFAULT}/index.html"))
-    check("adres pobierania ma znacznik tresci",
-          "/download/*" in headers_early() and "max-age=300" in headers_early())
+# Pobieranie prowadzi do wydania na GitHubie - jedno binarium na wersje.
+# Wlasna kopia oznaczalaby druga sume kontrolna pod ta sama wersja.
+release_link = f"/releases/download/v{APP_VERSION}/"
+check("przycisk pobierania wskazuje na wydanie",
+      release_link in read(f"{DEFAULT}/index.html"))
+check("strona nie hostuje wlasnej kopii", not (DIST / "download").exists())
 check("brak odnosnikow do nieistniejacego repozytorium",
       not any("github.com/kacper" in read(f"{code}/index.html") for code in LANGS))
 

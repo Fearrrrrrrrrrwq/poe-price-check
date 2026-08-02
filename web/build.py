@@ -22,7 +22,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 from content import C, DEFAULT, LANGS, LOCALES
 # Wersja i sklejanie archiwum siedza w package.py, zeby plik ze strony
 # i plik z wydania na GitHubie byly identyczne.
-from package import APP_VERSION, ARCHIVE_NAME, build_archive
+from package import APP_VERSION, ARCHIVE_NAME
 
 HERE = pathlib.Path(__file__).parent
 DIST = HERE / "dist"
@@ -36,35 +36,25 @@ DIST = HERE / "dist"
 # Da sie go podac zmienna srodowiskowa, zeby nie edytowac kodu przy kazdym
 # wdrozeniu:  SITE_URL=https://poe.twojadomena.pl python build.py
 SITE_URL = os.environ.get("SITE_URL", "https://poe-price-check.pages.dev").rstrip("/")
-# Plik do pobrania serwujemy z wlasnej domeny. Cloudflare Pages przyjmuje pliki
-# do 25 MB, a nasz ma ~16 MB, wiec nie trzeba osobnego hostingu ani wydania
-# na GitHubie. Nazwa zawiera wersje, zeby dalo sie odroznic, co ktos pobral.
-#
-# Wydajemy ZIP, a nie samo .exe: przegladarki blokuja pobieranie niepodpisanych
-# plikow wykonywalnych z nowych domen znacznie ostrzej niz archiwow. Samego
-# SmartScreena przy uruchomieniu to NIE zalatwia - Windows przenosi znacznik
-# pochodzenia takze na pliki wypakowane - dlatego w srodku jest instrukcja.
-DOWNLOAD_FILE = ARCHIVE_NAME
-
-# Sciezka do gotowego .exe, ktory build.py spakuje do dist/download/.
-EXE_PATH = pathlib.Path(os.environ.get(
-    "EXE_PATH", HERE.parent / "dist" / "poe-price-check.exe"))
-
-# Znacznik tresci w adresie pobierania - z tego samego powodu co przy stylach.
-# Nazwa pliku nie zmienia sie miedzy poprawkami tej samej wersji, wiec bez tego
-# Cloudflare przez cztery godziny serwuje poprzedni build. Raz juz sie zdarzylo,
-# ze opublikowana paczka miala stara zawartosc mimo poprawnego wdrozenia.
-# Znacznik nie wplywa na nazwe, pod ktora plik sie zapisze u uzytkownika.
-EXE_HASH = (hashlib.sha256(EXE_PATH.read_bytes()).hexdigest()[:8]
-            if EXE_PATH.exists() else "")
-DOWNLOAD_URL = os.environ.get(
-    "DOWNLOAD_URL",
-    f"/download/{DOWNLOAD_FILE}" + (f"?v={EXE_HASH}" if EXE_HASH else ""))
-
 # Adres repozytorium. Puste = przycisk "kod zrodlowy" w ogole sie nie pokaze -
 # lepiej go nie miec niz miec taki, ktory prowadzi w 404.
 SOURCE_URL = os.environ.get(
     "SOURCE_URL", "https://github.com/Fearrrrrrrrrrwq/poe-price-check")
+
+# Pobieranie prowadzi do artefaktu z wydania na GitHubie, a nie do kopii
+# trzymanej tutaj.
+#
+# Powod jest konkretny: PyInstaller nie buduje bajt w bajt powtarzalnie, wiec
+# plik zbudowany lokalnie ma inna sume kontrolna niz ten z CI. Trzymanie
+# wlasnej kopii oznaczalo dwa rozne binaria pod ta sama wersja - a suma
+# kontrolna, ktora sie nie zgadza, jest gorsza niz jej brak.
+#
+# Skutek uboczny na plus: github.com ma reputacje, ktorej swieza domena nie ma,
+# wiec przegladarki rzadziej strasza przy pobieraniu.
+DOWNLOAD_FILE = ARCHIVE_NAME
+DOWNLOAD_URL = os.environ.get(
+    "DOWNLOAD_URL",
+    f"{SOURCE_URL}/releases/download/v{APP_VERSION}/{ARCHIVE_NAME}")
 
 # Wpis na liste preload jest praktycznie nieodwracalny - wykreslenie trwa
 # miesiacami, a do tego czasu przegladarki odmawiaja polaczenia po http z cala
@@ -225,7 +215,7 @@ def page(lang: str) -> str:
         <h1>{esc(title)}<span>{esc(lead)}</span></h1>
         <p class="lead">{esc(t['hero_lead'])}</p>
         <p class="actions">
-          <a class="btn primary" href="{DOWNLOAD_URL}" download>{esc(t["hero_cta"])}</a>
+          <a class="btn primary" href="{DOWNLOAD_URL}" rel="noopener noreferrer">{esc(t["hero_cta"])}</a>
           <span class="note">{esc(t['hero_note'])}</span>
         </p>
       </div>
@@ -287,7 +277,7 @@ def page(lang: str) -> str:
       <h2>{esc(t['download_title'])}</h2>
       <p class="body-text">{esc(t['download_body'])}</p>
       <p class="actions">
-        <a class="btn primary" href="{DOWNLOAD_URL}" download>{esc(t['download_cta'])}</a>
+        <a class="btn primary" href="{DOWNLOAD_URL}" rel="noopener noreferrer">{esc(t['download_cta'])}</a>
         {source_button(t)}
       </p>
     </div>
@@ -699,19 +689,6 @@ def build() -> None:
     icon = HERE.parent / "icon.png"
     if icon.exists():
         shutil.copy(icon, DIST / "assets" / "icon.png")
-
-    # Plik do pobrania. Bez niego strona reklamowalaby cos, czego nie ma -
-    # dlatego mowimy o tym glosno, a nie po cichu pomijamy.
-    if EXE_PATH.exists():
-        archive, checksum = build_archive(EXE_PATH, DIST / "download")
-        print(f"dolaczono plik do pobrania: {archive.name} "
-              f"({archive.stat().st_size / 1048576:.1f} MB)")
-        print(f"  suma SHA-256 pliku .exe: {checksum}")
-    else:
-        print(f"[uwaga] nie znalazlem {EXE_PATH} - przycisk pobierania "
-              f"bedzie prowadzil donikad.\n"
-              f"        Zbuduj go: python -m PyInstaller --noconfirm "
-              f"poe-price-check.spec")
 
     pages = len(LANGS) + 3  # jezyki + strona wejsciowa + panel + logowanie
     print(f"zbudowano {pages} stron w {DIST}")

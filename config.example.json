@@ -1,0 +1,43 @@
+{
+  "_comment": "Skopiuj ten plik na config.json i uzupelnij gdoc_id.",
+
+  "_language_comment": "en | pl | de | es | pt | ru. Puste = wykryj z ustawien Windows.",
+  "language": "",
+
+  "league": "auto",
+  "_search_status_comment": "securable = Instant Buyout | available = Instant Buyout and In Person | online = In Person (Online) | onlineleague = In Person (Online in League) | any = Any (tez offline)",
+  "search_status": "securable",
+  "user_agent": "poe-price-check/1.0 (+https://poepricecheck.eu)",
+  "poesessid": "",
+
+  "transport": "gdoc",
+  "_gdoc_comment": "Puste = przy pierwszym uruchomieniu pokaze sie kreator. Nie wpisuj tu placeholdera - kazdy dlugi ciag znakow przejdzie walidacje jako ID.",
+  "gdoc_id": "",
+  "appsscript_url": "",
+
+  "hotkey": "ctrl+d",
+  "local_clipboard_hotkey": "ctrl+alt+d",
+  "quit_hotkey": "ctrl+alt+q",
+  "overlay_hotkey": "f7",
+
+  "_telemetry_comment": "Anonimowy licznik uzyc: wersja, liga, liczba wycen. ZERO danych o przedmiotach, cenach i koncie. Bez telemetry_url nie wysyla sie nic. Ustaw telemetry na false, zeby wylaczyc.",
+  "telemetry": true,
+  "telemetry_url": "https://poepricecheck.eu/api/collect",
+
+  "max_listings": 10,
+  "_close_on_focus_loss_comment": "true = klikniecie poza okno je chowa. Ustaw false, jesli przeszkadza przy przechodzeniu do przegladarki.",
+  "close_on_focus_loss": true,
+
+  "_timing_comment": "Po wklejeniu program nie czeka sztywno, tylko odpytuje dokument i zamyka overlay, gdy tekst dotrze. Najwiekszy zapas siedzi w overlay_open_ms - to pierwsza wartosc do schodzenia w dol.",
+  "timing": {
+    "after_copy_ms": 250,
+    "overlay_open_ms": 1500,
+    "after_select_ms": 150,
+    "after_paste_ms": 200,
+    "after_close_ms": 200,
+    "overlay_poll_s": 4.0,
+    "poll_timeout_s": 12.0,
+    "poll_interval_s": 0.25,
+    "key_hold_ms": 60
+  }
+}

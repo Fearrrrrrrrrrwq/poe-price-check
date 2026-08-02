@@ -1,0 +1,420 @@
+/* PoE Price Check - strona.
+   Zero zewnetrznych zasobow: brak CDN, brak fontow Google. Mniej ryzyka,
+   mniej sledzenia, ostrzejsze CSP.
+
+   Uklad opiera sie na naprzemiennych pasach pelnej szerokosci. Przy jednym
+   odcieniu tla wszystko zlewalo sie w jedna plame, bo skoki miedzy poziomami
+   byly za male - dlatego bg / band / panel wyraznie sie od siebie roznia. */
+
+:root {
+  --bg: #14110d;      /* tlo strony */
+  --band: #1c1811;    /* co drugi pas */
+  --panel: #241f17;   /* kafelki */
+  --raise: #2c261c;   /* najazd */
+  --border: #3a3226;
+  --fg: #ded0b2;
+  --muted: #92866e;
+  --title: #f4e0af;
+  --accent: #c9a227;
+  --accent-hi: #e6bd3a;
+  --ok: #7fb069;
+  --radius: 10px;
+  --wrap: 1080px;
+  --narrow: 720px;
+}
+
+* { box-sizing: border-box; }
+/* Regula przegladarki dla [hidden] to zwykle "display: none" bez zadnej klasy,
+   wiec przegrywa z czymkolwiek w rodzaju ".btn { display: inline-block }" -
+   ukryty przycisk i tak byl widoczny. */
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font: 16px/1.7 "Segoe UI", system-ui, -apple-system, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.wrap { max-width: var(--wrap); margin: 0 auto; padding: 0 24px; }
+.wrap.narrow { max-width: var(--narrow); }
+.wrap.wide   { max-width: 1340px; }
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { color: var(--accent-hi); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 3px; }
+
+.skip {
+  position: absolute; left: -9999px; top: 0; z-index: 20;
+  background: var(--accent); color: var(--bg); padding: 12px 18px; font-weight: 600;
+}
+.skip:focus { left: 0; }
+
+/* --- gorny pasek --------------------------------------------------------- */
+.topbar {
+  position: sticky; top: 0; z-index: 10;
+  background: rgba(20, 17, 13, .88);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+.bar { display: flex; align-items: center; justify-content: space-between;
+       gap: 24px; height: 62px; }
+.brand { display: flex; align-items: center; gap: 10px; color: var(--title);
+         font-weight: 600; font-size: 15px; letter-spacing: -.01em; }
+.topbar nav { display: flex; align-items: center; gap: 26px; }
+.topbar nav a { color: var(--muted); font-size: 14px; }
+.topbar nav a:hover { color: var(--fg); }
+.topbar nav a.cta {
+  color: var(--bg); background: var(--accent); padding: 8px 16px;
+  border-radius: 7px; font-weight: 600;
+}
+.topbar nav a.cta:hover { background: var(--accent-hi); color: var(--bg); }
+@media (max-width: 720px) { .topbar nav a:not(.cta) { display: none; } }
+
+/* --- sekcja otwierajaca --------------------------------------------------- */
+.hero {
+  position: relative; overflow: hidden;
+  padding: 76px 0 84px;
+  border-bottom: 1px solid var(--border);
+}
+/* Delikatna poswiata daje glebie bez zadnego obrazka w tle. */
+.hero::before {
+  content: ""; position: absolute; inset: -40% 0 auto 50%;
+  width: 900px; height: 700px; transform: translateX(-50%);
+  background: radial-gradient(closest-side, rgba(201, 162, 39, .13), transparent 70%);
+  pointer-events: none;
+}
+.hero-grid {
+  position: relative; display: grid; gap: 48px; align-items: center;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr);
+}
+@media (max-width: 900px) {
+  .hero-grid { grid-template-columns: 1fr; gap: 36px; }
+  .hero { padding: 56px 0 64px; }
+}
+
+.badge {
+  display: inline-block; margin: 0 0 20px; padding: 6px 14px;
+  border: 1px solid var(--border); border-radius: 100px; background: var(--band);
+  color: var(--muted); font-size: 12.5px; letter-spacing: .02em;
+}
+h1 {
+  margin: 0 0 20px; font-size: clamp(32px, 4.6vw, 50px); line-height: 1.1;
+  color: var(--title); font-weight: 650; letter-spacing: -.022em;
+}
+h1 span {
+  display: block; margin-top: 8px; color: var(--fg); font-weight: 400;
+  font-size: clamp(21px, 2.7vw, 30px); line-height: 1.25; letter-spacing: -.01em;
+}
+.lead { font-size: 17.5px; color: var(--muted); max-width: 54ch; margin: 0 0 32px; }
+
+.actions { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin: 0; }
+.btn {
+  display: inline-block; padding: 13px 24px; border-radius: 8px;
+  border: 1px solid var(--border); background: var(--panel); color: var(--fg);
+  font-weight: 600; font-size: 15px; cursor: pointer;
+  transition: background .15s, transform .1s, border-color .15s;
+}
+.btn:hover { background: var(--raise); border-color: var(--muted); color: var(--fg); }
+.btn:active { transform: translateY(1px); }
+.btn.primary {
+  background: var(--accent); color: #17130c; border-color: var(--accent);
+  box-shadow: 0 6px 22px -10px rgba(201, 162, 39, .8);
+}
+.btn.primary:hover { background: var(--accent-hi); color: #17130c; }
+.note { color: var(--muted); font-size: 13.5px; }
+
+/* --- zrzuty aplikacji ------------------------------------------------------ */
+/* figure ma w przegladarkach wlasny margines 16px/40px - bez wyzerowania
+   zrzut byl wciety wzgledem tekstu obok. */
+.shot { position: relative; display: block; margin: 0; }
+.shot img {
+  display: block; width: 100%; height: auto; border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: 0 30px 70px -30px rgba(0, 0, 0, .95), 0 0 0 1px rgba(0, 0, 0, .35);
+}
+.hero-shot { justify-self: center; max-width: 420px; width: 100%; }
+.shot-small { max-width: 290px; width: 100%; justify-self: center; }
+
+/* --- pasy i naglowki ------------------------------------------------------- */
+section { padding: 72px 0; }
+.band { background: var(--band); border-block: 1px solid var(--border); }
+
+.eyebrow {
+  margin: 0 0 10px; font-size: 12px; font-weight: 700; letter-spacing: .11em;
+  text-transform: uppercase; color: var(--accent);
+}
+h2 {
+  margin: 0 0 20px; font-size: clamp(24px, 3vw, 31px); line-height: 1.2;
+  color: var(--title); font-weight: 650; letter-spacing: -.018em;
+}
+h3 { margin: 0 0 8px; font-size: 17px; color: var(--title); font-weight: 600; }
+p { margin: 0 0 16px; }
+.body-text { color: var(--muted); max-width: 64ch; }
+.solution {
+  color: var(--fg); border-left: 3px solid var(--accent);
+  padding-left: 16px; max-width: 64ch;
+}
+
+/* --- kroki ----------------------------------------------------------------- */
+.steps {
+  list-style: none; margin: 0; padding: 0; display: grid; gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
+  counter-reset: step;
+}
+.steps li {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px;
+}
+.num {
+  display: block; font-size: 30px; font-weight: 700; line-height: 1;
+  color: var(--accent); margin-bottom: 14px; font-variant-numeric: tabular-nums;
+}
+.steps p { color: var(--muted); margin: 0; font-size: 15px; }
+
+/* --- mozliwosci ------------------------------------------------------------ */
+/* Kafelkow jest cztery, wiec celujemy w 2x2. Przy trzech kolumnach czwarty
+   zostawal sam w drugim rzedzie i uklad wygladal na urwany.
+
+   min() jest tu konieczne: samo minmax(400px, 1fr) tworzy sciezke 400px takze
+   wtedy, gdy kontener ma mniej - na telefonie kafelki wychodzily poza ekran. */
+.features {
+  display: grid; gap: 18px;
+  grid-template-columns: repeat(auto-fit, minmax(min(400px, 100%), 1fr));
+}
+.feature {
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 24px;
+  transition: border-color .15s, transform .15s;
+}
+.feature:hover { border-color: var(--muted); transform: translateY(-2px); }
+.feature p { color: var(--muted); margin: 0; font-size: 15px; }
+
+/* --- prywatnosc ------------------------------------------------------------ */
+.split {
+  display: grid; gap: 44px; align-items: center;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
+}
+@media (max-width: 860px) { .split { grid-template-columns: 1fr; gap: 32px; } }
+.privacy-note {
+  border-left: 3px solid var(--ok); padding-left: 16px; color: var(--muted);
+  max-width: 58ch;
+}
+
+/* --- pytania --------------------------------------------------------------- */
+details {
+  border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--bg); padding: 16px 20px; margin-bottom: 10px;
+  transition: border-color .15s;
+}
+details[open] { border-color: var(--muted); }
+summary { cursor: pointer; color: var(--title); font-weight: 600; font-size: 16px;
+          list-style: none; display: flex; align-items: center; gap: 12px; }
+summary::-webkit-details-marker { display: none; }
+summary::before {
+  content: "+"; color: var(--accent); font-size: 19px; line-height: 1;
+  width: 16px; flex: none;
+}
+details[open] summary::before { content: "\2212"; }
+details p { color: var(--muted); margin: 12px 0 0 28px; max-width: 68ch; }
+
+/* --- pobieranie ------------------------------------------------------------ */
+.download { text-align: center; }
+.download .actions { justify-content: center; }
+.download .body-text { margin: 0 auto 26px; }
+
+/* --- stopka ---------------------------------------------------------------- */
+footer { border-top: 1px solid var(--border); padding: 32px 0 44px; background: var(--band); }
+.langs { display: flex; flex-wrap: wrap; gap: 10px 20px; margin-bottom: 18px; }
+.langs a { color: var(--muted); font-size: 14px; }
+.langs a:hover { color: var(--fg); }
+.langs a[aria-current] { color: var(--title); font-weight: 600; }
+.disclaimer { color: var(--muted); font-size: 12px; margin: 0; }
+
+/* --- strona wejsciowa ------------------------------------------------------- */
+.centre { display: grid; place-items: center; min-height: 100vh; text-align: center; }
+.centre h1 { font-size: 34px; }
+.langlist {
+  list-style: none; padding: 0; display: flex; flex-wrap: wrap;
+  gap: 12px; justify-content: center;
+}
+.langlist a {
+  display: inline-block; padding: 10px 18px; border: 1px solid var(--border);
+  border-radius: 8px; background: var(--panel); color: var(--fg);
+}
+.langlist a:hover { background: var(--raise); }
+
+/* --- panel administracyjny --------------------------------------------------- */
+.admin { padding: 36px 0 64px; }
+/* Na waskim ekranie znacznik czasu i login spychaly przycisk wylogowania poza
+   krawedz. Same przyciski musza zostac - opisy nie. */
+@media (max-width: 760px) {
+  .topbar nav .note { display: none; }
+  .topbar nav { gap: 10px; }
+}
+.admin h1 { font-size: 22px; margin: 0 0 18px; }
+.admin h2 { font-size: 15px; letter-spacing: .04em; text-transform: uppercase;
+            color: var(--muted); margin: 0 0 16px; font-weight: 600; }
+
+.gate {
+  display: grid; gap: 9px; max-width: 500px; background: var(--panel);
+  border: 1px solid var(--border); border-radius: var(--radius); padding: 24px;
+}
+.field { display: grid; gap: 6px; }
+.gate label { font-size: 11.5px; color: var(--muted); text-transform: uppercase;
+              letter-spacing: .07em; font-weight: 600; }
+.gate input {
+  background: var(--bg); border: 1px solid var(--border); border-radius: 7px;
+  color: var(--fg); padding: 11px 13px; font: inherit; font-size: 14px;
+  width: 100%;
+}
+.gate input:focus { border-color: var(--accent); outline: none; }
+.gate .btn { margin-top: 10px; justify-self: start; }
+.gate .note { font-size: 13px; margin: 4px 0 0; }
+
+/* To tez jest <label>, wiec bez tego dostaloby wersaliki po regule wyzej. */
+.gate .check {
+  display: flex; align-items: center; gap: 9px; margin-top: 4px;
+  font-size: 13px; text-transform: none; letter-spacing: normal;
+  font-weight: 400; color: var(--muted); cursor: pointer;
+}
+.gate .check input { width: auto; margin: 0; accent-color: var(--accent); }
+
+#frame {
+  width: 100%; height: 78vh; border: 1px solid var(--border);
+  border-radius: var(--radius); background: var(--panel); margin-top: 16px;
+}
+.error { color: #d17a6b; }
+
+/* Ostrzezenie o bledach - jedyny element, ktory ma prawo krzyczec. */
+.alert {
+  border-radius: var(--radius); padding: 14px 18px; margin-bottom: 22px;
+  border: 1px solid; font-size: 14.5px; line-height: 1.55;
+}
+.alert strong { font-weight: 700; }
+.alert.warn { border-color: #7a6320; background: #241d0d; color: #e0c163; }
+.alert.danger { border-color: #7a3327; background: #251310; color: #e09080; }
+
+/* Pasek narzedzi: zakladki i zakres w jednym rzedzie. Trzyma sie gory przy
+   przewijaniu, zeby przy dlugiej liscie rozkladow nie trzeba bylo wracac. */
+.toolbar {
+  position: sticky; top: 62px; z-index: 5;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 16px; flex-wrap: wrap; margin-bottom: 26px;
+  padding: 10px 0 12px;
+  background: linear-gradient(var(--bg) 70%, transparent);
+}
+
+/* Przelacznik segmentowy zamiast podkreslenia - czytelniej widac, ze to
+   dwa rownorzedne widoki, a nie zakladka i podzakladka. */
+.tabs {
+  display: inline-flex; gap: 2px; padding: 3px;
+  background: var(--panel); border: 1px solid var(--border); border-radius: 11px;
+}
+/* Oba przelaczniki stoja obok siebie, wiec musza miec identyczna wysokosc -
+   inaczej para pigulek wyglada na zlozona z przypadkowych czesci. */
+.tab, .range {
+  appearance: none; background: none; border: none; border-radius: 8px;
+  color: var(--muted); font: inherit; font-size: 13.5px; font-weight: 600;
+  line-height: 22px; padding: 7px 18px; cursor: pointer;
+  transition: color .15s, background .15s;
+}
+.tab:hover { color: var(--fg); }
+.tab[aria-selected="true"] {
+  color: var(--title); background: var(--raise);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .05);
+}
+
+.ranges { display: inline-flex; gap: 2px; padding: 3px; flex-wrap: wrap;
+          background: var(--panel); border: 1px solid var(--border);
+          border-radius: 11px; }
+.range:hover { background: none; color: var(--fg); border-color: transparent; }
+.range[aria-pressed="true"] {
+  background: var(--accent); color: #17130c; border-color: transparent;
+}
+.range[aria-pressed="true"]:hover { background: var(--accent-hi); color: #17130c; }
+
+.tiles {
+  display: grid; gap: 14px; margin-bottom: 22px;
+  grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr));
+}
+.tile {
+  position: relative; overflow: hidden;
+  background: linear-gradient(160deg, var(--panel), var(--bg));
+  border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px;
+  display: flex; flex-direction: column; gap: 5px;
+  transition: border-color .15s, transform .15s;
+}
+.tile:hover { border-color: #4a4133; transform: translateY(-1px); }
+/* Cienka kreska u gory - drobiazg, ale kafelki przestaja byc plaskimi pudelkami. */
+.tile::before {
+  content: ""; position: absolute; inset: 0 0 auto 0; height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(201, 162, 39, .35), transparent);
+}
+.tile-label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em;
+              color: var(--muted); font-weight: 700; }
+.tile b {
+  font-size: 32px; color: var(--title); font-weight: 600; line-height: 1.1;
+  font-variant-numeric: tabular-nums; letter-spacing: -.02em;
+}
+.tile b.warn { color: #e0c163; }
+.tile b.bad { color: #e09080; }
+.tile-note { font-size: 12.5px; color: var(--muted); }
+
+.card {
+  background: var(--panel); border: 1px solid var(--border);
+  border-radius: 14px; padding: 24px; margin-bottom: 16px;
+}
+.splits {
+  display: grid; gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(min(360px, 100%), 1fr));
+}
+.splits .card { margin: 0; }
+
+/* Pusty wykres wyglada jak zepsuty, wiec zamiast siatki bez slupkow
+   pokazujemy komunikat. */
+.empty {
+  display: grid; place-items: center; min-height: 150px; text-align: center;
+  color: var(--muted); font-size: 14px;
+  border: 1px dashed var(--border); border-radius: 10px;
+}
+
+.legend { display: flex; align-items: center; gap: 8px; margin: -8px 0 14px;
+          font-size: 12.5px; color: var(--muted); }
+.key { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+.key-users, .key-checks { background: #5c7f9e; }
+.key-fresh { background: var(--accent); }
+.key-fail { background: #b5544a; }
+.legend .key:not(:first-child) { margin-left: 10px; }
+
+/* Wykres skaluje sie proporcjonalnie przez viewBox - wysokosc wynika
+   z szerokosci karty, wiec napisy nie sa sciesnione. */
+.chart svg { display: block; width: 100%; height: auto; }
+.grid { stroke: var(--border); stroke-width: 1; }
+.axis { fill: var(--muted); font-size: 11px; text-anchor: middle; }
+.peak { text-anchor: start; }
+.bar-main { fill: #5c7f9e; }
+.bar-accent { fill: var(--accent); }
+.bar-bad { fill: #b5544a; }
+
+.bar-row {
+  display: grid; grid-template-columns: minmax(90px, 1fr) 2fr auto;
+  align-items: center; gap: 14px; margin-bottom: 11px; font-size: 13.5px;
+}
+.bar-row:last-child { margin-bottom: 0; }
+.bar-name { color: var(--fg); overflow: hidden; text-overflow: ellipsis;
+            white-space: nowrap; }
+.bar-track { background: var(--bg); border-radius: 99px; height: 7px;
+             overflow: hidden; }
+.bar-fill { display: block; height: 100%; border-radius: 99px;
+            background: linear-gradient(90deg, #a8871f, var(--accent)); }
+.bar-count { color: var(--muted); font-variant-numeric: tabular-nums;
+             white-space: nowrap; font-size: 12.5px; }
+
+#meta { font-size: 12.5px; margin-top: 14px; }

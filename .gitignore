@@ -1,0 +1,29 @@
+# --- rzeczy prywatne: NIGDY do repozytorium -------------------------------
+# config.json powstaje z config.example.json i zawiera identyfikator
+# dokumentu-mostu uzytkownika. Sam plik przykladowy jest wersjonowany.
+config.json
+*.log
+web/.setup-token
+web/.dev.vars
+web/.salt-set
+
+# --- wyniki budowania ------------------------------------------------------
+dist/
+build/
+release/
+__pycache__/
+*.pyc
+*.spec.bak
+
+# --- zaleznosci i stan lokalny --------------------------------------------
+node_modules/
+web/.wrangler/
+.cache/
+.venv/
+venv/
+
+# --- edytory i system ------------------------------------------------------
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini

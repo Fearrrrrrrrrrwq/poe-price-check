@@ -1,0 +1,38 @@
+<!-- Strona mostu dla bridge_appsscript.gs. W projekcie Apps Script dodaj plik
+     HTML o nazwie "page" i wklej tu ta zawartosc. -->
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top" />
+    <style>
+      html, body { margin: 0; height: 100%; background: #14110d; }
+      textarea {
+        width: 100%; height: 100%; box-sizing: border-box; border: 0;
+        padding: 12px; resize: none; outline: none;
+        background: #14110d; color: #c8b48a;
+        font: 14px/1.45 Consolas, "Courier New", monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <textarea id="pad" autofocus spellcheck="false"
+              placeholder="Wklej tu przedmiot (Ctrl+V)"></textarea>
+    <script>
+      var pad = document.getElementById('pad');
+      var timer = null;
+
+      // Zapis z debounce - inaczej kazde nacisniecie klawisza to osobne
+      // wywolanie serwera i Apps Script zaczyna gubic requesty.
+      function scheduleSave() {
+        clearTimeout(timer);
+        timer = setTimeout(function () {
+          google.script.run.save(pad.value);
+        }, 250);
+      }
+
+      pad.addEventListener('input', scheduleSave);
+      pad.addEventListener('paste', function () { setTimeout(scheduleSave, 0); });
+      pad.focus();
+    </script>
+  </body>
+</html>

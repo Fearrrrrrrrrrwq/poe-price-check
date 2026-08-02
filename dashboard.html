@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PoE Price Check — statystyki</title>
+<style>
+  :root{
+    --bg:#16130f; --panel:#1e1a14; --row:#241f18; --border:#332c22;
+    --fg:#d8c9a8; --muted:#8a7c64; --title:#f0d9a4; --accent:#c9a227;
+    --ok:#7fb069; --warn:#d99a3c; --err:#c76a5c;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--fg);
+       font:14px/1.5 "Segoe UI",system-ui,sans-serif;padding:28px 20px 48px}
+  .wrap{max-width:960px;margin:0 auto}
+
+  header{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:24px}
+  h1{font-size:22px;margin:0;color:var(--title);font-weight:600}
+  .sub{color:var(--muted);font-size:12px}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--ok);
+       display:inline-block;margin-right:6px}
+
+  .grid{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+        margin-bottom:22px}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:6px;
+        padding:14px 16px}
+  .card .num{font-size:28px;color:var(--title);font-weight:600;line-height:1.15}
+  .card .cap{font-size:11px;color:var(--muted);text-transform:uppercase;
+             letter-spacing:.04em;margin-top:2px}
+  .card.accent{border-left:3px solid var(--accent)}
+  .card.good{border-left:3px solid var(--ok)}
+  .card.bad{border-left:3px solid var(--err)}
+
+  h2{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;
+     margin:26px 0 10px;font-weight:600}
+
+  .chart{background:var(--panel);border:1px solid var(--border);border-radius:6px;
+         padding:18px 16px 10px}
+  .bars{display:flex;align-items:flex-end;gap:4px;height:130px}
+  .bar{flex:1;background:var(--accent);border-radius:2px 2px 0 0;min-height:2px;
+       position:relative;opacity:.85;transition:opacity .15s}
+  .bar:hover{opacity:1}
+  .bar span{position:absolute;top:-18px;left:50%;transform:translateX(-50%);
+            font-size:10px;color:var(--title);opacity:0;transition:opacity .15s}
+  .bar:hover span{opacity:1}
+  .xaxis{display:flex;gap:4px;margin-top:6px}
+  .xaxis div{flex:1;text-align:center;font-size:9px;color:var(--muted)}
+
+  .cols{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+  table{width:100%;border-collapse:collapse;background:var(--panel);
+        border:1px solid var(--border);border-radius:6px;overflow:hidden}
+  th{text-align:left;font-size:10px;color:var(--muted);text-transform:uppercase;
+     letter-spacing:.05em;padding:9px 12px;font-weight:600;border-bottom:1px solid var(--border)}
+  td{padding:7px 12px;font-size:13px}
+  tr:nth-child(even) td{background:var(--row)}
+  td.n{text-align:right;color:var(--title);font-variant-numeric:tabular-nums}
+  .barcell{height:4px;background:var(--accent);border-radius:2px;display:block;
+           margin-top:4px;opacity:.6}
+
+  footer{margin-top:32px;color:var(--muted);font-size:11px;
+         border-top:1px solid var(--border);padding-top:14px}
+  .empty{color:var(--muted);text-align:center;padding:40px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>PoE Price Check</h1>
+    <span class="sub"><span class="dot"></span><span id="updated"></span></span>
+  </header>
+
+  <div class="grid" id="cards"></div>
+
+  <h2>Aktywni użytkownicy — ostatnie 14 dni</h2>
+  <div class="chart">
+    <div class="bars" id="bars"></div>
+    <div class="xaxis" id="xaxis"></div>
+  </div>
+
+  <h2>Rozkłady</h2>
+  <div class="cols" id="tables"></div>
+
+  <footer id="footer"></footer>
+</div>
+
+<script>
+// Podmieniane przez Apps Script. Tutaj dane przykladowe do podgladu.
+var DATA = __DATA__;
+
+function el(tag, cls, text){
+  var node = document.createElement(tag);
+  if (cls) node.className = cls;
+  if (text !== undefined) node.textContent = text;
+  return node;
+}
+
+function card(num, caption, variant){
+  var box = el('div', 'card' + (variant ? ' ' + variant : ''));
+  box.appendChild(el('div', 'num', num));
+  box.appendChild(el('div', 'cap', caption));
+  return box;
+}
+
+function pct(part, whole){
+  return whole ? Math.round(part / whole * 100) : 0;
+}
+
+(function render(){
+  document.getElementById('updated').textContent =
+    'zaktualizowano ' + DATA.updated;
+
+  var successRate = pct(DATA.checks, DATA.checks + DATA.failures);
+  var perUser = DATA.users_total ? (DATA.checks / DATA.users_total).toFixed(1) : '0';
+
+  var cards = document.getElementById('cards');
+  [
+    [DATA.users_today, 'użytkowników dziś', 'accent'],
+    [DATA.users_week, 'użytkowników w 7 dni', ''],
+    [DATA.users_total, 'użytkowników łącznie', ''],
+    [DATA.checks.toLocaleString('pl'), 'wycen łącznie', ''],
+    [successRate + '%', 'skuteczność wycen', successRate >= 90 ? 'good' : 'bad'],
+    [perUser, 'wycen na użytkownika', ''],
+  ].forEach(function(row){ cards.appendChild(card(row[0], row[1], row[2])); });
+
+  // --- wykres dzienny
+  var bars = document.getElementById('bars');
+  var axis = document.getElementById('xaxis');
+  var peak = Math.max.apply(null, DATA.daily.map(function(d){ return d.users; })) || 1;
+  DATA.daily.forEach(function(day, index){
+    var bar = el('div', 'bar');
+    bar.style.height = Math.max(2, day.users / peak * 100) + '%';
+    bar.appendChild(el('span', '', day.users));
+    bar.title = day.date + ': ' + day.users;
+    bars.appendChild(bar);
+    // Co druga etykieta, zeby sie nie zlewaly.
+    axis.appendChild(el('div', '', index % 2 ? '' : day.date.slice(5)));
+  });
+
+  // --- rozklady
+  var tables = document.getElementById('tables');
+  [
+    ['Wersje', DATA.versions],
+    ['Języki', DATA.languages],
+    ['Ligi', DATA.leagues],
+    ['System', DATA.systems],
+  ].forEach(function(pair){
+    var rows = pair[1];
+    if (!rows.length) return;
+    var total = rows.reduce(function(sum, r){ return sum + r.count; }, 0);
+    var table = el('table');
+    var head = el('tr');
+    head.appendChild(el('th', '', pair[0]));
+    var right = el('th', '', 'użytk.');
+    right.style.textAlign = 'right';
+    head.appendChild(right);
+    table.appendChild(head);
+    rows.forEach(function(row){
+      var tr = el('tr');
+      var name = el('td', '', row.name || '(brak)');
+      var meter = el('span', 'barcell');
+      meter.style.width = pct(row.count, total) + '%';
+      name.appendChild(meter);
+      tr.appendChild(name);
+      tr.appendChild(el('td', 'n', row.count));
+      table.appendChild(tr);
+    });
+    tables.appendChild(table);
+  });
+
+  document.getElementById('footer').textContent =
+    DATA.pings + ' sygnałów · średnia sesja ' + DATA.avg_session + ' min · ' +
+    'dane anonimowe, bez informacji o przedmiotach i kontach';
+})();
+</script>
+</body>
+</html>

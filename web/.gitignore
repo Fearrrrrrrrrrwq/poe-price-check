@@ -1,0 +1,9 @@
+# Zawiera identyfikator konkretnej bazy D1 - kazdy ma swoja.
+wrangler.toml
+node_modules/
+.wrangler/
+.dev.vars
+.setup-token
+.salt-set
+dist/
+__pycache__/

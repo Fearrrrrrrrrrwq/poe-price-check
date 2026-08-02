@@ -16,7 +16,7 @@ import json
 import re
 import statistics
 import time
-from collections import Counter
+from collections import Counter, deque
 from dataclasses import dataclass
 from datetime import datetime, timezone
 
@@ -313,40 +313,104 @@ class SearchResult:
         return text
 
 
+def _policy_of(url: str) -> str:
+    """Nazwa polityki limitow dla adresu: 'search', 'fetch', 'exchange', 'data'."""
+    tail = url.split("/api/trade/", 1)[-1]
+    return tail.split("/", 1)[0] or "other"
+
+
 class RateLimiter:
-    """Prosty limiter oparty o naglowki X-Rate-Limit-* zwracane przez GGG."""
+    """Limiter na oknach przesuwnych, liczony OSOBNO dla kazdego endpointu.
 
-    def __init__(self) -> None:
-        self._wait_until = 0.0
+    Poprzednia wersja trzymala jeden wspolny licznik i zwalniala dopiero przy
+    80% wykorzystania okna, dokladajac srednie odstepy. Nie dzialalo z dwoch
+    powodow:
 
-    def wait(self) -> None:
-        delay = self._wait_until - time.monotonic()
+    * GGG stosuje inne limity dla /search, /fetch i /exchange, a naglowki
+      opisuja tylko ten endpoint, ktory wlasnie odpowiedzial - wspolny licznik
+      mieszal je ze soba,
+    * reakcja przy 80% jest spozniona. Zanim odpowiedz z takim naglowkiem
+      wrocila, kolejne zapytania juz poszly i okno bylo przepelnione.
+
+    W praktyce konczylo sie to bledem 429 i szescdziesieciosekundowa blokada
+    juz po trzech wycenach.
+
+    Teraz prowadzimy wlasny dziennik wyslanych zapytan i przed kazdym kolejnym
+    sprawdzamy, czy zmiesci sie w KAZDEJ regule. Jesli nie - czekamy dokladnie
+    tyle, ile trzeba, zeby najstarsze zapytanie wypadlo z okna.
+    """
+
+    # Zostawiamy jedno zapytanie zapasu w kazdym oknie: nasz zegar i zegar GGG
+    # nie sa zsynchronizowane, a blokada kosztuje minute.
+    SAFETY = 1
+
+    # Zanim poznamy prawdziwe reguly (pierwsza odpowiedz), zakladamy ostroznie.
+    DEFAULT_RULES = ((6, 10),)
+
+    def __init__(self, on_wait=None) -> None:
+        self._rules: dict[str, tuple[tuple[int, int], ...]] = {}
+        self._sent: dict[str, deque[float]] = {}
+        self._blocked_until: dict[str, float] = {}
+        # Wywolanie zwrotne do interfejsu. Bez niego dluzsze czekanie wyglada
+        # jak zawieszony program - a to najczestsza skarga, jaka dostajemy.
+        self._on_wait = on_wait
+
+    def wait(self, policy: str) -> None:
+        now = time.monotonic()
+        rules = self._rules.get(policy, self.DEFAULT_RULES)
+        sent = self._sent.setdefault(policy, deque())
+
+        # Wpisy starsze niz najdluzsze okno nie maja juz znaczenia.
+        horizon = max(period for _, period in rules)
+        while sent and now - sent[0] > horizon:
+            sent.popleft()
+
+        until = self._blocked_until.get(policy, 0.0)
+        for limit, period in rules:
+            budget = max(1, limit - self.SAFETY)
+            window = [stamp for stamp in sent if now - stamp < period]
+            if len(window) >= budget:
+                # Wolne miejsce zrobi sie, gdy najstarsze zapytanie z okna
+                # przestanie sie liczyc.
+                until = max(until, window[-budget] + period)
+
+        delay = until - time.monotonic()
         if delay > 0:
-            time.sleep(delay)
+            # Spimy sekundowymi kawalkami i po kazdym odswiezamy odliczanie.
+            # Jedno dlugie sleep() daloby ten sam efekt co teraz: martwe okno.
+            deadline = time.monotonic() + delay
+            while True:
+                left = deadline - time.monotonic()
+                if left <= 0:
+                    break
+                if self._on_wait and delay >= 1:
+                    self._on_wait(int(left) + 1)
+                time.sleep(min(1.0, left))
+        sent.append(time.monotonic())
 
-    def update(self, response: requests.Response) -> None:
+    def update(self, policy: str, response: requests.Response) -> None:
         if response.status_code == 429:
             retry_after = float(response.headers.get("Retry-After", "60"))
-            self._wait_until = time.monotonic() + retry_after
+            self._blocked_until[policy] = time.monotonic() + retry_after
             return
 
-        # Naglowki maja postac "hits:period:ban,hits:period:ban".
+        # Naglowki maja postac "hits:period:ban,hits:period:ban". Bierzemy
+        # sumę wszystkich zakresow - i tak sprawdzamy kazda regule osobno,
+        # wiec najostrzejsza zadziala sama z siebie.
+        found: list[tuple[int, int]] = []
         for scope in ("Ip", "Account", "Client"):
-            rules = response.headers.get(f"X-Rate-Limit-{scope}")
-            state = response.headers.get(f"X-Rate-Limit-{scope}-State")
-            if not rules or not state:
+            spec = response.headers.get(f"X-Rate-Limit-{scope}")
+            if not spec:
                 continue
-            for rule, current in zip(rules.split(","), state.split(",")):
+            for rule in spec.split(","):
                 try:
-                    limit, period, _ = (int(x) for x in rule.split(":"))
-                    hits, _, _ = (int(x) for x in current.split(":"))
+                    limit, period, _ = (int(part) for part in rule.split(":"))
                 except ValueError:
                     continue
-                # Przy 80% wykorzystania okna zwalniamy, zeby nie oberwac banem.
-                if limit and hits >= limit * 0.8:
-                    self._wait_until = max(
-                        self._wait_until, time.monotonic() + period / max(limit, 1)
-                    )
+                if limit > 0 and period > 0:
+                    found.append((limit, period))
+        if found:
+            self._rules[policy] = tuple(found)
 
 
 class TradeClient:
@@ -356,6 +420,7 @@ class TradeClient:
         user_agent: str,
         poesessid: str = "",
         status: str = "securable",
+        on_wait=None,
     ) -> None:
         self.league = league
         # Odpowiednik listy "status" na stronie trade'a. Identyfikatory nie sa
@@ -374,7 +439,7 @@ class TradeClient:
         })
         if poesessid:
             self.session.cookies.set("POESESSID", poesessid, domain=".pathofexile.com")
-        self.limiter = RateLimiter()
+        self.limiter = RateLimiter(on_wait=on_wait)
         self.rates = CurrencyRates(self, league, CACHE_DIR)
         self._stat_index: dict[str, str] | None = None
         self._stat_local: dict[str, str] | None = None
@@ -386,7 +451,9 @@ class TradeClient:
     # ---------------------------------------------------------------- requests
 
     def _request(self, method: str, url: str, **kwargs) -> dict:
-        self.limiter.wait()
+        # Kazdy endpoint ma wlasny limit, wiec i wlasny licznik.
+        policy = _policy_of(url)
+        self.limiter.wait(policy)
         try:
             response = self.session.request(method, url, timeout=20, **kwargs)
         except requests.RequestException as exc:
@@ -397,7 +464,7 @@ class TradeClient:
                 f"Brak polaczenia z pathofexile.com ({type(exc).__name__}). "
                 "Sprawdz siec i sprobuj ponownie."
             ) from exc
-        self.limiter.update(response)
+        self.limiter.update(policy, response)
 
         if response.status_code == 429:
             raise TradeError(

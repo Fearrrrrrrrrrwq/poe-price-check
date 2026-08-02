@@ -106,6 +106,7 @@ STRINGS["en"] = {
     "res.open_trade": "Open on pathofexile.com/trade  →",
     "res.exchange": "bulk exchange",
     "res.offers": "{n} offers",
+    "res.rate_wait": "Path of Exile limits how often you may search - {n} s left",
 
     # kolumny
     "col.price": "Price",
@@ -220,6 +221,7 @@ STRINGS["pl"] = {
     "res.open_trade": "Otwórz na pathofexile.com/trade  →",
     "res.exchange": "giełda wymiany",
     "res.offers": "{n} ofert",
+    "res.rate_wait": "Path of Exile ogranicza częstotliwość wyszukiwań - jeszcze {n} s",
 
     "col.price": "Cena",
     "col.div": "≈div",
@@ -330,6 +332,7 @@ STRINGS["de"] = {
     "res.open_trade": "Auf pathofexile.com/trade öffnen  →",
     "res.exchange": "Massenhandel",
     "res.offers": "{n} Angebote",
+    "res.rate_wait": "Path of Exile begrenzt die Suchhäufigkeit - noch {n} s",
 
     "col.price": "Preis",
     "col.div": "≈div",
@@ -439,6 +442,7 @@ STRINGS["es"] = {
     "res.open_trade": "Abrir en pathofexile.com/trade  →",
     "res.exchange": "intercambio masivo",
     "res.offers": "{n} ofertas",
+    "res.rate_wait": "Path of Exile limita la frecuencia de búsqueda - quedan {n} s",
 
     "col.price": "Precio",
     "col.div": "≈div",
@@ -548,6 +552,7 @@ STRINGS["pt"] = {
     "res.open_trade": "Abrir em pathofexile.com/trade  →",
     "res.exchange": "troca em massa",
     "res.offers": "{n} ofertas",
+    "res.rate_wait": "Path of Exile limita a frequência de busca - faltam {n} s",
 
     "col.price": "Preço",
     "col.div": "≈div",
@@ -657,6 +662,7 @@ STRINGS["ru"] = {
     "res.open_trade": "Открыть на pathofexile.com/trade  →",
     "res.exchange": "обмен валют",
     "res.offers": "{n} предложений",
+    "res.rate_wait": "Path of Exile ограничивает частоту поиска - осталось {n} с",
 
     "col.price": "Цена",
     "col.div": "≈div",

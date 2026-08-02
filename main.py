@@ -130,6 +130,10 @@ class PriceChecker:
             user_agent=config["user_agent"],
             poesessid=config.get("poesessid", ""),
             status=config.get("search_status", "any"),
+            # Limity GGG potrafia wymusic kilkanascie sekund przerwy. Bez tego
+            # komunikatu okno po prostu zamiera i wyglada na zawieszone.
+            on_wait=lambda left: self.events.put(
+                ("status", t("res.rate_wait", n=left))),
         )
         self.timing = build_timing(config.get("timing", {}))
         self.events: queue.Queue[tuple] = queue.Queue()

@@ -42,6 +42,15 @@ jobs:
       - name: Kompilacja wszystkich modulow
         run: python -m compileall -q . -x "(web[\\/]dist|build|dist|node_modules)"
 
+      # Kompilacja NIE wystarczy. Odwolanie w przod w adnotacji - list[Listing]
+      # przed definicja klasy - kompiluje sie bez slowa, a wywala dopiero przy
+      # imporcie, i tylko na Pythonie starszym niz 3.14. Dokladnie tak wyszlo
+      # wydanie, ktore w ogole nie startowalo, mimo ze lokalnie dzialalo.
+      - name: Import modulow
+        run: >
+          python -c "import applog, bridge, currency, i18n, item_parser,
+          package, paths, pseudo_stats, telemetry, theme, trade_api, winutil"
+
   release:
     name: wydanie
     if: startsWith(github.ref, 'refs/tags/v')

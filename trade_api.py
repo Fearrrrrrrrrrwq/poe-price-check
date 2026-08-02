@@ -7,6 +7,11 @@ Uwaga na limity zapytan - GGG zwraca naglowki X-Rate-Limit-* i potrafi zbanowac
 IP na endpoincie. Klient sam sie przyhamowuje na podstawie tych naglowkow.
 """
 
+# Adnotacje jako tekst, nie wyliczane od razu. Bez tego odwolanie w przod
+# (np. list[Listing] przed definicja klasy) wywala import na Pythonie
+# starszym niz 3.14 - dokladnie tak padl build z CI, ktory uzywa 3.12.
+from __future__ import annotations
+
 import json
 import re
 import statistics

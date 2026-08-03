@@ -102,6 +102,8 @@ C["en"] = {
     "download_body": "One file. Run it, the wizard does the rest.",
     "download_cta": "Download for Windows",
     "download_alt": "Source code",
+    "discord_cta": "Join the Discord",
+    "discord_body": "Questions, bug reports and news about new versions - the Discord is the fastest way to reach me.",
     "footer_disclaimer": "This product isn't affiliated with or endorsed by Grinding "
                          "Gear Games in any way.",
     "footer_lang": "Language",
@@ -188,6 +190,8 @@ C["pl"] = {
     "download_body": "Jeden plik. Uruchom, resztą zajmie się kreator.",
     "download_cta": "Pobierz na Windows",
     "download_alt": "Kod źródłowy",
+    "discord_cta": "Wbij na Discorda",
+    "discord_body": "Pytania, zgłoszenia błędów i informacje o nowych wersjach - na Discordzie złapiesz mnie najszybciej.",
     "footer_disclaimer": "This product isn't affiliated with or endorsed by Grinding "
                          "Gear Games in any way.",
     "footer_lang": "Język",
@@ -273,6 +277,8 @@ C["de"] = {
     "download_body": "Eine Datei. Starten, den Rest macht der Assistent.",
     "download_cta": "Für Windows herunterladen",
     "download_alt": "Quellcode",
+    "discord_cta": "Discord beitreten",
+    "discord_body": "Fragen, Fehlermeldungen und Neuigkeiten zu neuen Versionen - über Discord erreichst du mich am schnellsten.",
     "footer_disclaimer": "This product isn't affiliated with or endorsed by Grinding "
                          "Gear Games in any way.",
     "footer_lang": "Sprache",
@@ -358,6 +364,8 @@ C["es"] = {
     "download_body": "Un archivo. Ejecútalo y el asistente hace el resto.",
     "download_cta": "Descargar para Windows",
     "download_alt": "Código fuente",
+    "discord_cta": "Únete al Discord",
+    "discord_body": "Preguntas, informes de errores y novedades sobre nuevas versiones: en Discord me localizas más rápido.",
     "footer_disclaimer": "This product isn't affiliated with or endorsed by Grinding "
                          "Gear Games in any way.",
     "footer_lang": "Idioma",
@@ -442,6 +450,8 @@ C["pt"] = {
     "download_body": "Um arquivo. Execute e o assistente faz o resto.",
     "download_cta": "Baixar para Windows",
     "download_alt": "Código-fonte",
+    "discord_cta": "Entre no Discord",
+    "discord_body": "Dúvidas, relatos de erros e novidades sobre novas versões - no Discord você me encontra mais rápido.",
     "footer_disclaimer": "This product isn't affiliated with or endorsed by Grinding "
                          "Gear Games in any way.",
     "footer_lang": "Idioma",
@@ -526,6 +536,8 @@ C["ru"] = {
     "download_body": "Один файл. Запустите - остальное сделает мастер.",
     "download_cta": "Скачать для Windows",
     "download_alt": "Исходный код",
+    "discord_cta": "Зайти в Discord",
+    "discord_body": "Вопросы, сообщения об ошибках и новости о новых версиях - в Discord ответ придёт быстрее всего.",
     "footer_disclaimer": "This product isn't affiliated with or endorsed by Grinding "
                          "Gear Games in any way.",
     "footer_lang": "Язык",

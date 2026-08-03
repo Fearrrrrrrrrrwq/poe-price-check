@@ -128,6 +128,22 @@ h1 span {
   box-shadow: 0 6px 22px -10px rgba(201, 162, 39, .8);
 }
 .btn.primary:hover { background: var(--accent-hi); color: #17130c; }
+
+/* Discord: firmowy blend, ale przygaszony do ciemnego tla strony. Pelne
+   #5865F2 obok zoltego akcentu bilo sie o uwage z glownym przyciskiem
+   pobierania, a to on ma byc pierwszy. */
+.btn.discord {
+  display: inline-flex; align-items: center; gap: 9px;
+  border-color: rgba(88, 101, 242, .55); color: #b9c0fb;
+}
+.btn.discord:hover {
+  background: rgba(88, 101, 242, .14);
+  border-color: rgba(88, 101, 242, .9); color: #dfe3ff;
+}
+.btn.discord .ico { flex: none; }
+.discord-note { margin: 14px 0 0; }
+.footer-cta { margin: 18px 0 0; }
+
 .note { color: var(--muted); font-size: 13.5px; }
 
 /* --- zrzuty aplikacji ------------------------------------------------------ */

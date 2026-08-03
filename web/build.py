@@ -42,6 +42,15 @@ SITE_URL = os.environ.get("SITE_URL", "https://poe-price-check.pages.dev").rstri
 SOURCE_URL = os.environ.get(
     "SOURCE_URL", "https://github.com/Fearrrrrrrrrrwq/poe-price-check")
 
+# Zaproszenie na Discorda. Puste = przycisk w ogole sie nie pokaze, tak samo jak
+# przy adresie repozytorium - lepiej go nie miec niz miec martwy.
+#
+# Zaproszenia Discorda potrafia wygasnac. To jest ustawione jako bezterminowe,
+# ale gdyby kiedys przestalo dzialac, podmiana idzie tutaj albo zmienna
+# srodowiskowa DISCORD_URL - bez szukania po szablonach stron.
+DISCORD_URL = os.environ.get(
+    "DISCORD_URL", "https://discord.gg/FjAnFqGNh4")
+
 # Pobieranie prowadzi do artefaktu z wydania na GitHubie, a nie do kopii
 # trzymanej tutaj.
 #
@@ -135,6 +144,31 @@ def source_button(t: dict) -> str:
         return ""
     return (f'<a class="btn" href="{SOURCE_URL}" rel="noopener noreferrer">'
             f'{esc(t["download_alt"])}</a>')
+
+
+# Znak Discorda wklejony wprost w HTML, a nie jako <img>. Powod jest taki sam
+# jak przy reszcie zasobow: to jedno zapytanie mniej, ikona nie mrugnie przed
+# zaladowaniem, a CSP nie musi dopuszczac zadnego zewnetrznego zrodla.
+DISCORD_MARK = (
+    '<svg class="ico" viewBox="0 0 24 18" width="18" height="14" aria-hidden="true"'
+    ' focusable="false"><path fill="currentColor" d="M20.3 1.6A19.8 19.8 0 0 0 15.4.1'
+    'a13.8 13.8 0 0 0-.6 1.3 18.3 18.3 0 0 0-5.5 0A13.6 13.6 0 0 0 8.6.1'
+    ' 19.7 19.7 0 0 0 3.7 1.6C.6 6.2-.3 10.7.2 15.1a19.9 19.9 0 0 0 6 3'
+    'c.5-.7.9-1.4 1.3-2.1a13 13 0 0 1-2-1c.2-.1.4-.3.5-.4a14.2 14.2 0 0 0 12.2 0'
+    'l.5.4c-.6.4-1.3.7-2 1 .4.7.8 1.4 1.3 2.1a19.8 19.8 0 0 0 6-3'
+    'c.6-5.1-.9-9.6-3.7-13.5ZM8.0 12.4c-1.2 0-2.2-1.1-2.2-2.4S6.8 7.6 8 7.6'
+    's2.2 1.1 2.2 2.4-1 2.4-2.2 2.4Zm8 0c-1.2 0-2.2-1.1-2.2-2.4s1-2.4 2.2-2.4'
+    ' 2.2 1.1 2.2 2.4-1 2.4-2.2 2.4Z"/></svg>')
+
+
+def discord_button(t: dict, primary: bool = False) -> str:
+    """Przycisk zaproszenia na Discorda - tylko gdy jest dokad kierowac."""
+    if not DISCORD_URL:
+        return ""
+    css = "btn discord primary" if primary else "btn discord"
+    return (f'<a class="{css}" href="{DISCORD_URL}" target="_blank"'
+            f' rel="noopener noreferrer">{DISCORD_MARK}'
+            f'<span>{esc(t["discord_cta"])}</span></a>')
 
 
 def lang_switch(current: str) -> str:
@@ -279,8 +313,10 @@ def page(lang: str) -> str:
       <p class="body-text">{esc(t['download_body'])}</p>
       <p class="actions">
         <a class="btn primary" href="{DOWNLOAD_URL}" rel="noopener noreferrer">{esc(t['download_cta'])}</a>
+        {discord_button(t)}
         {source_button(t)}
       </p>
+      <p class="note discord-note">{esc(t['discord_body'])}</p>
     </div>
   </section>
 </main>
@@ -288,6 +324,7 @@ def page(lang: str) -> str:
 <footer>
   <div class="wrap">
     <nav class="langs" aria-label="{esc(t['footer_lang'])}">{lang_switch(lang)}</nav>
+    <p class="footer-cta">{discord_button(t)}</p>
     <p class="disclaimer">{esc(t['footer_disclaimer'])}</p>
     <p class="disclaimer"><a href="{SOURCE_URL}/blob/main/SIGNING-POLICY.md"
        rel="noopener noreferrer">Code signing policy</a></p>

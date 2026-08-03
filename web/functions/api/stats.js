@@ -14,6 +14,11 @@ import { currentSession, json } from '../../lib/auth.js';
 const DAY = 86400000;
 const FAILURE_ALERT = 15;   // procent nieudanych wycen zapalajacy ostrzezenie
 const MIN_SAMPLE = 20;      // ponizej tylu prob odsetek nic nie znaczy
+// Drugi prog, na LICZBE INSTALACJI. Sam prog na liczbe prob nie wystarcza:
+// jedna osoba z gorszym kwadransem potrafila wygenerowac 39 prob i zapalic
+// czerwony baner "wysoki odsetek bledow" na cala strone. Awaria warta alarmu
+// dotyka wiecej niz jednej instalacji.
+const MIN_INSTALLS = 3;
 
 const BREAKDOWNS = [
   ['versions', 'version'],
@@ -57,7 +62,8 @@ export async function onRequestGet({ request, env }) {
   // pierwszy slupek pokazywalby urwany kawalek dnia.
   const from = Date.parse(isoDay(now - (days - 1) * DAY) + 'T00:00:00Z');
 
-  const [totals, session_, daily, firstSeen, returning, windows, ...splits] =
+  const [totals, session_, daily, firstSeen, returning, windows,
+         activeInstalls, errorKinds, ...splits] =
     await env.DB.batch([
       env.DB.prepare(
         `SELECT COUNT(DISTINCT install) AS total,
@@ -105,6 +111,23 @@ export async function onRequestGet({ request, env }) {
          FROM pings`
       ).bind(weekAgo, twoWeeksAgo),
 
+      // Ile ROZNYCH instalacji zlozylo sie na probki z okna alarmowego.
+      // Odsetek liczony z jednej instalacji nie mowi nic o stanie aplikacji.
+      env.DB.prepare(
+        `SELECT COUNT(DISTINCT install) AS installs FROM pings
+          WHERE at >= ?1 AND (checks > 0 OR failures > 0)`
+      ).bind(weekAgo),
+
+      // Rodzaje bledow z tego samego okna co odsetek - inaczej alert i lista
+      // przyczyn opisywalyby dwa rozne okresy.
+      env.DB.prepare(
+        `SELECT kind AS name,
+                SUM(count) AS count,
+                COUNT(DISTINCT install) AS installs
+           FROM errors WHERE at >= ?1
+          GROUP BY kind ORDER BY count DESC LIMIT 12`
+      ).bind(weekAgo),
+
       ...BREAKDOWNS.map(([, column]) => env.DB.prepare(
         `SELECT ${column} AS name, COUNT(DISTINCT install) AS count
            FROM pings GROUP BY ${column} ORDER BY count DESC LIMIT 8`
@@ -134,11 +157,17 @@ export async function onRequestGet({ request, env }) {
   const sampleNow = win.c_now + win.f_now;
   const samplePrev = win.c_prev + win.f_prev;
   const rate = sampleNow ? (win.f_now * 100) / sampleNow : 0;
-  const ratePrev = samplePrev ? (win.f_prev * 100) / samplePrev : 0;
+  // null, a NIE zero, gdy poprzedni tydzien jest pusty. Zero znaczy "bylo
+  // bezbledne", a brak danych znaczy "nie ma z czym porownac" - podstawienie
+  // zera pokazywalo skok "+17.9 pkt" wzgledem okresu, ktory nie istnial.
+  const ratePrev = samplePrev ? (win.f_prev * 100) / samplePrev : null;
+
+  const installsNow = activeInstalls.results[0].installs;
+  const solid = sampleNow >= MIN_SAMPLE && installsNow >= MIN_INSTALLS;
 
   let level = 'ok';
-  if (sampleNow >= MIN_SAMPLE && rate >= FAILURE_ALERT) level = 'alert';
-  else if (sampleNow >= MIN_SAMPLE && rate >= FAILURE_ALERT / 2) level = 'warn';
+  if (solid && rate >= FAILURE_ALERT) level = 'alert';
+  else if (solid && rate >= FAILURE_ALERT / 2) level = 'warn';
 
   const installs = sums.total;
   const newToday = byFirst.get(isoDay(now)) || 0;
@@ -169,9 +198,21 @@ export async function onRequestGet({ request, env }) {
     health: {
       level,
       rate: round(rate),
-      rate_previous: round(ratePrev),
+      rate_previous: ratePrev === null ? null : round(ratePrev),
       sample: sampleNow,
+      installs: installsNow,
+      // Najczestszy rodzaj bledu wprost z danych. Panel wypisywal tu wczesniej
+      // zdanie zaszyte na sztywno ("zmiana w API handlu"), ktorego nie mial
+      // z czego wyprowadzic - baza trzymala sam licznik, bez rodzaju.
+      top: errorKinds.results[0]
+        ? { name: errorKinds.results[0].name, count: errorKinds.results[0].count }
+        : null,
     },
+
+    errors: share(errorKinds.results).map((row, index) => ({
+      ...row,
+      installs: errorKinds.results[index].installs,
+    })),
 
     daily: series,
   };

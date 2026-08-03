@@ -101,10 +101,21 @@
 
     // Sama wartosc niewiele mowi - dopiero zmiana wzgledem poprzedniego
     // tygodnia pokazuje, czy cos wlasnie przestalo dzialac.
-    var delta = Math.round(((health.rate || 0) - (health.rate_previous || 0)) * 10) / 10;
-    setNote(root, 'failure_delta', health.sample
-      ? (delta > 0 ? '+' : '') + delta + ' pkt wobec poprz. tygodnia'
-      : 'za mało danych');
+    //
+    // Ale porownanie ma sens tylko wtedy, gdy poprzedni tydzien W OGOLE mial
+    // dane. Przy pustym okresie odniesienia serwer oddaje null, a nie zero -
+    // zero czytaloby sie jako "bylo bezbledne" i kazdy pierwszy tydzien
+    // dzialania wygladalby na nagle pogorszenie.
+    var note;
+    if (!health.sample) {
+      note = 'za mało danych';
+    } else if (health.rate_previous === null || health.rate_previous === undefined) {
+      note = 'brak poprzedniego tygodnia do porównania';
+    } else {
+      var delta = Math.round(((health.rate || 0) - health.rate_previous) * 10) / 10;
+      note = (delta > 0 ? '+' : '') + delta + ' pkt wobec poprz. tygodnia';
+    }
+    setNote(root, 'failure_delta', note);
 
     var tile = root.querySelector('[data-tile="failure_rate"]');
     if (tile) {
@@ -128,6 +139,64 @@
     setNote(root, 'per_visitor', data.per_visitor + ' na odwiedzającego');
   }
 
+  // Etykiety z aplikacji sa krotkie i techniczne ("trade_400"), zeby przezyc
+  // zmiany tlumaczen. Ludzki opis jest wylacznie tutaj, po stronie panelu.
+  var KINDS = {
+    tekst_przedmiotu: 'nieczytelny tekst przedmiotu',
+    schowek_pusty: 'pusty schowek',
+    most_pusty: 'most nie zwrócił tekstu',
+    most_dostep: 'brak dostępu do dokumentu Google',
+    most_siec: 'brak połączenia z Google Docs',
+    most_konfig: 'błąd konfiguracji mostu',
+    most: 'błąd mostu',
+    trade_limit: 'limit zapytań do trade (429)',
+    trade_403: 'blokada Cloudflare (403)',
+    trade_siec: 'brak połączenia z pathofexile.com',
+    trade_json: 'odpowiedź trade nie jest JSON-em',
+    trade_400: 'trade odrzuca zapytanie (400)',
+    trade_404: 'trade nie zna zasobu (404)',
+    trade_500: 'awaria po stronie trade (500)',
+    trade_503: 'trade niedostępny (503)',
+    trade: 'błąd API handlu',
+    inny: 'inny błąd',
+  };
+
+  function describeKind(name) {
+    if (KINDS[name]) return KINDS[name];
+    // Nieznany kod HTTP z trade'a - opisujemy go, zamiast pokazywac surowa
+    // etykiete. Nowe kody pojawiaja sie bez zmian w panelu.
+    var http = /^trade_(\d{3})$/.exec(name || '');
+    if (http) return 'trade zwraca HTTP ' + http[1];
+    return name || 'nieznany';
+  }
+
+  // Co z tym zrobic. Kazda rada wskazuje na inne miejsce, wiec zla diagnoza
+  // kosztuje realnie czas - dlatego bierze sie z rodzaju bledu, a nie z domyslu.
+  function adviceFor(name) {
+    if (name === 'tekst_przedmiotu' || name === 'schowek_pusty') {
+      return 'To najczęściej zwykłe użycie skrótu poza przedmiotem – ' +
+        'niekoniecznie awaria aplikacji.';
+    }
+    if (name && name.indexOf('most') === 0) {
+      return 'Problem jest po stronie mostu przez Dokumenty Google, ' +
+        'a nie w API handlu.';
+    }
+    if (name === 'trade_limit') {
+      return 'To limit zapytań GGG, nie awaria – aplikacja sama odczekuje.';
+    }
+    if (name === 'trade_403') {
+      return 'Cloudflare blokuje zapytania: potrzebny POESESSID w config.json.';
+    }
+    if (/^trade_4\d\d$/.test(name || '')) {
+      return 'Trade odrzuca samo zapytanie – to zwykle znak, że zmienił się ' +
+        'format filtrów. Sprawdź, czy wyszukiwanie działa.';
+    }
+    if (/^trade_5\d\d$/.test(name || '')) {
+      return 'Awaria jest po stronie GGG – zwykle mija sama.';
+    }
+    return 'Sprawdź, czy wyszukiwanie działa.';
+  }
+
   function renderAlert(data) {
     var health = data.health || {};
     if (!health.sample || health.level === 'ok') {
@@ -141,10 +210,21 @@
     alertBox.className = 'alert ' + (health.level === 'alert' ? 'danger' : 'warn');
     alertBox.appendChild(el('strong', null, health.level === 'alert'
       ? 'Wysoki odsetek błędów' : 'Podwyższony odsetek błędów'));
-    alertBox.appendChild(el('span', null,
-      ' – ' + health.rate + '% wycen kończy się niepowodzeniem (' +
-      nf.format(health.sample) + ' prób w 7 dni). Najczęstsza przyczyna to ' +
-      'zmiana w API handlu Path of Exile: sprawdź, czy wyszukiwanie działa.'));
+
+    var opis = ' – ' + health.rate + '% wycen kończy się niepowodzeniem (' +
+      nf.format(health.sample) + ' prób, ' + nf.format(health.installs || 0) +
+      ' instalacji, 7 dni). ';
+    // Przyczyne bierzemy z danych. Wczesniej stalo tu zdanie zaszyte w kodzie
+    // ("zmiana w API handlu"), ktore padalo przy KAZDYM alercie niezaleznie od
+    // tego, co sie faktycznie dzialo - baza nie trzymala wtedy rodzaju bledu.
+    if (health.top) {
+      opis += 'Najczęstszy błąd: ' + describeKind(health.top.name) +
+        ' (' + nf.format(health.top.count) + '×). ' + adviceFor(health.top.name);
+    } else {
+      opis += 'Brak danych o rodzajach błędów – zgłoszenia pochodzą z wersji ' +
+        'starszej niż 1.0.7, która ich jeszcze nie wysyłała.';
+    }
+    alertBox.appendChild(el('span', null, opis));
   }
 
   // --------------------------------------------------------------- wykresy
@@ -250,6 +330,37 @@
     });
   }
 
+  function renderErrors(host, items) {
+    if (!host) return;
+    clear(host);
+    if (!items || !items.length) {
+      host.appendChild(el('p', 'note',
+        'Brak błędów w tym okresie – albo zgłoszenia pochodzą z wersji ' +
+        'starszej niż 1.0.7, która nie wysyłała ich rodzaju.'));
+      return;
+    }
+    var top = items[0].count || 1;
+
+    items.forEach(function (item) {
+      var row = el('div', 'bar-row');
+      var name = el('span', 'bar-name', describeKind(item.name));
+      // Surowa etykieta zostaje pod kursorem - po niej szuka sie w kodzie.
+      name.title = item.name;
+      row.appendChild(name);
+
+      var track = el('span', 'bar-track');
+      var fill = el('span', 'bar-fill bar-bad');
+      fill.style.width = Math.round((item.count / top) * 100) + '%';
+      track.appendChild(fill);
+      row.appendChild(track);
+
+      row.appendChild(el('span', 'bar-count',
+        nf.format(item.count) + '  ·  ' + item.share + '%  ·  ' +
+        nf.format(item.installs) + (item.installs === 1 ? ' instalacja' : ' inst.')));
+      host.appendChild(row);
+    });
+  }
+
   // -------------------------------------------------------------- pobranie
 
   function renderApp(data) {
@@ -268,6 +379,11 @@
       .forEach(function (name) {
         renderBars(root.querySelector('[data-bars="' + name + '"]'), data[name]);
       });
+
+    // Rodzaje bledow ida przez wlasny renderer: nazwa wymaga przetlumaczenia
+    // na ludzki jezyk, a liczba instalacji odroznia awarie ogolna od jednej
+    // osoby, ktora trafila na swoj wlasny problem.
+    renderErrors(root.querySelector('[data-bars="errors"]'), data.errors);
 
     stamp(data);
     meta.textContent = nf.format(data.pings) + ' sygnałów w bazie';

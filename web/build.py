@@ -361,7 +361,12 @@ def admin_page() -> str:
         f'{" aria-pressed=\"true\"" if n == 14 else " aria-pressed=\"false\""}>'
         f'{n} dni</button>' for n in (7, 14, 30, 90))
 
-    splits = "".join(
+    # Rodzaje bledow ida pierwsze i przez cala szerokosc: to jedyna karta,
+    # ktora odpowiada na pytanie "co sie psuje", a nie "kto uzywa".
+    splits = (
+        '<section class="card wide"><h2>Rodzaje błędów (7 dni)</h2>'
+        '<div class="bars" data-bars="errors"></div></section>'
+    ) + "".join(
         f'<section class="card"><h2>{esc(label)}</h2>'
         f'<div class="bars" data-bars="{key}"></div></section>'
         for key, label in [("versions", "Wersje"), ("languages", "Języki"),
@@ -629,6 +634,25 @@ def sitemap() -> str:
             + "\n".join(entries) + "\n</urlset>\n")
 
 
+def version_manifest() -> str:
+    """Plik, po ktory siega aplikacja, zeby sprawdzic, czy jest nowsza wersja.
+
+    Statyczny JSON, a nie endpoint w Functions: informacja o wersji nie zalezy
+    od bazy, wiec nie ma powodu, zeby awaria D1 albo limit zapytan blokowaly
+    powiadomienie o aktualizacji. Wersja bierze sie z APP_VERSION, czyli z tego
+    samego zrodla co build aplikacji - nie da sie ich rozjechac.
+    """
+    return json.dumps(
+        {
+            "version": APP_VERSION,
+            "download": DOWNLOAD_URL,
+            "page": f"{SITE_URL}/pl/",
+            "notes": f"{SOURCE_URL}/releases/tag/v{APP_VERSION}",
+        },
+        indent=2,
+    ) + "\n"
+
+
 def robots() -> str:
     return (f"User-agent: *\nAllow: /\nDisallow: /admin/\n\n"
             f"Sitemap: {SITE_URL}/sitemap.xml\n")
@@ -683,6 +707,11 @@ def headers() -> str:
         # w adresie sprawiaja, ze nikt nie pobierze poprzedniego buildu.
         "\n/download/*\n"
         "  Cache-Control: public, max-age=300, must-revalidate\n"
+        # Po ten plik siega kazda uruchomiona aplikacja, zeby sprawdzic, czy jest
+        # nowsza wersja. Dluga pamiec podreczna oznaczalaby, ze po wydaniu ludzie
+        # jeszcze przez wiele godzin nie widza powiadomienia.
+        "\n/version.json\n"
+        "  Cache-Control: public, max-age=600, must-revalidate\n"
         "\n/admin/*\n"
         "  X-Robots-Tag: noindex, nofollow\n"
         "  Cache-Control: no-store\n"
@@ -723,6 +752,7 @@ def build() -> None:
     (DIST / "404.html").write_text(not_found_page(), encoding="utf-8")
     (DIST / "sitemap.xml").write_text(sitemap(), encoding="utf-8")
     (DIST / "robots.txt").write_text(robots(), encoding="utf-8")
+    (DIST / "version.json").write_text(version_manifest(), encoding="utf-8")
     (DIST / "_headers").write_text(headers(), encoding="utf-8")
 
     # Kopiujemy caly katalog zasobow - zrzuty ekranu dochodza i znikaja, a lista

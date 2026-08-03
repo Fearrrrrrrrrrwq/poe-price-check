@@ -39,6 +39,9 @@ STRINGS["en"] = {
     "app.hk_quit": "quit the program",
     "app.minimise": "You can minimise this -\nshortcuts keep working.",
     "app.quit": "Quit",
+    "update.available": "Version {version} is available",
+    "update.current": "You are running {version}",
+    "update.open": "See what changed",
 
     # kreator
     "setup.title": "PoE Price Check - setup",
@@ -156,6 +159,9 @@ STRINGS["pl"] = {
     "app.hk_quit": "zakończ program",
     "app.minimise": "Możesz zminimalizować -\nskróty działają w tle.",
     "app.quit": "Zakończ",
+    "update.available": "Dostępna jest wersja {version}",
+    "update.current": "Używasz wersji {version}",
+    "update.open": "Zobacz, co się zmieniło",
 
     "setup.title": "PoE Price Check - konfiguracja",
     "setup.language": "Język",
@@ -266,6 +272,9 @@ STRINGS["de"] = {
     "app.hk_quit": "Programm beenden",
     "app.minimise": "Du kannst minimieren -\ndie Tastenkürzel laufen weiter.",
     "app.quit": "Beenden",
+    "update.available": "Version {version} ist verfügbar",
+    "update.current": "Du nutzt Version {version}",
+    "update.open": "Änderungen ansehen",
 
     "setup.title": "PoE Price Check - Einrichtung",
     "setup.language": "Sprache",
@@ -377,6 +386,9 @@ STRINGS["es"] = {
     "app.hk_quit": "salir del programa",
     "app.minimise": "Puedes minimizar -\nlos atajos siguen activos.",
     "app.quit": "Salir",
+    "update.available": "La versión {version} está disponible",
+    "update.current": "Estás usando la versión {version}",
+    "update.open": "Ver los cambios",
 
     "setup.title": "PoE Price Check - configuración",
     "setup.language": "Idioma",
@@ -487,6 +499,9 @@ STRINGS["pt"] = {
     "app.hk_quit": "encerrar o programa",
     "app.minimise": "Você pode minimizar -\nos atalhos continuam funcionando.",
     "app.quit": "Sair",
+    "update.available": "A versão {version} está disponível",
+    "update.current": "Você está usando a versão {version}",
+    "update.open": "Ver o que mudou",
 
     "setup.title": "PoE Price Check - configuração",
     "setup.language": "Idioma",
@@ -597,6 +612,9 @@ STRINGS["ru"] = {
     "app.hk_quit": "выйти из программы",
     "app.minimise": "Можно свернуть -\nсочетания работают в фоне.",
     "app.quit": "Выход",
+    "update.available": "Доступна версия {version}",
+    "update.current": "У вас версия {version}",
+    "update.open": "Что изменилось",
 
     "setup.title": "PoE Price Check - настройка",
     "setup.language": "Язык",

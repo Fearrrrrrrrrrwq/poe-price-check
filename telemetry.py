@@ -21,6 +21,8 @@ import i18n
 
 HEARTBEAT_SECONDS = 6 * 3600  # sygnal zycia co 6 godzin dzialania
 SEND_TIMEOUT = 8
+KIND_LIMIT = 24   # dlugosc etykiety rodzaju bledu
+MAX_KINDS = 20    # ile roznych etykiet najwyzej trzymamy miedzy wysylkami
 
 
 class Telemetry:
@@ -35,6 +37,7 @@ class Telemetry:
 
         self._checks = 0
         self._failures = 0
+        self._errors: dict[str, int] = {}
         self._lock = threading.Lock()
         self._started = time.monotonic()
         self._stop = threading.Event()
@@ -52,15 +55,31 @@ class Telemetry:
 
     # ------------------------------------------------------------- liczniki
 
-    def record_check(self, ok: bool) -> None:
-        """Zlicza wycene. NIE zapisuje, czego dotyczyla."""
+    def record_check(self, ok: bool, kind: str = "") -> None:
+        """Zlicza wycene. NIE zapisuje, czego dotyczyla.
+
+        Przy niepowodzeniu leci jeszcze RODZAJ bledu - krotka etykieta w rodzaju
+        "trade_400" albo "most_dostep". Bez niej panel widzial sam odsetek
+        niepowodzen i nie dalo sie odroznic zmiany w API handlu od kogos, kto po
+        prostu wcisnal skrot nad czyms, co nie jest przedmiotem.
+
+        Etykieta nie moze niesc nic o przedmiocie ani o uzytkowniku - pochodzi
+        wylacznie z zamknietego zbioru nazw wpisanych w kodzie.
+        """
         if not self.enabled:
             return
         with self._lock:
             if ok:
                 self._checks += 1
+                return
+            self._failures += 1
+            label = (kind or "inny")[:KIND_LIMIT]
+            # Gorny limit na liczbe roznych etykiet: gdyby kiedys wpadla tu
+            # wartosc zmienna (np. z komunikatu), slownik nie urosnie bez konca.
+            if label in self._errors or len(self._errors) < MAX_KINDS:
+                self._errors[label] = self._errors.get(label, 0) + 1
             else:
-                self._failures += 1
+                self._errors["inny"] = self._errors.get("inny", 0) + 1
 
     def set_league(self, league: str) -> None:
         self.league = league
@@ -70,7 +89,9 @@ class Telemetry:
     def _payload(self) -> dict:
         with self._lock:
             checks, failures = self._checks, self._failures
+            errors = self._errors
             self._checks = self._failures = 0
+            self._errors = {}
         return {
             "id": self.install_id,
             "version": self.version,
@@ -80,6 +101,7 @@ class Telemetry:
             "transport": self.transport,
             "checks": checks,
             "failures": failures,
+            "errors": errors,
             "uptime_min": int((time.monotonic() - self._started) / 60),
         }
 
@@ -114,7 +136,8 @@ class Telemetry:
         if not self.enabled:
             return "Telemetria: wylaczona."
         return (
-            "Telemetria: wysylam anonimowy licznik uzyc (wersja, liga, liczba wycen).\n"
+            "Telemetria: wysylam anonimowy licznik uzyc (wersja, liga, liczba wycen\n"
+            '            oraz rodzaje bledow, np. "trade_400").\n'
             "            Zadnych przedmiotow, cen ani danych konta. Wylaczysz przez\n"
             '            "telemetry": false w config.json.'
         )

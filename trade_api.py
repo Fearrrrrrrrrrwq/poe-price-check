@@ -82,7 +82,16 @@ def _prefers_local(item: ParsedItem, pattern: str) -> bool:
 
 
 class TradeError(RuntimeError):
-    pass
+    """Blad po stronie API handlu.
+
+    Atrybut kind niesie krotka, stabilna etykiete rodzaju bledu. Sam komunikat
+    jest tlumaczony i przeredagowywany miedzy wersjami, wiec do zliczania w
+    statystykach nadaje sie wylacznie taka etykieta.
+    """
+
+    def __init__(self, message: str, kind: str = "trade") -> None:
+        super().__init__(message)
+        self.kind = kind
 
 
 def _fmt_number(value: float) -> str:
@@ -462,26 +471,33 @@ class TradeClient:
             # tracebackiem zamiast komunikatem.
             raise TradeError(
                 f"Brak polaczenia z pathofexile.com ({type(exc).__name__}). "
-                "Sprawdz siec i sprobuj ponownie."
+                "Sprawdz siec i sprobuj ponownie.",
+                kind="trade_siec",
             ) from exc
         self.limiter.update(policy, response)
 
         if response.status_code == 429:
             raise TradeError(
                 "Limit zapytan do trade'a przekroczony. Odczekaj chwile "
-                f"({response.headers.get('Retry-After', '?')} s)."
+                f"({response.headers.get('Retry-After', '?')} s).",
+                kind="trade_limit",
             )
         if response.status_code == 403:
             raise TradeError(
                 "403 od pathofexile.com - najczesciej Cloudflare. Wpisz POESESSID "
-                "w config.json (ciasteczko z zalogowanej sesji na pathofexile.com)."
+                "w config.json (ciasteczko z zalogowanej sesji na pathofexile.com).",
+                kind="trade_403",
             )
         if not response.ok:
-            raise TradeError(f"HTTP {response.status_code} z {url}: {response.text[:200]}")
+            # Sam kod HTTP w etykiecie: 400 od /search to prawie zawsze filtr,
+            # ktorego GGG nie zna - dokladnie tak objawil sie bug z Foulborn.
+            raise TradeError(f"HTTP {response.status_code} z {url}: {response.text[:200]}",
+                             kind=f"trade_{response.status_code}")
         try:
             return response.json()
         except ValueError as exc:
-            raise TradeError(f"Odpowiedz z {url} nie jest JSON-em.") from exc
+            raise TradeError(f"Odpowiedz z {url} nie jest JSON-em.",
+                             kind="trade_json") from exc
 
     def _cached(self, name: str, url: str) -> dict:
         CACHE_DIR.mkdir(exist_ok=True)
@@ -518,7 +534,8 @@ class TradeClient:
         except requests.RequestException as exc:
             raise TradeError(
                 f"Nie moge pobrac listy lig ({type(exc).__name__}). Sprawdz siec, "
-                "albo wpisz nazwe ligi na sztywno w config.json."
+                "albo wpisz nazwe ligi na sztywno w config.json.",
+                kind="trade_siec",
             ) from exc
         seen: dict[str, None] = {}
         for entry in response.json().get("result", []):

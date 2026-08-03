@@ -31,6 +31,7 @@ from setup_window import SetupWindow, needs_setup
 from status_window import StatusWindow
 from telemetry import Telemetry
 from trade_api import TradeClient, TradeError
+from updater import UpdateCheck
 from winutil import (
     describe_foreground,
     foreground_hwnd,
@@ -238,6 +239,11 @@ class PriceChecker:
                 # grze pierwszy plan i klawisze poszlyby w nasze okno.
                 raw, changed = self.bridge.grab_item_text()
                 if not raw:
+                    # Most nie oddal tekstu - to jest nieudana wycena, a nie
+                    # zdarzenie neutralne. Wczesniej wychodzilo sie stad bez
+                    # zliczenia czegokolwiek, wiec najczestsza awaria calego
+                    # obejscia przez Boosteroida byla w statystykach niewidoczna.
+                    self.telemetry.record_check(ok=False, kind="most_pusty")
                     self.events.put((
                         "error",
                         t("err.bridge_empty"),
@@ -246,6 +252,7 @@ class PriceChecker:
             else:
                 raw, changed = read_local_clipboard(), True
                 if not raw:
+                    self.telemetry.record_check(ok=False, kind="schowek_pusty")
                     self.events.put(("error", t("err.clipboard_empty")))
                     return
             self.check_from_text(raw, changed)
@@ -254,13 +261,15 @@ class PriceChecker:
             print(f"[zasoby] wycena {self.checks_done}: {applog.resource_snapshot()}")
             self.telemetry.record_check(ok=True)
         except ItemParseError as exc:
-            self.telemetry.record_check(ok=False)
+            self.telemetry.record_check(ok=False, kind="tekst_przedmiotu")
             self.events.put(("error", t("err.item_unknown", error=exc)))
         except (BridgeError, TradeError) as exc:
-            self.telemetry.record_check(ok=False)
+            # Etykieta idzie z samego wyjatku - patrz TradeError.kind.
+            self.telemetry.record_check(ok=False, kind=getattr(exc, "kind", ""))
             self.events.put(("error", str(exc)))
         except Exception as exc:  # noqa: BLE001 - petla nie moze umrzec na skrocie
-            self.telemetry.record_check(ok=False)
+            # Nazwa klasy wystarczy do rozpoznania, a nie niesie zadnej tresci.
+            self.telemetry.record_check(ok=False, kind=type(exc).__name__[:24])
             traceback.print_exc()
             self.events.put(("error", f"{type(exc).__name__}: {exc}"))
         finally:
@@ -270,7 +279,8 @@ class PriceChecker:
         threading.Thread(target=self._run_job, args=(use_bridge,), daemon=True).start()
 
 
-def pump_events(window: ResultWindow, checker: PriceChecker, status=None) -> None:
+def pump_events(window: ResultWindow, checker: PriceChecker, status=None,
+                updates=None) -> None:
     # Cokolwiek by tu nie poszlo nie tak, petla MUSI zostac przeplanowana.
     # Wyjatek, ktory sie z niej wymknie, ubija pompe zdarzen na zawsze i program
     # przestaje reagowac na skroty, wygladajac przy tym na zawieszony.
@@ -299,7 +309,18 @@ def pump_events(window: ResultWindow, checker: PriceChecker, status=None) -> Non
     except Exception:  # noqa: BLE001 - patrz komentarz wyzej
         traceback.print_exc()
     finally:
-        window.root.after(60, pump_events, window, checker, status)
+        # Sprawdzenie wersji konczy sie w watku w tle, a widgetow Tk nie wolno
+        # tworzyc spoza watku glownego - dlatego wynik odbieramy tutaj.
+        # show_update() sam pilnuje, zeby pokazac pasek tylko raz, wiec nawet
+        # gdyby sie wywrocil, kolejne obroty petli tego nie powtorza.
+        try:
+            if updates is not None and status is not None:
+                found = updates.result()
+                if found:
+                    status.show_update(found["version"], found["url"])
+        except Exception:  # noqa: BLE001 - powiadomienie nie moze ubic pompy
+            traceback.print_exc()
+        window.root.after(60, pump_events, window, checker, status, updates)
 
 
 def run_gui(config: dict, league: str) -> int:
@@ -344,8 +365,11 @@ def run_gui(config: dict, league: str) -> int:
     print(f"  {quit_hotkey:<12} wyjscie")
     print("Gotowe.")
 
+    updates = UpdateCheck(config, APP_VERSION, config.get("user_agent", ""))
+    updates.start()
+
     telemetry.start()
-    status.root.after(60, pump_events, window, checker, status)
+    status.root.after(60, pump_events, window, checker, status, updates)
     status.root.mainloop()
     telemetry.stop()  # ostatni sygnal, zeby nie zgubic licznika z tej sesji
     return 0

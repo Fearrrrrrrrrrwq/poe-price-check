@@ -376,6 +376,10 @@ footer { border-top: 1px solid var(--border); padding: 32px 0 44px; background: 
   grid-template-columns: repeat(auto-fit, minmax(min(360px, 100%), 1fr));
 }
 .splits .card { margin: 0; }
+/* Rodzaje bledow biora cala szerokosc: nazwy sa dluzsze niz "Windows 11", a
+   po scisnieciu do jednej kolumny siatki zawijaly sie w nieczytelne slupki.
+   1/-1 dziala niezaleznie od tego, ile kolumn wyszlo z auto-fit. */
+.splits .card.wide { grid-column: 1 / -1; }
 
 /* Pusty wykres wyglada jak zepsuty, wiec zamiast siatki bez slupkow
    pokazujemy komunikat. */

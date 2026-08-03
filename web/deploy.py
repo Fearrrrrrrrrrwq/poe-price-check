@@ -162,6 +162,32 @@ def ensure_project() -> None:
     print("  utworzony")
 
 
+def attached_domain() -> str:
+    """Wlasna domena podpieta do projektu Pages, albo pusty tekst.
+
+    Bez tego kazde wdrozenie bez --domain budowalo strone dla adresu
+    *.pages.dev: adresy kanoniczne i CALA sitemapa wskazywaly na inny host niz
+    ten, pod ktorym strona faktycznie stoi. Google Search Console odrzuca
+    mapy witryny z adresami spoza zgloszonej wlasciwosci, wiec objawialo sie
+    to jako "nie udalo sie odczytac mapy witryny" i zero zaindeksowanych stron.
+
+    Domena jest juz zapisana po stronie Cloudflare, wiec nie ma powodu wymagac
+    jej za kazdym razem w wierszu polecen.
+    """
+    listing = parse_json(run("pages", "project", "list", "--json", capture=True)) or []
+    for row in listing:
+        if row.get("name") != PROJECT and row.get("Project Name") != PROJECT:
+            continue
+        raw = row.get("domains") or row.get("Project Domains") or ""
+        names = raw if isinstance(raw, list) else str(raw).split(",")
+        for name in (part.strip() for part in names):
+            # pages.dev to adres techniczny, a www. przekierowuje na goly -
+            # patrz functions/_middleware.js. Kanoniczny jest adres bez www.
+            if name and not name.endswith(".pages.dev") and not name.startswith("www."):
+                return name
+    return ""
+
+
 def ensure_secret() -> str | None:
     say("6/8", "sekrety projektu")
 
@@ -223,15 +249,20 @@ def main() -> None:
              f"{PROJECT}.pages.dev")
     args = parser.parse_args()
 
-    host = (args.domain or f"{PROJECT}.pages.dev").strip()
-    host = re.sub(r"^https?://", "", host).strip("/")
-    site_url = f"https://{host}"
-
     check_login()
     database_id = ensure_database()
     patch_config(database_id)
     apply_schema()
     ensure_project()
+
+    # Kolejnosc: jawny --domain, potem domena podpieta do projektu, a adres
+    # *.pages.dev dopiero na koncu - inaczej wdrozenie po cichu przestawialoby
+    # cala strone na adres techniczny.
+    host = (args.domain or attached_domain() or f"{PROJECT}.pages.dev").strip()
+    host = re.sub(r"^https?://", "", host).strip("/")
+    site_url = f"https://{host}"
+    say("6/8", f"adres docelowy: {site_url}")
+
     token = ensure_secret()
     build(site_url)
     deploy()

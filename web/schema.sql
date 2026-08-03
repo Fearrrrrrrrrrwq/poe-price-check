@@ -26,6 +26,24 @@ CREATE TABLE IF NOT EXISTS pings (
 CREATE INDEX IF NOT EXISTS pings_at      ON pings (at);
 CREATE INDEX IF NOT EXISTS pings_install ON pings (install, at);
 
+-- Rodzaje bledow. Osobna tabela, a nie kolumny w pings: rodzajow przybywa
+-- razem z kodem, a dokladanie kolumny przy kazdym nowym bylo by absurdem.
+--
+-- kind to zamknieta lista etykiet z kodu aplikacji ("trade_400", "most_dostep",
+-- "tekst_przedmiotu"). Nie ma w niej nic o przedmiocie ani o uzytkowniku -
+-- inaczej telemetria przestala by byc anonimowa.
+CREATE TABLE IF NOT EXISTS errors (
+  id      INTEGER PRIMARY KEY AUTOINCREMENT,
+  at      INTEGER NOT NULL,
+  install TEXT    NOT NULL,
+  version TEXT    NOT NULL DEFAULT '',
+  kind    TEXT    NOT NULL,
+  count   INTEGER NOT NULL DEFAULT 0
+);
+
+CREATE INDEX IF NOT EXISTS errors_at   ON errors (at);
+CREATE INDEX IF NOT EXISTS errors_kind ON errors (kind, at);
+
 CREATE TABLE IF NOT EXISTS admins (
   id      INTEGER PRIMARY KEY AUTOINCREMENT,
   login   TEXT    NOT NULL UNIQUE,

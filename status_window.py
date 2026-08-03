@@ -5,6 +5,7 @@ czy aplikacja wystartowala, jakie ma skroty ani jak ja zamknac.
 """
 
 import tkinter as tk
+import webbrowser
 
 import theme
 from i18n import t
@@ -39,9 +40,17 @@ class StatusWindow:
         tk.Label(head, text=f"v{APP_VERSION}", font=FONT_LABEL, fg=FG_MUTED,
                  bg=BG).pack(side="right", pady=(6, 0))
 
+        # --- pasek aktualizacji ---------------------------------------------
+        # Tworzony od razu, ale nie pokazywany: sprawdzenie wersji leci w tle
+        # i konczy sie juz po zbudowaniu okna. Dokladanie widgetu pozniej
+        # przestawialoby uklad i zmienialo rozmiar okna w trakcie pracy.
+        self._update_holder = tk.Frame(outer, bg=BG)
+        self._update_info: dict | None = None
+
         # --- kafelek stanu -------------------------------------------------
         state_card = theme.card(outer, accent=FG_OK)
         state_card.pack(fill="x", pady=(GAP + 2, GAP))
+        self._first_card = state_card
 
         line = tk.Frame(state_card.body, bg=BG_PANEL)
         line.pack(fill="x", padx=12, pady=(10, 0))
@@ -107,6 +116,37 @@ class StatusWindow:
         x = (self.root.winfo_screenwidth() - width) // 2
         y = (self.root.winfo_screenheight() - height) // 3
         self.root.geometry(f"+{x}+{y}")
+
+    def show_update(self, version: str, url: str) -> None:
+        """Pokazuje pasek 'jest nowsza wersja'. Wywolywac tylko z watku Tk.
+
+        Program niczego nie pobiera ani nie podmienia sam - przycisk tylko
+        otwiera strone wydania w przegladarce. Patrz updater.py.
+        """
+        if self._update_info is not None:
+            return  # pasek juz wisi, drugi raz nie ma czego pokazywac
+        self._update_info = {"version": version, "url": url}
+
+        card = theme.card(self._update_holder, accent=FG_ACCENT)
+        card.pack(fill="x")
+        row = tk.Frame(card.body, bg=BG_PANEL)
+        row.pack(fill="x", padx=12, pady=10)
+
+        labels = tk.Frame(row, bg=BG_PANEL)
+        labels.pack(side="left", fill="x", expand=True)
+        tk.Label(labels, text=t("update.available", version=version),
+                 font=FONT_BODY, fg=FG_TITLE, bg=BG_PANEL, anchor="w").pack(fill="x")
+        tk.Label(labels, text=t("update.current", version=APP_VERSION),
+                 font=FONT_LABEL, fg=FG_MUTED, bg=BG_PANEL, anchor="w").pack(fill="x")
+
+        if url:
+            theme.button(row, t("update.open"),
+                         lambda: webbrowser.open(url)).pack(side="right", padx=(GAP, 0))
+
+        # Pasek wchodzi na gore, nad kafelek stanu - inaczej ginie na dole okna.
+        self._update_holder.pack(fill="x", pady=(GAP + 2, 0), before=self._first_card)
+        self.root.update_idletasks()
+        self._centre()
 
     def set_checks(self, count: int) -> None:
         if count != self._checks:

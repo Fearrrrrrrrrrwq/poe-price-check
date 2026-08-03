@@ -23,7 +23,15 @@ GDOC_EXPORT = "https://docs.google.com/document/d/{doc_id}/export?format=txt"
 
 
 class BridgeError(RuntimeError):
-    pass
+    """Blad mostu do sesji w chmurze.
+
+    Jak w TradeError: kind to stabilna etykieta do statystyk, niezalezna od
+    tresci komunikatu.
+    """
+
+    def __init__(self, message: str, kind: str = "most") -> None:
+        super().__init__(message)
+        self.kind = kind
 
 
 @dataclass
@@ -78,7 +86,7 @@ class GoogleDocTransport(Transport):
 
     def __init__(self, doc_id: str) -> None:
         if not doc_id:
-            raise BridgeError("Brak doc_id w config.json.")
+            raise BridgeError("Brak doc_id w config.json.", kind="most_konfig")
         self.doc_id = doc_id
         self.session = requests.Session()
 
@@ -88,12 +96,14 @@ class GoogleDocTransport(Transport):
             response = self.session.get(url, timeout=15, allow_redirects=True)
         except requests.RequestException as exc:
             raise BridgeError(
-                f"Brak polaczenia z Google Docs ({type(exc).__name__})."
+                f"Brak polaczenia z Google Docs ({type(exc).__name__}).",
+                kind="most_siec",
             ) from exc
         if response.status_code in (401, 403, 404):
             raise BridgeError(
                 f"Nie moge odczytac dokumentu ({response.status_code}). Sprawdz, czy "
-                "jest udostepniony jako 'Kazdy uzytkownik, ktory ma link'."
+                "jest udostepniony jako 'Kazdy uzytkownik, ktory ma link'.",
+                kind="most_dostep",
             )
         response.raise_for_status()
         # Google potrafi oddac tekst z BOM-em i twardymi znakami niedzielacymi.
@@ -110,7 +120,7 @@ class AppsScriptTransport(Transport):
 
     def __init__(self, exec_url: str) -> None:
         if not exec_url:
-            raise BridgeError("Brak appsscript_url w config.json.")
+            raise BridgeError("Brak appsscript_url w config.json.", kind="most_konfig")
         self.exec_url = exec_url
         self.session = requests.Session()
 
@@ -123,7 +133,8 @@ class AppsScriptTransport(Transport):
         except requests.RequestException as exc:
             raise BridgeError(
                 f"Nie moge odczytac web appa ({type(exc).__name__}). "
-                "Sprawdz 'appsscript_url' i czy wdrozenie ma dostep 'Wszyscy'."
+                "Sprawdz 'appsscript_url' i czy wdrozenie ma dostep 'Wszyscy'.",
+                kind="most_siec",
             ) from exc
         return response.text.replace("\r\n", "\n").strip()
 
@@ -134,7 +145,8 @@ def make_transport(config: dict) -> Transport:
         return GoogleDocTransport(config.get("gdoc_id", ""))
     if kind == "appsscript":
         return AppsScriptTransport(config.get("appsscript_url", ""))
-    raise BridgeError(f"Nieznany transport: {kind!r} (uzyj 'gdoc' albo 'appsscript').")
+    raise BridgeError(f"Nieznany transport: {kind!r} (uzyj 'gdoc' albo 'appsscript').",
+                      kind="most_konfig")
 
 
 MODIFIERS = ("ctrl", "shift", "alt", "windows")

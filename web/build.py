@@ -685,6 +685,10 @@ def version_manifest() -> str:
             "download": DOWNLOAD_URL,
             "page": f"{SITE_URL}/pl/",
             "notes": f"{SOURCE_URL}/releases/tag/v{APP_VERSION}",
+            # Aplikacja ma wbudowany adres zapasowy, ale pyta stad. Dzieki temu
+            # wygasle zaproszenie podmienia sie wdrozeniem strony, bez zmuszania
+            # ludzi do pobrania nowej wersji programu.
+            "discord": DISCORD_URL,
         },
         indent=2,
     ) + "\n"

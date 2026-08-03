@@ -15,12 +15,19 @@ from theme import (BG, BG_PANEL, FG, FG_ACCENT, FG_MUTED, FG_OK, FG_TITLE,
                    GAP, PAD, TIGHT)
 
 
+# Zaproszenie na Discorda. To jest adres ZAPASOWY - wlasciwy przychodzi z
+# version.json, wiec wygasle zaproszenie da sie podmienic samym wdrozeniem
+# strony, bez zmuszania ludzi do pobrania nowej wersji programu.
+DISCORD_URL = "https://discord.gg/FjAnFqGNh4"
+
+
 class StatusWindow:
     """Glowne okno aplikacji. Trzyma obiekt Tk, reszta okien jest podrzedna."""
 
     def __init__(self, league: str, hotkeys: dict, on_quit=None) -> None:
         self.on_quit = on_quit
         self._checks = 0
+        self._discord_url = DISCORD_URL
 
         self.root = tk.Tk()
         self.root.title("PoE Price Check")
@@ -105,6 +112,14 @@ class StatusWindow:
         tk.Label(footer, text=t("app.minimise"), font=FONT_LABEL, fg=FG_MUTED,
                  bg=BG, anchor="w", justify="left").pack(side="left")
         theme.button(footer, t("app.quit"), self._quit).pack(side="right")
+        # Adres czytany dopiero w chwili klikniecia, a nie domykany teraz -
+        # dzieki temu set_discord() moze go podmienic bez przebudowy przycisku.
+        # Margines z LEWEJ tez, nie tylko miedzy przyciskami: przy dluzszym
+        # tekscie stopki (niemiecki, portugalski) etykieta dochodzila do
+        # przycisku na styk, bez ani jednego piksela przerwy.
+        theme.button(footer, t("app.discord"),
+                     lambda: webbrowser.open(self._discord_url)).pack(
+                         side="right", padx=(GAP, TIGHT + 2))
 
         self.root.update_idletasks()
         self._centre()
@@ -116,6 +131,11 @@ class StatusWindow:
         x = (self.root.winfo_screenwidth() - width) // 2
         y = (self.root.winfo_screenheight() - height) // 3
         self.root.geometry(f"+{x}+{y}")
+
+    def set_discord(self, url: str) -> None:
+        """Podmienia adres zaproszenia na ten podany przez strone."""
+        if url:
+            self._discord_url = url
 
     def show_update(self, version: str, url: str) -> None:
         """Pokazuje pasek 'jest nowsza wersja'. Wywolywac tylko z watku Tk.

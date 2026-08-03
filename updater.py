@@ -72,6 +72,7 @@ class UpdateCheck:
         self.user_agent = user_agent
         self.enabled = config.get("update_check", True) and bool(self.url)
         self._result: dict | None = None
+        self._manifest: dict = {}
         self._lock = threading.Lock()
 
     def _fetch(self) -> None:
@@ -86,6 +87,8 @@ class UpdateCheck:
             return
         if not isinstance(data, dict):
             return
+        with self._lock:
+            self._manifest = data
 
         version = str(data.get("version", ""))
         if not is_newer(version, self.current):
@@ -108,3 +111,18 @@ class UpdateCheck:
     def result(self) -> dict | None:
         with self._lock:
             return self._result
+
+    def discord(self) -> str:
+        """Adres zaproszenia podany przez strone, albo pusty tekst.
+
+        Aplikacja ma wbudowany adres zapasowy - ten sluzy tylko do podmiany,
+        gdyby zaproszenie wygaslo juz po wydaniu wersji.
+        """
+        with self._lock:
+            url = str(self._manifest.get("discord", "") or "")
+        # Tylko https i tylko domena Discorda: manifest przychodzi z sieci, a
+        # przycisk otwiera przegladarke. Bez tego podmieniony plik na serwerze
+        # posrednim mogl by kierowac ludzi gdziekolwiek.
+        if url.startswith(("https://discord.gg/", "https://discord.com/invite/")):
+            return url
+        return ""

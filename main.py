@@ -315,6 +315,7 @@ def pump_events(window: ResultWindow, checker: PriceChecker, status=None,
         # gdyby sie wywrocil, kolejne obroty petli tego nie powtorza.
         try:
             if updates is not None and status is not None:
+                status.set_discord(updates.discord())
                 found = updates.result()
                 if found:
                     status.show_update(found["version"], found["url"])

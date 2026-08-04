@@ -285,8 +285,13 @@ def main() -> None:
         print(f"  Workers & Pages -> {PROJECT} -> Custom domains -> Set up a domain")
         print("Certyfikat wystawi sie sam, zwykle w kilka minut.")
     else:
-        print(f"\nStrona stoi pod https://{PROJECT}.pages.dev")
-        print("Wlasna domene podepniesz przez:  python deploy.py --domain poe.twoja.pl")
+        # site_url, a nie {PROJECT}.pages.dev na sztywno: domena wykrywa sie
+        # sama, wiec ten komunikat mowil "strona stoi pod pages.dev" tuz obok
+        # linijki z panelem pod wlasciwym adresem.
+        print(f"\nStrona stoi pod {site_url}")
+        if host.endswith(".pages.dev"):
+            print("Wlasna domene podepniesz przez:  "
+                  "python deploy.py --domain poe.twoja.pl")
 
     print(f"\nPanel: {site_url}/admin/")
 

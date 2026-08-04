@@ -128,9 +128,23 @@ export async function onRequestGet({ request, env }) {
           GROUP BY kind ORDER BY count DESC LIMIT 12`
       ).bind(weekAgo),
 
+      // Kazda instalacja liczy sie RAZ, wedlug ostatnio zgloszonej wartosci.
+      //
+      // Wczesniej bylo COUNT(DISTINCT install) GROUP BY kolumna, wiec kto
+      // zaktualizowal program, siedzial jednocześnie w kilku wersjach naraz -
+      // udzialy sumowaly sie do wiecej niz 100% wszystkich instalacji, a
+      // "1.0.7 - 30.8%" nie znaczylo "30.8% uzytkownikow ma 1.0.7".
+      //
+      // Dotyczy tak samo jezyka, ligi i systemu: kazde z nich potrafi sie
+      // miedzy sygnalami zmienic.
       ...BREAKDOWNS.map(([, column]) => env.DB.prepare(
-        `SELECT ${column} AS name, COUNT(DISTINCT install) AS count
-           FROM pings GROUP BY ${column} ORDER BY count DESC LIMIT 8`
+        `SELECT name, COUNT(*) AS count FROM (
+           SELECT ${column} AS name,
+                  ROW_NUMBER() OVER (
+                    PARTITION BY install ORDER BY at DESC, id DESC) AS rn
+             FROM pings
+         ) WHERE rn = 1
+         GROUP BY name ORDER BY count DESC LIMIT 8`
       )),
     ]);
 

@@ -143,6 +143,10 @@
   // zmiany tlumaczen. Ludzki opis jest wylacznie tutaj, po stronie panelu.
   var KINDS = {
     tekst_przedmiotu: 'nieczytelny tekst przedmiotu',
+    nie_przedmiot: 'skopiowany tekst to nie przedmiot',
+    przedmiot_bez_rzadkosci: 'przedmiot z PoE bez linii Rarity',
+    tekst_pusty: 'pusty tekst z mostu',
+    tekst_bez_sekcji: 'tekst bez sekcji',
     schowek_pusty: 'pusty schowek',
     most_pusty: 'most nie zwrócił tekstu',
     most_dostep: 'brak dostępu do dokumentu Google',
@@ -173,6 +177,15 @@
   // Co z tym zrobic. Kazda rada wskazuje na inne miejsce, wiec zla diagnoza
   // kosztuje realnie czas - dlatego bierze sie z rodzaju bledu, a nie z domyslu.
   function adviceFor(name) {
+    if (name === 'przedmiot_bez_rzadkosci') {
+      return 'To NASZ błąd: tekst wyszedł z gry, ale parser go nie rozumie. ' +
+        'Warto sprawdzić, jaka klasa przedmiotu to powoduje.';
+    }
+    if (name === 'nie_przedmiot' || name === 'tekst_pusty' ||
+        name === 'tekst_bez_sekcji') {
+      return 'Skopiowany tekst nie pochodzi z przedmiotu – skrót wciśnięty ' +
+        'nie tam albo w dokumencie została stara treść.';
+    }
     if (name === 'tekst_przedmiotu' || name === 'schowek_pusty') {
       return 'To najczęściej zwykłe użycie skrótu poza przedmiotem – ' +
         'niekoniecznie awaria aplikacji.';

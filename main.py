@@ -261,7 +261,8 @@ class PriceChecker:
             print(f"[zasoby] wycena {self.checks_done}: {applog.resource_snapshot()}")
             self.telemetry.record_check(ok=True)
         except ItemParseError as exc:
-            self.telemetry.record_check(ok=False, kind="tekst_przedmiotu")
+            # Etykieta idzie z wyjatku - patrz ItemParseError.kind.
+            self.telemetry.record_check(ok=False, kind=getattr(exc, "kind", ""))
             self.events.put(("error", t("err.item_unknown", error=exc)))
         except (BridgeError, TradeError) as exc:
             # Etykieta idzie z samego wyjatku - patrz TradeError.kind.

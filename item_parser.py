@@ -244,14 +244,26 @@ def _first_int(value: str) -> int | None:
 
 
 class ItemParseError(ValueError):
-    pass
+    """Tekstu nie da sie zrozumiec jako przedmiotu z PoE.
+
+    Atrybut kind rozroznia sytuacje, ktore wygladaja tak samo w oknie, a
+    znacza cos zupelnie innego dla nas: "ktos wcisnal skrot nie nad
+    przedmiotem" to zachowanie uzytkownika, a "tekst wyglada na przedmiot,
+    ale nie ma rzadkosci" to juz nasza luka w parserze. Bez tego podzialu
+    93% wszystkich bledow siedzialo w jednym worku, z ktorego nic nie
+    wynikalo.
+    """
+
+    def __init__(self, message: str, kind: str = "tekst_przedmiotu") -> None:
+        super().__init__(message)
+        self.kind = kind
 
 
 def parse_item(raw: str) -> ParsedItem:
     """Parsuje surowy tekst ze schowka na ParsedItem."""
     raw = raw.replace("\r\n", "\n").strip()
     if not raw:
-        raise ItemParseError("Pusty tekst przedmiotu.")
+        raise ItemParseError("Pusty tekst przedmiotu.", kind="tekst_pusty")
 
     sections = [
         [line.strip() for line in block.split("\n") if line.strip()]
@@ -259,7 +271,8 @@ def parse_item(raw: str) -> ParsedItem:
     ]
     sections = [s for s in sections if s]
     if not sections:
-        raise ItemParseError("Brak sekcji w tekscie przedmiotu.")
+        raise ItemParseError("Brak sekcji w tekscie przedmiotu.",
+                             kind="tekst_bez_sekcji")
 
     item = ParsedItem(raw=raw)
     _parse_header(sections[0], item)
@@ -281,8 +294,15 @@ def _parse_header(lines: list[str], item: ParsedItem) -> None:
             remaining.append(line)
 
     if not item.rarity:
+        # Rozroznienie kosztuje jedna linijke, a oszczedza zgadywania:
+        # tekst z naglowkiem "Item Class:" albo z separatorem sekcji NA PEWNO
+        # wyszedl z PoE, wiec brak rzadkosci jest luka po naszej stronie.
+        # Tekst bez zadnego z tych znakow to po prostu cos innego - stara
+        # zawartosc dokumentu albo skrot wcisniety nie nad przedmiotem.
+        z_poe = "Item Class:" in item.raw or SEP_RE.search(item.raw) is not None
         raise ItemParseError(
-            "Brak linii 'Rarity:' - to chyba nie jest tekst przedmiotu z PoE."
+            "Brak linii 'Rarity:' - to chyba nie jest tekst przedmiotu z PoE.",
+            kind="przedmiot_bez_rzadkosci" if z_poe else "nie_przedmiot",
         )
     if item.rarity not in RARITIES:
         # Nowe klasy przedmiotow trafiaja tu zanim dopiszemy je do RARITIES;

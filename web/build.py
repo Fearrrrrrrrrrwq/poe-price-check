@@ -147,6 +147,15 @@ def source_button(t: dict) -> str:
             f'{esc(t["download_alt"])}</a>')
 
 
+def mac_button(t: dict) -> str:
+    """Przycisk macOS - nie ma gotowej paczki .app, wiec kieruje do sekcji
+    'macOS (experimental)' w README na GitHubie zamiast do pobrania binarki."""
+    if not SOURCE_URL:
+        return ""
+    return (f'<a class="btn" href="{SOURCE_URL}#macos-experimental" '
+            f'rel="noopener noreferrer">{esc(t["download_mac_cta"])}</a>')
+
+
 # Znak Discorda wklejony wprost w HTML, a nie jako <img>. Powod jest taki sam
 # jak przy reszcie zasobow: to jedno zapytanie mniej, ikona nie mrugnie przed
 # zaladowaniem, a CSP nie musi dopuszczac zadnego zewnetrznego zrodla.
@@ -318,9 +327,11 @@ def page(lang: str) -> str:
       <p class="body-text">{esc(t['download_body'])}</p>
       <p class="actions">
         <a class="btn primary" href="{DOWNLOAD_URL}" rel="noopener noreferrer">{esc(t['download_cta'])}</a>
+        {mac_button(t)}
         {discord_button(t)}
         {source_button(t)}
       </p>
+      <p class="note">{esc(t['download_mac_note'])}</p>
       <p class="note discord-note">{esc(t['discord_body'])}</p>
     </div>
   </section>

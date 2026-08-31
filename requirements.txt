@@ -1,2 +1,6 @@
 requests>=2.31
-keyboard>=0.13.5
+# keyboard nie dziala na macOS - wymaga roota do niskopoziomowych hookow i ma
+# dziurawa tabele mapowania klawiszy (zdiagnozowane na zgloszonym crashu,
+# patrz hotkeys_macos.py). Na macOS uzywamy pynput.
+keyboard>=0.13.5; sys_platform == "win32"
+pynput>=1.7.6; sys_platform == "darwin"

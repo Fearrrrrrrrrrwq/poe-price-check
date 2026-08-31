@@ -29,7 +29,10 @@ sys.path.insert(0, str(HERE))
 from paths import APP_VERSION
 
 hiddenimports = []
-hiddenimports += collect_submodules('keyboard')
+# Nie 'keyboard' - na macOS uzywamy 'pynput' (patrz hotkeys_macos.py).
+# pynput laduje swoj backend Quartz/Cocoa dynamicznie po nazwie modulu,
+# co PyInstaller bez hiddenimports czesto gubi.
+hiddenimports += collect_submodules('pynput')
 
 ICNS = HERE / 'build' / 'icon.icns'
 

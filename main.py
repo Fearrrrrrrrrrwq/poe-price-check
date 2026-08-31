@@ -18,9 +18,8 @@ import time
 import traceback
 from dataclasses import fields
 
-import keyboard
-
 import applog
+import hotkeys
 import i18n
 from bridge import BoosteroidBridge, BridgeError, BridgeTiming, make_transport
 from i18n import t
@@ -360,11 +359,11 @@ def run_gui(config: dict, league: str) -> int:
         close_on_focus_loss=config.get("close_on_focus_loss", True),
     )
 
-    keyboard.add_hotkey(hotkey, lambda: checker.trigger(use_bridge=True))
-    keyboard.add_hotkey(local_hotkey, lambda: checker.trigger(use_bridge=False))
+    hotkeys.add_hotkey(hotkey, lambda: checker.trigger(use_bridge=True))
+    hotkeys.add_hotkey(local_hotkey, lambda: checker.trigger(use_bridge=False))
     # Skrot leci z watku biblioteki keyboard, a Tk wolno dotykac tylko z watku
     # glownego - dlatego zamkniecie przekazujemy przez kolejke zdarzen Tk.
-    keyboard.add_hotkey(quit_hotkey, lambda: status.root.after(0, status.root.quit))
+    hotkeys.add_hotkey(quit_hotkey, lambda: status.root.after(0, status.root.quit))
 
     print(f"  {hotkey:<12} wycen przedmiot pod kursorem (przez Boosteroida)")
     print(f"  {local_hotkey:<12} wycen zawartosc lokalnego schowka")
@@ -435,12 +434,12 @@ def main() -> int:
         print(f"okno na wierzchu: {describe_foreground()}\n")
 
         print("[A] wysylam 'i' - w PoE to przelacza ekwipunek.")
-        keyboard.send("i")
+        hotkeys.send("i")
         time.sleep(3)
         print("    Czy ekwipunek sie przelaczyl?\n")
 
         print(f"[B] wysylam '{overlay_hotkey}' - to powinno otworzyc Steam Overlay.")
-        keyboard.send(overlay_hotkey)
+        hotkeys.send(overlay_hotkey)
         time.sleep(3)
         print("    Czy overlay sie otworzyl?\n")
 

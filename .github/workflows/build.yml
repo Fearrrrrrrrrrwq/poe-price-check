@@ -48,7 +48,7 @@ jobs:
       # wydanie, ktore w ogole nie startowalo, mimo ze lokalnie dzialalo.
       - name: Import modulow
         run: >
-          python -c "import applog, bridge, currency, i18n, item_parser,
+          python -c "import applog, bridge, currency, hotkeys, i18n, item_parser,
           package, paths, pseudo_stats, telemetry, theme, trade_api, winutil"
 
   # Jedyne miejsce, gdzie kod macOS (winutil_macos.py) w ogole dotyka
@@ -76,7 +76,7 @@ jobs:
 
       - name: Import modulow
         run: >
-          python -c "import applog, bridge, currency, i18n, item_parser,
+          python -c "import applog, bridge, currency, hotkeys, i18n, item_parser,
           package_mac, paths, pseudo_stats, telemetry, theme, trade_api, winutil"
 
   release:

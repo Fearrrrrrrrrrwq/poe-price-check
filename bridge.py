@@ -14,9 +14,9 @@ import threading
 import time
 from dataclasses import dataclass
 
-import keyboard
 import requests
 
+import hotkeys
 from winutil import describe_foreground
 
 GDOC_EXPORT = "https://docs.google.com/document/d/{doc_id}/export?format=txt"
@@ -60,8 +60,8 @@ def send_combo(combo: str, hold_ms: int = 80) -> None:
         return
     hold = hold_ms / 1000.0
 
-    sequence = [(keyboard.press, part) for part in parts]
-    sequence += [(keyboard.release, part) for part in reversed(parts)]
+    sequence = [(hotkeys.press, part) for part in parts]
+    sequence += [(hotkeys.release, part) for part in reversed(parts)]
 
     last = len(sequence) - 1
     for index, (action, part) in enumerate(sequence):
@@ -161,13 +161,13 @@ def _clear_modifiers(timeout: float = 2.0) -> None:
     """
     deadline = time.monotonic() + timeout
     while time.monotonic() < deadline:
-        if not any(keyboard.is_pressed(key) for key in MODIFIERS):
+        if not any(hotkeys.is_pressed(key) for key in MODIFIERS):
             return
         time.sleep(0.02)
 
     for key in MODIFIERS:
         try:
-            keyboard.release(key)
+            hotkeys.release(key)
         except Exception:  # noqa: BLE001 - zwalnianie na sile bywa zawodne
             pass
 

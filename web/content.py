@@ -105,6 +105,15 @@ C["en"] = {
                "reason this tool exists: same trade data, same official API, but "
                "it pulls the item text out of the cloud session instead of "
                "assuming your clipboard has it.",
+    "faq_6_q": "Does this work on GeForce NOW too?",
+    "faq_6_a": "You probably don't need it there - GeForce NOW syncs the "
+               "clipboard in both directions, so Awakened PoE Trade already "
+               "works directly on GFN. This tool's bridge step is built for "
+               "services where the clipboard only goes one way (local to "
+               "cloud), like Boosteroid. On a different cloud service and not "
+               "sure which kind it is? Copy something locally, then try "
+               "pasting it inside the cloud session - if it shows up, you "
+               "don't need this.",
     "download_title": "Get it",
     "download_body": "One file. Run it, the wizard does the rest.",
     "download_cta": "Download for Windows",
@@ -206,6 +215,15 @@ C["pl"] = {
                "istnieje: te same dane rynkowe, to samo oficjalne API, tylko "
                "tekst przedmiotu wyciągnięty z sesji chmurowej zamiast "
                "zakładania, że jest w schowku.",
+    "faq_6_q": "Czy to działa też na GeForce NOW?",
+    "faq_6_a": "Prawdopodobnie tam tego nie potrzebujesz - GeForce NOW "
+               "synchronizuje schowek w obie strony, więc Awakened PoE Trade "
+               "działa tam wprost. Most w tym narzędziu jest zrobiony pod "
+               "usługi, gdzie schowek leci tylko w jedną stronę (lokalnie → "
+               "chmura), jak Boosteroid. Grasz w innej usłudze chmurowej i "
+               "nie wiesz, która to wersja? Skopiuj coś lokalnie i spróbuj "
+               "wkleić w sesji chmurowej - jeśli się pojawi, tego narzędzia "
+               "nie potrzebujesz.",
     "download_title": "Pobierz",
     "download_body": "Jeden plik. Uruchom, resztą zajmie się kreator.",
     "download_cta": "Pobierz na Windows",
@@ -306,6 +324,16 @@ C["de"] = {
                "dieses Tool: gleiche Handelsdaten, gleiche offizielle API, nur "
                "wird der Item-Text aus der Cloud-Sitzung geholt statt "
                "anzunehmen, dass er in der Zwischenablage steht.",
+    "faq_6_q": "Funktioniert das auch mit GeForce NOW?",
+    "faq_6_a": "Dort brauchst du es wahrscheinlich nicht - GeForce NOW "
+               "synchronisiert die Zwischenablage in beide Richtungen, "
+               "Awakened PoE Trade funktioniert dort also direkt. Der "
+               "Brücken-Schritt dieses Tools ist für Dienste gedacht, bei "
+               "denen die Zwischenablage nur in eine Richtung geht (lokal → "
+               "Cloud), wie bei Boosteroid. Bist du auf einem anderen "
+               "Cloud-Dienst und weißt nicht, welche Art das ist: kopiere "
+               "lokal etwas und versuche es in der Cloud-Sitzung einzufügen "
+               "- erscheint es dort, brauchst du dieses Tool nicht.",
     "download_title": "Holen",
     "download_body": "Eine Datei. Starten, den Rest macht der Assistent.",
     "download_cta": "Für Windows herunterladen",
@@ -406,6 +434,16 @@ C["es"] = {
                "mismos datos de mercado, la misma API oficial, pero el texto del "
                "objeto se saca de la sesión en la nube en vez de asumir que está "
                "en el portapapeles.",
+    "faq_6_q": "¿Esto funciona también en GeForce NOW?",
+    "faq_6_a": "Ahí probablemente no lo necesites - GeForce NOW sincroniza el "
+               "portapapeles en ambas direcciones, así que Awakened PoE Trade "
+               "ya funciona directamente. El paso del puente de esta "
+               "herramienta está pensado para servicios donde el "
+               "portapapeles solo va en un sentido (local → nube), como "
+               "Boosteroid. ¿Usas otro servicio en la nube y no sabes de qué "
+               "tipo es? Copia algo localmente e intenta pegarlo dentro de "
+               "la sesión en la nube - si aparece, no necesitas esta "
+               "herramienta.",
     "download_title": "Descárgalo",
     "download_body": "Un archivo. Ejecútalo y el asistente hace el resto.",
     "download_cta": "Descargar para Windows",
@@ -505,6 +543,16 @@ C["pt"] = {
                "ferramenta existe: os mesmos dados de mercado, a mesma API "
                "oficial, só que o texto do item é retirado da sessão na nuvem "
                "em vez de presumir que está na área de transferência.",
+    "faq_6_q": "Isso funciona também no GeForce NOW?",
+    "faq_6_a": "Ali você provavelmente não precisa dele - o GeForce NOW "
+               "sincroniza a área de transferência nos dois sentidos, então "
+               "o Awakened PoE Trade já funciona diretamente lá. A etapa de "
+               "ponte desta ferramenta foi feita para serviços em que a "
+               "área de transferência só vai em um sentido (local → nuvem), "
+               "como o Boosteroid. Usa outro serviço em nuvem e não sabe "
+               "qual é o tipo? Copie algo localmente e tente colar dentro "
+               "da sessão na nuvem - se aparecer, você não precisa desta "
+               "ferramenta.",
     "download_title": "Baixe",
     "download_body": "Um arquivo. Execute e o assistente faz o resto.",
     "download_cta": "Baixar para Windows",
@@ -604,6 +652,15 @@ C["ru"] = {
                "инструмент: те же торговые данные, тот же официальный API, но "
                "текст предмета берётся из облачной сессии, а не из "
                "предположения, что он в буфере обмена.",
+    "faq_6_q": "Работает ли это с GeForce NOW?",
+    "faq_6_a": "Там это, скорее всего, не нужно - GeForce NOW синхронизирует "
+               "буфер обмена в обе стороны, поэтому Awakened PoE Trade там "
+               "уже работает напрямую. Мост в этом инструменте сделан для "
+               "сервисов, где буфер обмена идёт только в одну сторону "
+               "(локально → облако), как в Boosteroid. Играете в другом "
+               "облачном сервисе и не знаете, какой у него тип? Скопируйте "
+               "что-нибудь локально и попробуйте вставить внутри облачной "
+               "сессии - если появилось, этот инструмент вам не нужен.",
     "download_title": "Скачать",
     "download_body": "Один файл. Запустите - остальное сделает мастер.",
     "download_cta": "Скачать для Windows",

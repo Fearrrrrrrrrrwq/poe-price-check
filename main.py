@@ -334,9 +334,13 @@ def run_gui(config: dict, league: str) -> int:
     print(f"Liga: {league}")
     if telemetry.notice():
         print(telemetry.notice())
-    if not is_admin():
+    if sys.platform == "win32" and not is_admin():
         print("[uwaga] Program NIE dziala jako administrator. Jesli klawisze nie beda")
         print("        docieraly do Boosteroida, uruchom go z prawami administratora.")
+    elif sys.platform == "darwin":
+        print("[uwaga] Na macOS System Events (uzywany do przelaczania okien i")
+        print("        odczytu okna na wierzchu) wymaga uprawnienia Accessibility.")
+        print("        Ustawienia systemowe -> Prywatnosc i ochrona -> Dostepnosc.")
     print("Pobieram slownik statystyk...")
     checker.warm_up()
 
@@ -412,9 +416,12 @@ def main() -> int:
         print("TEST: czy nasze klawisze w ogole docieraja do sesji Boosteroida")
         print("=" * 64)
         print(f"Uprawnienia administratora: {'TAK' if is_admin() else 'NIE'}")
-        if not is_admin():
+        if sys.platform == "win32" and not is_admin():
             print("  ^ jesli test wypadnie negatywnie, uruchom program jako administrator:")
             print("    prawy przycisk na .exe -> 'Uruchom jako administrator'")
+        elif sys.platform == "darwin":
+            print("  ^ jesli test wypadnie negatywnie, sprawdz uprawnienie Accessibility")
+            print("    dla Terminala/Pythona w Ustawieniach systemowych.")
         print()
         print("Przelacz sie teraz na okno Boosteroida i PATRZ NA EKRAN GRY.")
 

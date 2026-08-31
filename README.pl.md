@@ -25,7 +25,7 @@ gra (chmura) --Ctrl+C--> schowek chmury --Ctrl+V--> Google Doc
 
 ## Wymagania
 
-- Windows
+- Windows lub macOS (patrz [macOS](#macos-eksperymentalne) niżej — wsparcie jest nowe i niepełne)
 - Gra uruchamiana w Boosteroidzie **przez Steama** (potrzebny Steam Overlay)
 - Konto Google
 
@@ -64,6 +64,31 @@ Przebudowa exe (wymaga dodatkowo `pip install pyinstaller`):
 ```bash
 build.bat
 ```
+
+### macOS (eksperymentalne)
+
+Gotowy `.exe` jest tylko dla Windows — na macOS uruchamiasz **ze źródeł**
+(nie ma jeszcze paczki `.app`, patrz zastrzeżenie niżej):
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python main.py
+```
+
+Program prosi macOS o uprawnienie **Dostępność** (Accessibility) dla
+Terminala/Pythona — bez niego globalny skrót klawiszowy i przełączanie się
+między oknem gry a programem nie zadziała. System sam o to zapyta przy
+pierwszym użyciu; jeśli nie zapyta, dodaj ręcznie: *Ustawienia systemowe →
+Prywatność i ochrona → Dostępność*.
+
+> **To wsparcie jest świeże i nieprzetestowane na prawdziwym Macu** — kod
+> platformowy (`winutil_macos.py`) został napisany na podstawie dokumentacji
+> AppleScript/System Events, nie sprawdzony ręcznie krok po kroku na macOS.
+> Jeśli używasz Maca i coś nie działa — zgłoś na GitHubie albo Discordzie
+> (linki niżej), to pomoże doszlifować tę ścieżkę. Budowanie gotowej paczki
+> `.app` (jak `build.bat` robi `.exe`) nie jest jeszcze zrobione.
 
 ## 1. Dokument-most
 

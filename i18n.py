@@ -9,6 +9,8 @@ danego jezyka na co dzien - sa poprawne, ale moga brzmiec sztywno.
 """
 
 import ctypes
+import locale
+import sys
 
 DEFAULT = "en"
 
@@ -724,12 +726,25 @@ _current = DEFAULT
 
 
 def detect_default() -> str:
-    """Jezyk z ustawien Windows, z odwrotem na angielski."""
+    """Jezyk z ustawien systemu, z odwrotem na angielski.
+
+    Windows ma wlasne, dokladniejsze API (GetUserDefaultUILanguage) i tego
+    trzymamy sie tam, gdzie jest dostepne. Na macOS/Linux nie ma odpowiednika
+    w ctypes, wiec sciagamy jezyk z modulu locale - mniej dokladne (bierze
+    ustawienia regionalne powloki, nie systemowy jezyk UI), ale wystarczajace
+    do sensownego domyslnego wyboru."""
+    if sys.platform == "win32":
+        try:
+            code = ctypes.windll.kernel32.GetUserDefaultUILanguage()
+            buffer = ctypes.create_unicode_buffer(85)
+            ctypes.windll.kernel32.LCIDToLocaleName(code, buffer, 85, 0)
+            prefix = (buffer.value or "")[:2].lower()
+            return _WINDOWS_HINTS.get(prefix, DEFAULT)
+        except Exception:  # noqa: BLE001 - wykrycie jezyka nie moze psuc startu
+            return DEFAULT
     try:
-        code = ctypes.windll.kernel32.GetUserDefaultUILanguage()
-        buffer = ctypes.create_unicode_buffer(85)
-        ctypes.windll.kernel32.LCIDToLocaleName(code, buffer, 85, 0)
-        prefix = (buffer.value or "")[:2].lower()
+        tag = locale.getlocale()[0] or ""
+        prefix = tag[:2].lower()
         return _WINDOWS_HINTS.get(prefix, DEFAULT)
     except Exception:  # noqa: BLE001 - wykrycie jezyka nie moze psuc startu
         return DEFAULT

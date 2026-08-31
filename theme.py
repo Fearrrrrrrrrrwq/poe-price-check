@@ -5,6 +5,7 @@ wygladaly jak jeden program, a nie dwa rozne narzedzia.
 """
 
 import ctypes
+import sys
 import tkinter as tk
 
 from paths import resource_path
@@ -59,7 +60,12 @@ def dark_titlebar(window: tk.Misc) -> None:
 
     Bez tego nad ciemna aplikacja wisi jasny pasek Windows - najbardziej rzucajaca
     sie w oczy oznaka, ze to nie jest zaprojektowany program.
+
+    Windows-only: DWM to mechanizm kompozytora okien Windows, macOS nie ma
+    odpowiednika (tam belka tytulu sama podaza za trybem ciemnym systemu).
     """
+    if sys.platform != "win32":
+        return
     try:
         hwnd = _hwnd_of(window)
         enabled = ctypes.c_int(1)
@@ -82,7 +88,14 @@ def dark_titlebar(window: tk.Misc) -> None:
 def apply_icon(window: tk.Misc) -> None:
     """Ustawia ikone okna i ciemna belke. Brak pliku nie moze przerwac startu."""
     try:
-        window.iconbitmap(str(resource_path("icon.ico")))
+        if sys.platform == "win32":
+            window.iconbitmap(str(resource_path("icon.ico")))
+        else:
+            # Tk na macOS/Linux nie czyta formatu .ico przez iconbitmap -
+            # potrzebuje PhotoImage, wiec bierzemy ten sam png co strona www.
+            icon = tk.PhotoImage(file=str(resource_path("icon.png")))
+            window.iconphoto(True, icon)
+            window._icon_ref = icon  # PhotoImage znika, gdy nikt go nie trzyma
     except Exception:  # noqa: BLE001 - ikona to ozdoba, nie warunek dzialania
         pass
     dark_titlebar(window)

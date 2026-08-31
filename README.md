@@ -54,6 +54,28 @@ hook, which is the only way to catch a shortcut while the game has focus; some
 antivirus software flags that heuristically. Build it yourself if you would
 rather be sure what you are running.
 
+### macOS (experimental)
+
+There is no `.app` build yet — run from source:
+
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+python main.py
+```
+
+macOS will prompt for **Accessibility** permission for Terminal/Python — the
+global hotkey and window switching need it. If it doesn't prompt, add it
+manually: *System Settings → Privacy & Security → Accessibility*.
+
+> **This support is new and has not been tested on real macOS hardware** —
+> the platform-specific code (`winutil_macos.py`) was written against the
+> AppleScript/System Events documentation, not verified step by step on a
+> Mac. If you're on macOS and something breaks, please open an issue or ping
+> Discord — that's how this gets solid. A packaged `.app` (the macOS
+> equivalent of `build.bat`'s `.exe`) doesn't exist yet.
+
 ## Build from source
 
 Python 3.11+.

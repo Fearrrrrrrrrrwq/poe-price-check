@@ -51,6 +51,34 @@ jobs:
           python -c "import applog, bridge, currency, i18n, item_parser,
           package, paths, pseudo_stats, telemetry, theme, trade_api, winutil"
 
+  # Jedyne miejsce, gdzie kod macOS (winutil_macos.py) w ogole dotyka
+  # prawdziwego macOS - autor portu pracuje na Windows i nie ma jak tego
+  # sprawdzic lokalnie. Import na macos-latest runnerze to najtansza mozliwa
+  # kontrola: nie gwarantuje, ze osascript/System Events dzialaja tak jak
+  # zakladano (do tego trzeba by faktycznie odpalic program i klikac), ale
+  # gwarantuje, ze program w ogole rusza z miejsca.
+  checks-macos:
+    name: kontrole (macOS)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Zaleznosci
+        run: pip install -r requirements.txt
+
+      - name: Kompilacja wszystkich modulow
+        run: python -m compileall -q . -x "(web/dist|build|dist|node_modules)"
+
+      - name: Import modulow
+        run: >
+          python -c "import applog, bridge, currency, i18n, item_parser,
+          package_mac, paths, pseudo_stats, telemetry, theme, trade_api, winutil"
+
   release:
     name: wydanie
     if: startsWith(github.ref, 'refs/tags/v')
@@ -96,3 +124,68 @@ jobs:
           (Get-Item dist/poe-price-check-*.zip)
           --title "PoE Price Check ${{ github.ref_name }}"
           --notes-file dist/RELEASE-NOTES.md
+
+  # EKSPERYMENTALNE - patrz README, sekcja "macOS (experimental)". Ten job
+  # dokleja .app do TEGO SAMEGO wydania co release (windows), wiec czeka az
+  # ono utworzy sam release przed doklejeniem swojego pliku (gh release upload,
+  # nie create - inaczej dwa joby scigalyby sie o stworzenie tego samego taga).
+  release-macos:
+    name: wydanie (macOS)
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [checks-macos, release]
+    runs-on: macos-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Zaleznosci
+        run: pip install -r requirements.txt pyinstaller
+
+      # icon.icns nie siedzi w repo jako binarka - generujemy go tu z
+      # icon.png narzedziami, ktore sa tylko na macOS. Zrodlo ma 256x256,
+      # wiec najwieksze rozmiary w iconsetcie sa upskalowane (mniej ostre) -
+      # kosmetyka, nie funkcjonalnosc.
+      - name: Ikona .icns
+        run: |
+          mkdir -p build/icon.iconset
+          sips -z 16 16     icon.png --out build/icon.iconset/icon_16x16.png
+          sips -z 32 32     icon.png --out build/icon.iconset/icon_16x16@2x.png
+          sips -z 32 32     icon.png --out build/icon.iconset/icon_32x32.png
+          sips -z 64 64     icon.png --out build/icon.iconset/icon_32x32@2x.png
+          sips -z 128 128   icon.png --out build/icon.iconset/icon_128x128.png
+          sips -z 256 256   icon.png --out build/icon.iconset/icon_128x128@2x.png
+          sips -z 256 256   icon.png --out build/icon.iconset/icon_256x256.png
+          sips -z 512 512   icon.png --out build/icon.iconset/icon_256x256@2x.png
+          sips -z 512 512   icon.png --out build/icon.iconset/icon_512x512.png
+          sips -z 1024 1024 icon.png --out build/icon.iconset/icon_512x512@2x.png
+          iconutil -c icns build/icon.iconset -o build/icon.icns
+
+      - name: Budowanie .app
+        run: python -m PyInstaller --noconfirm poe-price-check-mac.spec
+
+      - name: Pakowanie
+        id: pack
+        run: python package_mac.py "$GITHUB_OUTPUT"
+
+      - name: Artefakt budowania
+        uses: actions/upload-artifact@v4
+        with:
+          name: poe-price-check-macos-${{ github.ref_name }}
+          path: dist/poe-price-check-*-macos.zip
+          retention-days: 14
+
+      # Doklejamy do wydania, ktore stworzyl job "release" - upload, nie
+      # create. --clobber na wypadek ponownego uruchomienia joba po awarii.
+      - name: Dolaczenie do wydania na GitHubie
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: >
+          gh release upload ${{ github.ref_name }}
+          dist/poe-price-check-*-macos.zip
+          --clobber

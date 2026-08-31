@@ -1,6 +1,12 @@
 requests>=2.31
 # keyboard nie dziala na macOS - wymaga roota do niskopoziomowych hookow i ma
 # dziurawa tabele mapowania klawiszy (zdiagnozowane na zgloszonym crashu,
-# patrz hotkeys_macos.py). Na macOS uzywamy pynput.
+# patrz hotkeys_macos.py).
 keyboard>=0.13.5; sys_platform == "win32"
-pynput>=1.7.6; sys_platform == "darwin"
+# pynput TEZ nie dziala na macOS - crashuje natywnie przy pierwszym
+# zdarzeniu klawiatury (HIToolbox wolno pytac tylko z glownego watku,
+# pynput pyta z watku w tle). Uzywamy quickmachotkey (Carbon Event
+# Manager) do rejestracji skrotow; wysylanie klawiszy idzie bezposrednio
+# przez ctypes do CoreGraphics, bez dodatkowej zaleznosci - patrz
+# hotkeys_macos.py.
+quickmachotkey>=2023.3.4; sys_platform == "darwin"

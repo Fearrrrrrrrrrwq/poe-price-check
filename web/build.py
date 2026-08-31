@@ -25,6 +25,7 @@ from privacy_content import PRIVACY
 # Wersja i sklejanie archiwum siedza w package.py, zeby plik ze strony
 # i plik z wydania na GitHubie byly identyczne.
 from package import APP_VERSION, ARCHIVE_NAME
+from package_mac import ARCHIVE_NAME as MAC_ARCHIVE_NAME
 
 HERE = pathlib.Path(__file__).parent
 DIST = HERE / "dist"
@@ -66,6 +67,13 @@ DOWNLOAD_FILE = ARCHIVE_NAME
 DOWNLOAD_URL = os.environ.get(
     "DOWNLOAD_URL",
     f"{SOURCE_URL}/releases/download/v{APP_VERSION}/{ARCHIVE_NAME}")
+
+# macOS: release-macos w CI dokleja ten plik do TEGO SAMEGO wydania co
+# ARCHIVE_NAME (patrz .github/workflows/build.yml), wiec ten sam wzorzec
+# adresu dziala dla obu.
+MAC_DOWNLOAD_URL = os.environ.get(
+    "MAC_DOWNLOAD_URL",
+    f"{SOURCE_URL}/releases/download/v{APP_VERSION}/{MAC_ARCHIVE_NAME}")
 
 # Wpis na liste preload jest praktycznie nieodwracalny - wykreslenie trwa
 # miesiacami, a do tego czasu przegladarki odmawiaja polaczenia po http z cala
@@ -148,11 +156,9 @@ def source_button(t: dict) -> str:
 
 
 def mac_button(t: dict) -> str:
-    """Przycisk macOS - nie ma gotowej paczki .app, wiec kieruje do sekcji
-    'macOS (experimental)' w README na GitHubie zamiast do pobrania binarki."""
-    if not SOURCE_URL:
-        return ""
-    return (f'<a class="btn" href="{SOURCE_URL}#macos-experimental" '
+    """Przycisk macOS - bezposrednie pobranie .app zbudowanego w CI
+    (release-macos, patrz .github/workflows/build.yml)."""
+    return (f'<a class="btn" href="{MAC_DOWNLOAD_URL}" '
             f'rel="noopener noreferrer">{esc(t["download_mac_cta"])}</a>')
 
 

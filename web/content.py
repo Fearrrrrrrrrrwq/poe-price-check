@@ -101,9 +101,11 @@ C["en"] = {
     "download_title": "Get it",
     "download_body": "One file. Run it, the wizard does the rest.",
     "download_cta": "Download for Windows",
-    "download_mac_cta": "macOS (from source)",
-    "download_mac_note": "No packaged macOS app yet - experimental, run from source. "
-                         "See the README for setup and current limitations.",
+    "download_mac_cta": "Download for macOS",
+    "download_mac_note": "Experimental and unsigned - macOS will warn about an "
+                         "unidentified developer. Right-click the app -> Open -> "
+                         "Open (once) to run it. See the README for details and "
+                         "current limitations.",
     "download_alt": "Source code",
     "discord_cta": "Join the Discord",
     "discord_body": "Questions, bug reports and news about new versions - the Discord is the fastest way to reach me.",
@@ -192,9 +194,10 @@ C["pl"] = {
     "download_title": "Pobierz",
     "download_body": "Jeden plik. Uruchom, resztą zajmie się kreator.",
     "download_cta": "Pobierz na Windows",
-    "download_mac_cta": "macOS (ze źródeł)",
-    "download_mac_note": "Nie ma jeszcze gotowej paczki na macOS - wsparcie jest "
-                         "eksperymentalne, uruchamiasz ze źródeł. Instrukcja i "
+    "download_mac_cta": "Pobierz na macOS",
+    "download_mac_note": "Eksperymentalne i niepodpisane - macOS ostrzeże o "
+                         "nieznanym deweloperze. Kliknij prawym na aplikację -> "
+                         "Otwórz -> Otwórz (raz), żeby uruchomić. Szczegóły i "
                          "obecne ograniczenia są w README.",
     "download_alt": "Kod źródłowy",
     "discord_cta": "Wbij na Discorda",
@@ -283,10 +286,11 @@ C["de"] = {
     "download_title": "Holen",
     "download_body": "Eine Datei. Starten, den Rest macht der Assistent.",
     "download_cta": "Für Windows herunterladen",
-    "download_mac_cta": "macOS (aus dem Quellcode)",
-    "download_mac_note": "Noch keine fertige macOS-App - experimentell, aus dem "
-                         "Quellcode starten. Anleitung und aktuelle "
-                         "Einschränkungen stehen im README.",
+    "download_mac_cta": "Für macOS herunterladen",
+    "download_mac_note": "Experimentell und unsigniert - macOS warnt vor einem "
+                         "nicht verifizierten Entwickler. Rechtsklick auf die App "
+                         "-> Öffnen -> Öffnen (einmalig), um sie zu starten. "
+                         "Details und aktuelle Einschränkungen stehen im README.",
     "download_alt": "Quellcode",
     "discord_cta": "Discord beitreten",
     "discord_body": "Fragen, Fehlermeldungen und Neuigkeiten zu neuen Versionen - über Discord erreichst du mich am schnellsten.",
@@ -374,10 +378,11 @@ C["es"] = {
     "download_title": "Descárgalo",
     "download_body": "Un archivo. Ejecútalo y el asistente hace el resto.",
     "download_cta": "Descargar para Windows",
-    "download_mac_cta": "macOS (desde el código fuente)",
-    "download_mac_note": "Todavía no hay una app empaquetada para macOS - es "
-                         "experimental, se ejecuta desde el código fuente. Las "
-                         "instrucciones y limitaciones actuales están en el README.",
+    "download_mac_cta": "Descargar para macOS",
+    "download_mac_note": "Experimental y sin firmar - macOS avisará sobre un "
+                         "desarrollador no identificado. Clic derecho en la "
+                         "app -> Abrir -> Abrir (una vez) para ejecutarla. Más "
+                         "detalles y limitaciones actuales en el README.",
     "download_alt": "Código fuente",
     "discord_cta": "Únete al Discord",
     "discord_body": "Preguntas, informes de errores y novedades sobre nuevas versiones: en Discord me localizas más rápido.",
@@ -464,10 +469,11 @@ C["pt"] = {
     "download_title": "Baixe",
     "download_body": "Um arquivo. Execute e o assistente faz o resto.",
     "download_cta": "Baixar para Windows",
-    "download_mac_cta": "macOS (a partir do código-fonte)",
-    "download_mac_note": "Ainda não há um app empacotado para macOS - é "
-                         "experimental, execute a partir do código-fonte. "
-                         "Instruções e limitações atuais estão no README.",
+    "download_mac_cta": "Baixar para macOS",
+    "download_mac_note": "Experimental e sem assinatura - o macOS vai avisar "
+                         "sobre um desenvolvedor não identificado. Clique com o "
+                         "botão direito no app -> Abrir -> Abrir (uma vez) para "
+                         "executar. Detalhes e limitações atuais no README.",
     "download_alt": "Código-fonte",
     "discord_cta": "Entre no Discord",
     "discord_body": "Dúvidas, relatos de erros e novidades sobre novas versões - no Discord você me encontra mais rápido.",
@@ -554,10 +560,11 @@ C["ru"] = {
     "download_title": "Скачать",
     "download_body": "Один файл. Запустите - остальное сделает мастер.",
     "download_cta": "Скачать для Windows",
-    "download_mac_cta": "macOS (из исходников)",
-    "download_mac_note": "Готового приложения для macOS пока нет - это "
-                         "экспериментальная поддержка, запуск из исходников. "
-                         "Инструкция и текущие ограничения - в README.",
+    "download_mac_cta": "Скачать для macOS",
+    "download_mac_note": "Экспериментально и без подписи - macOS предупредит о "
+                         "неопознанном разработчике. Правый клик по приложению "
+                         "-> Открыть -> Открыть (один раз), чтобы запустить. "
+                         "Подробности и текущие ограничения - в README.",
     "download_alt": "Исходный код",
     "discord_cta": "Зайти в Discord",
     "discord_body": "Вопросы, сообщения об ошибках и новости о новых версиях - в Discord ответ придёт быстрее всего.",

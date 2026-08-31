@@ -21,6 +21,7 @@ from datetime import date
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
 from content import C, DEFAULT, LANGS, LOCALES
+from privacy_content import PRIVACY
 # Wersja i sklejanie archiwum siedza w package.py, zeby plik ze strony
 # i plik z wydania na GitHubie byly identyczne.
 from package import APP_VERSION, ARCHIVE_NAME
@@ -225,6 +226,10 @@ def page(lang: str) -> str:
   <link rel="icon" href="{asset('icon.png')}" type="image/png">
   <link rel="stylesheet" href="{asset('style.css')}">
   <script src="{asset('hit.js')}" defer></script>
+  <script async src="https://fundingchoicesmessages.google.com/i/pub-6223562686562496?ers=1"></script>
+  <script>(function() {{function signalGooglefcPresent() {{if (!window.frames['googlefcPresent']) {{if (document.body) {{const iframe = document.createElement('iframe'); iframe.style = 'width: 0; height: 0; border: none; z-index: -1000; left: -1000px; top: -1000px;'; iframe.style.display = 'none'; iframe.name = 'googlefcPresent'; document.body.appendChild(iframe);}} else {{setTimeout(signalGooglefcPresent, 0);}}}}}} signalGooglefcPresent();}})();</script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6223562686562496"
+     crossorigin="anonymous"></script>
   {json_ld(lang, t)}
 </head>
 <body>
@@ -327,7 +332,45 @@ def page(lang: str) -> str:
     <p class="footer-cta">{discord_button(t)}</p>
     <p class="disclaimer">{esc(t['footer_disclaimer'])}</p>
     <p class="disclaimer"><a href="{SOURCE_URL}/blob/main/SIGNING-POLICY.md"
-       rel="noopener noreferrer">Code signing policy</a></p>
+       rel="noopener noreferrer">Code signing policy</a>
+       &middot; <a href="/{lang}/privacy/">{esc(PRIVACY[lang]['title'])}</a></p>
+  </div>
+</footer>
+</body>
+</html>
+"""
+
+
+def privacy_page(lang: str) -> str:
+    p = PRIVACY[lang]
+    t = C[lang]
+    sections = "".join(
+        f"<section><h2>{esc(heading)}</h2>"
+        + "".join(f"<p>{esc(para)}</p>" for para in paras)
+        + "</section>"
+        for heading, paras in p["sections"])
+    return f"""<!DOCTYPE html>
+<html lang="{lang}" dir="{t['dir']}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{esc(p['title'])} - PoE Price Check</title>
+  <meta name="description" content="{esc(p['description'])}">
+  <meta name="robots" content="index, follow">
+  <link rel="canonical" href="{SITE_URL}/{lang}/privacy/">
+  <link rel="icon" href="{asset('icon.png')}" type="image/png">
+  <link rel="stylesheet" href="{asset('style.css')}">
+</head>
+<body>
+<main class="wrap narrow legal">
+  <p><a href="/{lang}/">{esc(p['back'])}</a></p>
+  <h1>{esc(p['title'])}</h1>
+  <p class="note">{esc(p['updated'])}</p>
+  {sections}
+</main>
+<footer>
+  <div class="wrap">
+    <nav class="langs" aria-label="{esc(t['footer_lang'])}">{lang_switch(lang)}</nav>
   </div>
 </footer>
 </body>
@@ -356,6 +399,10 @@ def root_redirect() -> str:
   <link rel="stylesheet" href="{asset('style.css')}">
   <script src="{asset('lang.js')}" defer></script>
   <script src="{asset('hit.js')}" defer></script>
+  <script async src="https://fundingchoicesmessages.google.com/i/pub-6223562686562496?ers=1"></script>
+  <script>(function() {{function signalGooglefcPresent() {{if (!window.frames['googlefcPresent']) {{if (document.body) {{const iframe = document.createElement('iframe'); iframe.style = 'width: 0; height: 0; border: none; z-index: -1000; left: -1000px; top: -1000px;'; iframe.style.display = 'none'; iframe.name = 'googlefcPresent'; document.body.appendChild(iframe);}} else {{setTimeout(signalGooglefcPresent, 0);}}}}}} signalGooglefcPresent();}})();</script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6223562686562496"
+     crossorigin="anonymous"></script>
 </head>
 <body class="centre">
   <main class="wrap">
@@ -724,9 +771,20 @@ def headers() -> str:
     """
     return (
         "/*\n"
-        "  Content-Security-Policy: default-src 'none'; script-src 'self'; "
-        "style-src 'self'; img-src 'self' data:; font-src 'self'; "
-        "connect-src 'self'; form-action 'self'; base-uri 'none'; "
+        "  Content-Security-Policy: default-src 'none'; "
+        "script-src 'self' https://pagead2.googlesyndication.com "
+        "https://googleads.g.doubleclick.net https://tpc.googlesyndication.com "
+        "https://fundingchoicesmessages.google.com; "
+        "style-src 'self'; "
+        "img-src 'self' data: https://*.googlesyndication.com https://*.doubleclick.net "
+        "https://*.google.com https://*.gstatic.com; "
+        "font-src 'self'; "
+        "connect-src 'self' https://*.googlesyndication.com https://*.doubleclick.net "
+        "https://*.google.com https://fundingchoicesmessages.google.com; "
+        "frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com "
+        "https://*.safeframe.googlesyndication.com https://www.google.com "
+        "https://fundingchoicesmessages.google.com; "
+        "form-action 'self'; base-uri 'none'; "
         "frame-ancestors 'none'\n"
         "  X-Content-Type-Options: nosniff\n"
         "  Referrer-Policy: no-referrer\n"
@@ -775,6 +833,17 @@ def build() -> None:
                 f"Tresc dla {code!r} niezgodna: brakuje {sorted(missing)}, "
                 f"nadmiar {sorted(extra)}")
 
+    privacy_base = set(PRIVACY[DEFAULT])
+    for code in LANGS:
+        if code not in PRIVACY:
+            raise SystemExit(f"Brak polityki prywatnosci dla {code!r}")
+        missing = privacy_base - set(PRIVACY[code])
+        extra = set(PRIVACY[code]) - privacy_base
+        if missing or extra:
+            raise SystemExit(
+                f"Polityka prywatnosci dla {code!r} niezgodna: "
+                f"brakuje {sorted(missing)}, nadmiar {sorted(extra)}")
+
     if DIST.exists():
         shutil.rmtree(DIST)
     (DIST / "assets").mkdir(parents=True)
@@ -783,6 +852,9 @@ def build() -> None:
         target = DIST / code
         target.mkdir()
         (target / "index.html").write_text(page(code), encoding="utf-8")
+        (target / "privacy").mkdir()
+        (target / "privacy" / "index.html").write_text(
+            privacy_page(code), encoding="utf-8")
 
     (DIST / "index.html").write_text(root_redirect(), encoding="utf-8")
     (DIST / "admin").mkdir()
@@ -793,6 +865,9 @@ def build() -> None:
     (DIST / "404.html").write_text(not_found_page(), encoding="utf-8")
     (DIST / "sitemap.xml").write_text(sitemap(), encoding="utf-8")
     (DIST / "robots.txt").write_text(robots(), encoding="utf-8")
+    (DIST / "ads.txt").write_text(
+        "google.com, pub-6223562686562496, DIRECT, f08c47fec0942fa0\n",
+        encoding="utf-8")
     (DIST / "version.json").write_text(version_manifest(), encoding="utf-8")
     (DIST / "_headers").write_text(headers(), encoding="utf-8")
 

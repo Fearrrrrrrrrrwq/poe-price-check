@@ -98,6 +98,13 @@ print("\n=== bezpieczenstwo ===")
 LOADED_RE = re.compile(r'<(?:script|img|iframe)[^>]+src="(https?://[^"]+)"'
                        r'|<link[^>]+rel="(?:stylesheet|preload|preconnect)"[^>]+'
                        r'href="(https?://[^"]+)"')
+ALLOWED_EXTERNAL = {
+    # AdSense - swiadomie dopuszczony wyjatek do monetyzacji, zgodny z CSP wyzej.
+    "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"
+    "?client=ca-pub-6223562686562496",
+    # Funding Choices (CMP) - baner zgody RODO/EOG dla powyzszej reklamy.
+    "https://fundingchoicesmessages.google.com/i/pub-6223562686562496?ers=1",
+}
 external = set()
 for path in DIST.rglob("*.html"):
     page = path.read_text(encoding="utf-8")
@@ -105,7 +112,8 @@ for path in DIST.rglob("*.html"):
         url = next((g for g in groups if g), "")
         if url:
             external.add(url)
-check("zero zewnetrznych zasobow (CDN, fonty)", not external, str(external))
+external -= ALLOWED_EXTERNAL
+check("zero zewnetrznych zasobow (CDN, fonty) poza dopuszczonymi", not external, str(external))
 
 # Linki wychodzace musza miec noopener - inaczej otwarta strona dostaje
 # uchwyt do naszego okna przez window.opener.

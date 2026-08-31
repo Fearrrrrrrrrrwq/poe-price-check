@@ -438,3 +438,12 @@ footer { border-top: 1px solid var(--border); padding: 32px 0 44px; background: 
              white-space: nowrap; font-size: 12.5px; }
 
 #meta { font-size: 12.5px; margin-top: 14px; }
+
+/* Strona polityki prywatnosci - zwykly tekst, bez marketingowych odstepow
+   sekcji z reszty strony (section { padding: 72px 0 } byloby tu absurdalne). */
+.legal { padding: 56px 0 80px; }
+.legal h1 { font-size: 28px; margin-bottom: 4px; }
+.legal section { padding: 0; margin-top: 32px; }
+.legal h2 { font-size: 19px; margin-bottom: 10px; }
+.legal p { margin-bottom: 12px; line-height: 1.6; color: var(--fg); }
+.legal p:last-child { margin-bottom: 0; }

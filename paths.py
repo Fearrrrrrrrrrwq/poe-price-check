@@ -8,7 +8,7 @@ przetrwac (config, cache), musza isc obok samego .exe.
 import sys
 from pathlib import Path
 
-APP_VERSION = "1.1.0"
+APP_VERSION = "1.1.1"
 
 
 def app_dir() -> Path:

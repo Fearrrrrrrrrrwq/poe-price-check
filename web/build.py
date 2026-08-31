@@ -271,6 +271,7 @@ def page(lang: str) -> str:
         <p class="lead">{esc(t['hero_lead'])}</p>
         <p class="actions">
           <a class="btn primary" href="{DOWNLOAD_URL}" rel="noopener noreferrer">{esc(t["hero_cta"])}</a>
+          {mac_button(t)}
           <span class="note">{esc(t['hero_note'])}</span>
         </p>
       </div>

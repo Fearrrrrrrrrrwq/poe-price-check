@@ -786,22 +786,35 @@ def headers() -> str:
     Polityka jest dobrana pod panel, bo to on ma wieksze potrzeby. Strony
     publiczne dostaja przez to connect-src 'self' zamiast 'none', ale nie robia
     zadnych zapytan, a skryptow z zewnatrz i tak pilnuje script-src 'self'.
+
+    UWAGA (odkryte 2026-08-31 przez konsole na produkcji): AdSense/Funding
+    Choices NIE dzialaly z pierwotna wersja tej polityki mimo dodanych
+    domen - brakowalo 'unsafe-inline' (kod reklam Google wstrzykuje inline
+    <script>/style w locie, nie da sie tego domknac samym whitelistowaniem
+    hostow bez dynamicznych nonce'ow per-request, na co statyczny build tej
+    strony nie pozwala), brakowalo pagead2.googlesyndication.com we
+    frame-src (sam skrypt byl w script-src, ale reklama renderuje sie w
+    IFRAME z tej samej domeny) i brakowalo adtrafficquality.google w
+    connect-src (telemetria jakosci reklam Google). Efekt: bloki w konsoli,
+    zero wyswietlanych reklam - przez trzy tygodnie od wdrozenia AdSense.
     """
     return (
         "/*\n"
         "  Content-Security-Policy: default-src 'none'; "
-        "script-src 'self' https://pagead2.googlesyndication.com "
+        "script-src 'self' 'unsafe-inline' https://pagead2.googlesyndication.com "
         "https://googleads.g.doubleclick.net https://tpc.googlesyndication.com "
-        "https://fundingchoicesmessages.google.com; "
-        "style-src 'self'; "
+        "https://fundingchoicesmessages.google.com "
+        "https://*.adtrafficquality.google; "
+        "style-src 'self' 'unsafe-inline'; "
         "img-src 'self' data: https://*.googlesyndication.com https://*.doubleclick.net "
-        "https://*.google.com https://*.gstatic.com; "
+        "https://*.google.com https://*.gstatic.com https://*.adtrafficquality.google; "
         "font-src 'self'; "
         "connect-src 'self' https://*.googlesyndication.com https://*.doubleclick.net "
-        "https://*.google.com https://fundingchoicesmessages.google.com; "
-        "frame-src https://googleads.g.doubleclick.net https://tpc.googlesyndication.com "
-        "https://*.safeframe.googlesyndication.com https://www.google.com "
+        "https://*.google.com https://*.adtrafficquality.google "
         "https://fundingchoicesmessages.google.com; "
+        "frame-src https://*.googlesyndication.com https://googleads.g.doubleclick.net "
+        "https://*.safeframe.googlesyndication.com https://www.google.com "
+        "https://fundingchoicesmessages.google.com https://*.adtrafficquality.google; "
         "form-action 'self'; base-uri 'none'; "
         "frame-ancestors 'none'\n"
         "  X-Content-Type-Options: nosniff\n"

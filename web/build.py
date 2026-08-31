@@ -122,7 +122,7 @@ def json_ld(lang: str, t: dict) -> str:
         "@type": "SoftwareApplication",
         "name": "PoE Price Check",
         "applicationCategory": "UtilitiesApplication",
-        "operatingSystem": "Windows 10, Windows 11",
+        "operatingSystem": "Windows 10, Windows 11, macOS",
         "softwareVersion": APP_VERSION,
         "inLanguage": list(LANGS),
         "description": t["description"],
@@ -139,7 +139,7 @@ def json_ld(lang: str, t: dict) -> str:
         "mainEntity": [
             {"@type": "Question", "name": t[f"faq_{n}_q"],
              "acceptedAnswer": {"@type": "Answer", "text": t[f"faq_{n}_a"]}}
-            for n in (1, 2, 3, 4)
+            for n in (1, 2, 3, 4, 5)
         ],
     }
     return "\n".join(
@@ -210,7 +210,7 @@ def page(lang: str) -> str:
 
     faq = "".join(
         f'<details><summary>{esc(t[f"faq_{n}_q"])}</summary>'
-        f'<p>{esc(t[f"faq_{n}_a"])}</p></details>' for n in (1, 2, 3, 4))
+        f'<p>{esc(t[f"faq_{n}_a"])}</p></details>' for n in (1, 2, 3, 4, 5))
 
     return f"""<!DOCTYPE html>
 <html lang="{lang}" dir="{t['dir']}">

@@ -98,6 +98,13 @@ C["en"] = {
     "faq_4_q": "Which PoE version?",
     "faq_4_a": "Path of Exile 1. PoE 2 uses a different trade API and is not "
                "supported yet.",
+    "faq_5_q": "Can I just use Awakened PoE Trade instead?",
+    "faq_5_a": "Not on Boosteroid or any other cloud gaming service - Awakened PoE "
+               "Trade reads your local clipboard, and cloud gaming only syncs the "
+               "clipboard one way (local to cloud, never back). That's the whole "
+               "reason this tool exists: same trade data, same official API, but "
+               "it pulls the item text out of the cloud session instead of "
+               "assuming your clipboard has it.",
     "download_title": "Get it",
     "download_body": "One file. Run it, the wizard does the rest.",
     "download_cta": "Download for Windows",
@@ -191,6 +198,14 @@ C["pl"] = {
     "faq_4_q": "Która wersja PoE?",
     "faq_4_a": "Path of Exile 1. PoE 2 ma inne API rynku i nie jest jeszcze "
                "obsługiwane.",
+    "faq_5_q": "Czy nie prościej użyć Awakened PoE Trade?",
+    "faq_5_a": "Nie na Boosteroidzie ani żadnej innej chmurze - Awakened PoE Trade "
+               "czyta lokalny schowek, a przy graniu w chmurze schowek "
+               "synchronizuje się tylko w jedną stronę (lokalnie → chmura, "
+               "nigdy z powrotem). To cały powód, dla którego to narzędzie "
+               "istnieje: te same dane rynkowe, to samo oficjalne API, tylko "
+               "tekst przedmiotu wyciągnięty z sesji chmurowej zamiast "
+               "zakładania, że jest w schowku.",
     "download_title": "Pobierz",
     "download_body": "Jeden plik. Uruchom, resztą zajmie się kreator.",
     "download_cta": "Pobierz na Windows",
@@ -283,6 +298,14 @@ C["de"] = {
     "faq_4_q": "Welche PoE-Version?",
     "faq_4_a": "Path of Exile 1. PoE 2 nutzt eine andere Handels-API und wird noch "
                "nicht unterstützt.",
+    "faq_5_q": "Kann ich nicht einfach Awakened PoE Trade nutzen?",
+    "faq_5_a": "Nicht bei Boosteroid oder einem anderen Cloud-Gaming-Dienst - "
+               "Awakened PoE Trade liest die lokale Zwischenablage, und beim "
+               "Cloud-Gaming wird die Zwischenablage nur in eine Richtung "
+               "synchronisiert (lokal → Cloud, nie zurück). Genau deshalb gibt es "
+               "dieses Tool: gleiche Handelsdaten, gleiche offizielle API, nur "
+               "wird der Item-Text aus der Cloud-Sitzung geholt statt "
+               "anzunehmen, dass er in der Zwischenablage steht.",
     "download_title": "Holen",
     "download_body": "Eine Datei. Starten, den Rest macht der Assistent.",
     "download_cta": "Für Windows herunterladen",
@@ -375,6 +398,14 @@ C["es"] = {
     "faq_4_q": "¿Qué versión de PoE?",
     "faq_4_a": "Path of Exile 1. PoE 2 usa otra API de mercado y todavía no está "
                "soportado.",
+    "faq_5_q": "¿No puedo simplemente usar Awakened PoE Trade?",
+    "faq_5_a": "No en Boosteroid ni en ningún otro servicio de juego en la nube - "
+               "Awakened PoE Trade lee el portapapeles local, y al jugar en la "
+               "nube el portapapeles solo se sincroniza en un sentido (local → "
+               "nube, nunca al revés). Por eso existe esta herramienta: los "
+               "mismos datos de mercado, la misma API oficial, pero el texto del "
+               "objeto se saca de la sesión en la nube en vez de asumir que está "
+               "en el portapapeles.",
     "download_title": "Descárgalo",
     "download_body": "Un archivo. Ejecútalo y el asistente hace el resto.",
     "download_cta": "Descargar para Windows",
@@ -466,6 +497,14 @@ C["pt"] = {
     "faq_4_q": "Qual versão do PoE?",
     "faq_4_a": "Path of Exile 1. O PoE 2 usa outra API de mercado e ainda não é "
                "suportado.",
+    "faq_5_q": "Não dá pra simplesmente usar o Awakened PoE Trade?",
+    "faq_5_a": "Não no Boosteroid nem em outro serviço de jogo em nuvem - o "
+               "Awakened PoE Trade lê a área de transferência local, e ao jogar "
+               "na nuvem a área de transferência só sincroniza em um sentido "
+               "(local → nuvem, nunca de volta). É exatamente por isso que essa "
+               "ferramenta existe: os mesmos dados de mercado, a mesma API "
+               "oficial, só que o texto do item é retirado da sessão na nuvem "
+               "em vez de presumir que está na área de transferência.",
     "download_title": "Baixe",
     "download_body": "Um arquivo. Execute e o assistente faz o resto.",
     "download_cta": "Baixar para Windows",
@@ -557,6 +596,14 @@ C["ru"] = {
     "faq_4_q": "Какая версия PoE?",
     "faq_4_a": "Path of Exile 1. PoE 2 использует другое API рынка и пока не "
                "поддерживается.",
+    "faq_5_q": "Разве нельзя просто использовать Awakened PoE Trade?",
+    "faq_5_a": "Не на Boosteroid и не на других облачных сервисах - Awakened PoE "
+               "Trade читает локальный буфер обмена, а при облачном гейминге "
+               "буфер обмена синхронизируется только в одну сторону (локально → "
+               "облако, никогда обратно). Именно поэтому существует этот "
+               "инструмент: те же торговые данные, тот же официальный API, но "
+               "текст предмета берётся из облачной сессии, а не из "
+               "предположения, что он в буфере обмена.",
     "download_title": "Скачать",
     "download_body": "Один файл. Запустите - остальное сделает мастер.",
     "download_cta": "Скачать для Windows",

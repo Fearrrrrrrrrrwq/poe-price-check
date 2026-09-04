@@ -198,9 +198,10 @@ class _PropRow:
 class ResultWindow:
     """Okno wyniku. `on_search` dostaje (mody, wlasciwosci) i wykonuje zapytanie."""
 
-    def __init__(self, parent=None, on_search=None,
+    def __init__(self, parent=None, on_search=None, on_craft_check=None,
                  close_on_focus_loss: bool = True) -> None:
         self.on_search = on_search
+        self.on_craft_check = on_craft_check
         self._url = ""
         self._options: list = []
         self._properties: list = []
@@ -363,8 +364,12 @@ class ResultWindow:
             self._render_mods()
         if self._properties:
             self._render_props()
-        if self._options or self._properties:
-            self._render_buttons()
+        # can_be_modified tez otwiera rzad przyciskow (nie tylko options/
+        # properties) - inaczej przycisk "sufit tej bazy" nigdy by sie nie
+        # pokazal dla itemu, ktorego zaden mod nie trafil w baze statystyk
+        # (rzadkie, ale sie zdarza - patrz mods_unmatched).
+        if self._options or self._properties or item.can_be_modified:
+            self._render_buttons(item)
         self._render_results(result)
 
         self._url = result.browser_url()
@@ -467,14 +472,21 @@ class ResultWindow:
             self._prop_rows.append(_PropRow(self.props_rows, option,
                                             BG_ROW if index % 2 else BG_PANEL))
 
-    def _render_buttons(self) -> None:
+    def _render_buttons(self, item) -> None:
         self.buttons.pack(fill="x", pady=(GAP, 0))
-        theme.button(self.buttons, t("res.search_again"), self._do_search,
-                     primary=True).pack(side="left")
-        for label, command in ((t("res.wider"), self._widen),
-                               (t("res.all"), lambda: self._set_all(True)),
-                               (t("res.none"), lambda: self._set_all(False))):
-            theme.button(self.buttons, label, command).pack(side="left", padx=(TIGHT, 0))
+        if self._options or self._properties:
+            theme.button(self.buttons, t("res.search_again"), self._do_search,
+                         primary=True).pack(side="left")
+            for label, command in ((t("res.wider"), self._widen),
+                                   (t("res.all"), lambda: self._set_all(True)),
+                                   (t("res.none"), lambda: self._set_all(False))):
+                theme.button(self.buttons, label, command).pack(side="left", padx=(TIGHT, 0))
+        # Wolne gniazdo afiksu - pokaz punkt odniesienia "ile warte sa w
+        # pelni obrobione takie bazy", zamiast zgadywac konkretna wartosc
+        # craftu (patrz docstring TradeClient.craft_ceiling_url).
+        if item.can_be_modified and self.on_craft_check:
+            theme.button(self.buttons, t("res.craft_ceiling"),
+                         lambda: self.on_craft_check(item)).pack(side="left", padx=(TIGHT, 0))
 
     def _render_results(self, result) -> None:
         if not result.listings:

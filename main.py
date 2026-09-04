@@ -16,6 +16,7 @@ import sys
 import threading
 import time
 import traceback
+import webbrowser
 from dataclasses import fields
 
 import applog
@@ -210,6 +211,24 @@ class PriceChecker:
 
         threading.Thread(target=job, daemon=True).start()
 
+    def check_ceiling(self, item) -> None:
+        """Otwiera w przegladarce "sufit" tej bazy - patrz
+        TradeClient.craft_ceiling_url(). Nie idzie przez self._busy: to
+        lekka, poboczna akcja (jeden POST bez pobierania ofert), nie musi
+        czekac na trwajaca wycene ani jej blokowac.
+        """
+        def job() -> None:
+            try:
+                url = self.client.craft_ceiling_url(item)
+                webbrowser.open(url)
+            except (TradeError, BridgeError) as exc:
+                self.events.put(("error", str(exc)))
+            except Exception as exc:  # noqa: BLE001 - poboczna akcja nie moze ubic programu
+                traceback.print_exc()
+                self.events.put(("error", f"{type(exc).__name__}: {exc}"))
+
+        threading.Thread(target=job, daemon=True).start()
+
     def _yield_focus_to_game(self) -> None:
         """Chowa panel i oddaje pierwszy plan grze przed wyslaniem klawiszy.
 
@@ -384,6 +403,7 @@ def run_gui(config: dict, league: str) -> int:
     window = ResultWindow(
         parent=status.root,
         on_search=checker.research,
+        on_craft_check=checker.check_ceiling,
         close_on_focus_loss=config.get("close_on_focus_loss", True),
     )
 

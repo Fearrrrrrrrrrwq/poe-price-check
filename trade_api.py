@@ -1009,6 +1009,7 @@ class TradeClient:
         item: ParsedItem,
         stat_filters: list[dict],
         properties: list[PropertyOption] | None = None,
+        sort_desc: bool = False,
     ) -> dict:
         filters: dict[str, dict] = {}
         misc: dict[str, dict] = {}
@@ -1101,7 +1102,7 @@ class TradeClient:
         if stat_filters:
             query["stats"] = [{"type": "and", "filters": stat_filters}]
 
-        return {"query": query, "sort": {"price": "asc"}}
+        return {"query": query, "sort": {"price": "desc" if sort_desc else "asc"}}
 
     # ------------------------------------------------------- wyszukiwanie
 
@@ -1142,6 +1143,28 @@ class TradeClient:
             mods_used=len(stat_filters),
             mods_unmatched=unmatched_count,
         )
+
+    def craft_ceiling_url(self, item: ParsedItem) -> str:
+        """Adres wyszukiwania tej samej bazy/rzadkosci BEZ wymagania
+        konkretnych modow, posortowany od najdrozszych - orientacyjny
+        "sufit" tego, ile moze byc wart w pelni obrobiony przedmiot tej
+        bazy. Misc-filtry (fractured/mirrored/wplywy itd.) zostaja, zeby
+        porownanie bylo w miare rowne - tylko wymog na KONKRETNE mody
+        znika.
+
+        Celowo nie liczymy tu zadnej "oczekiwanej wartosci craftu" -
+        prawdziwa cena zalezy od tego, jaki dokladnie mod wypadnie, a to
+        jest wrozenie z fusow, ktore latwo wprowadzic w blad. Zamiast
+        zgadywac, dajemy punkt odniesienia i zostawiamy ocene czlowiekowi.
+
+        Sam POST po search_id, bez pobierania ofert - to tylko link do
+        otwarcia w przegladarce, nie pelna wycena.
+        """
+        payload = self.build_query(item, [], sort_desc=True)
+        search_id, _, _ = self._search(payload)
+        return SearchResult(
+            search_id=search_id, total=0, listings=[], league=self.league,
+        ).browser_url()
 
     def _search(self, payload: dict) -> tuple[str, int, list[str]]:
         data = self._request(

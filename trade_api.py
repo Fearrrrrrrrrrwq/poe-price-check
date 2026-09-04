@@ -1030,6 +1030,12 @@ class TradeClient:
 
         if item.corrupted:
             misc["corrupted"] = {"option": "true"}
+        # Bez tego filtru bonus z fracturu ginie w wynikach: oferty z i bez
+        # przefracturowanego moda mieszaja sie w jedna srednia, a fracture
+        # zwykle podbija cene (utrwala konkretny mod na sztywno). To ten sam
+        # rodzaj bledu co z Foulbornem nizej, tylko dla fracture.
+        if "fractured_item" in item.flags:
+            misc["fractured_item"] = {"option": "true"}
         # Bez tego filtru wersja Foulborn miesza sie ze zwykla: dla jednego
         # unikatu bylo 618 ofert lacznie, a tylko 57 to faktycznie Foulborny.
         # Wycena bez filtru zanizalaby ceny kilkukrotnie.

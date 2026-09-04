@@ -12,36 +12,51 @@ from paths import resource_path
 
 # DwmSetWindowAttribute: 20 na Win11 i Win10 2004+, 19 na starszych kompilacjach.
 _DARK_MODE_ATTRIBUTES = (20, 19)
-_DWMWA_CAPTION_COLOR = 35  # Win11 22000+; pozwala dobrac kolor belki dokladnie
+_DWMWA_CAPTION_COLOR = 35        # Win11 22000+; pozwala dobrac kolor belki dokladnie
+_DWMWA_CORNER_PREFERENCE = 33    # Win11 22000+; zaokraglone rogi calego okna
+_DWMWCP_ROUND = 2
 
-# --- kolory -----------------------------------------------------------------
-BG = "#16130f"          # tlo okna
-BG_PANEL = "#1e1a14"    # wydzielone sekcje
-BG_ROW = "#241f18"      # co drugi wiersz
-BG_INPUT = "#0f0d0a"    # pola do wpisywania
-BORDER = "#332c22"
+# --- kolory -------------------------------------------------------------
+#
+# "Obsydian i zloto": tlo niemal czarne (nie brazowe jak poprzednio), karty
+# odrozniaja sie samym jasniejszym wypelnieniem, bez ramek - to jest ten
+# sam trik co w nowoczesnych ciemnych panelach (Linear, Vercel, GitHub):
+# kontrast tla robi robote za bordery, wiec interfejs nie tnie sie na
+# kwadraciki. Zloto zostaje, bo pasuje tematycznie (divine/exalted), ale
+# jest bardziej nasycone - mniej "pergamin", wiecej "premium".
+BG = "#0c0a07"           # tlo okna
+BG_PANEL = "#1a160f"     # karty - jasniejsze o dwa stopnie od tla
+BG_ROW = "#221d14"       # co drugi wiersz w tabelach
+BG_ROW_HOVER = "#2a2318"  # wiersz pod kursorem
+BG_INPUT = "#070604"     # pola do wpisywania
+BORDER = "#2a2416"       # tylko tam, gdzie potrzebna wyrazna krawedz (pola, tabele)
 
-FG = "#d8c9a8"          # tekst podstawowy
-FG_MUTED = "#8a7c64"    # opisy, etykiety kolumn
-FG_TITLE = "#f0d9a4"    # nazwa przedmiotu
-FG_ACCENT = "#c9a227"   # akcent zlota
-FG_OK = "#7fb069"       # stan pozytywny
-FG_WARN = "#d99a3c"     # ostrzezenie
-FG_ERROR = "#c76a5c"    # blad
+FG = "#e8dcc0"           # tekst podstawowy - cieplejszy, wyzszy kontrast
+FG_MUTED = "#8f826a"     # opisy, etykiety kolumn
+FG_TITLE = "#f7deab"     # nazwa przedmiotu
+FG_ACCENT = "#d9ad2e"    # akcent zlota - bardziej nasycony niz poprzednio
+FG_ACCENT_HOVER = "#f0c33e"
+FG_OK = "#6fcf7d"        # stan pozytywny
+FG_WARN = "#e3a53f"      # ostrzezenie
+FG_ERROR = "#e2685a"     # blad
 
-# --- typografia -------------------------------------------------------------
-FONT_TITLE = ("Segoe UI Semibold", 13)
+# --- typografia -----------------------------------------------------------
+#
+# Consolas, nie cos nowszego (Cascadia Mono itp.) - jedyny monospace
+# gwarantowany na kazdym Windows od Visty, bez ryzyka cichego przelaczenia
+# sie na czcionke domyslna na maszynie, gdzie czegos nowszego nie ma.
+FONT_TITLE = ("Segoe UI Semibold", 14)
 FONT_HEAD = ("Segoe UI Semibold", 10)
 FONT_BODY = ("Segoe UI", 9)
 FONT_SMALL = ("Segoe UI", 8)
 FONT_LABEL = ("Segoe UI", 8)
 FONT_PRICE = ("Consolas", 10)
 FONT_BADGE = ("Consolas", 8, "bold")
-FONT_BIG = ("Segoe UI Semibold", 15)
+FONT_BIG = ("Segoe UI Semibold", 20)
 
 # --- odstepy ----------------------------------------------------------------
-PAD = 12    # margines okna
-GAP = 8     # odstep miedzy sekcjami
+PAD = 14    # margines okna
+GAP = 10    # odstep miedzy sekcjami
 TIGHT = 4   # odstep wewnatrz sekcji
 
 
@@ -81,6 +96,15 @@ def dark_titlebar(window: tk.Misc) -> None:
         colour = ctypes.c_int((blue << 16) | (green << 8) | red)
         ctypes.windll.dwmapi.DwmSetWindowAttribute(
             hwnd, _DWMWA_CAPTION_COLOR, ctypes.byref(colour), ctypes.sizeof(colour))
+
+        # Zaokraglone rogi calego okna - natywny mechanizm kompozytora Win11,
+        # nie rysunek. Na starszym Windows DwmSetWindowAttribute po prostu
+        # zwroci blad dla tej stalej, co i tak lapiemy w except nizej -
+        # okno zostaje kwadratowe, tak jak zawsze bylo.
+        preference = ctypes.c_int(_DWMWCP_ROUND)
+        ctypes.windll.dwmapi.DwmSetWindowAttribute(
+            hwnd, _DWMWA_CORNER_PREFERENCE, ctypes.byref(preference),
+            ctypes.sizeof(preference))
     except Exception:  # noqa: BLE001 - wyglad belki nie moze przerwac startu
         pass
 
@@ -107,14 +131,14 @@ def button(parent: tk.Misc, text: str, command, primary: bool = False) -> tk.But
     Tk nie ma stanu hover dla Button, wiec podpinamy go recznie - bez tego
     interfejs sprawia wrazenie martwego.
     """
-    idle_bg = FG_ACCENT if primary else BG_PANEL
+    idle_bg = FG_ACCENT if primary else BG_ROW
     idle_fg = BG if primary else FG
-    hover_bg = "#e0b62e" if primary else BORDER
+    hover_bg = FG_ACCENT_HOVER if primary else BORDER
 
     widget = tk.Button(
         parent, text=text, command=command, font=FONT_BODY,
         bg=idle_bg, fg=idle_fg, activebackground=hover_bg, activeforeground=idle_fg,
-        relief="flat", bd=0, padx=14, pady=6, cursor="hand2",
+        relief="flat", bd=0, padx=16, pady=7, cursor="hand2",
         highlightthickness=0,
     )
     widget.bind("<Enter>", lambda _e: widget.config(bg=hover_bg))
@@ -152,9 +176,13 @@ def keycap(parent: tk.Misc, text: str, bg: str = BG_PANEL) -> tk.Label:
 
 
 def card(parent: tk.Misc, accent: str | None = None) -> tk.Frame:
-    """Kafelek z opcjonalnym paskiem akcentu po lewej."""
-    holder = tk.Frame(parent, bg=BG_PANEL, highlightthickness=1,
-                      highlightbackground=BORDER)
+    """Kafelek z opcjonalnym paskiem akcentu po lewej.
+
+    Bez ramki - elewacje robi sam kontrast BG_PANEL na BG, jak w kazdym
+    wspolczesnym ciemnym panelu. Ramka na kazdym kafelku to byl ten
+    "biurowy" akcent, ktorego sie tu celowo pozbywamy.
+    """
+    holder = tk.Frame(parent, bg=BG_PANEL, highlightthickness=0)
     if accent:
         tk.Frame(holder, bg=accent, width=3).pack(side="left", fill="y")
     body = tk.Frame(holder, bg=BG_PANEL)
@@ -165,10 +193,12 @@ def card(parent: tk.Misc, accent: str | None = None) -> tk.Frame:
 
 def section(parent: tk.Misc, title: str) -> tuple[tk.Frame, tk.Frame]:
     """Ramka sekcji z naglowkiem. Zwraca (kontener, miejsce na tresc)."""
-    box = tk.Frame(parent, bg=BG_PANEL, highlightthickness=1,
-                   highlightbackground=BORDER)
-    tk.Label(box, text=title.upper(), font=FONT_LABEL, fg=FG_MUTED, bg=BG_PANEL,
-             anchor="w").pack(fill="x", padx=10, pady=(7, 3))
+    box = tk.Frame(parent, bg=BG_PANEL, highlightthickness=0)
+    head = tk.Frame(box, bg=BG_PANEL)
+    head.pack(fill="x", padx=12, pady=(9, 4))
+    tk.Frame(head, bg=FG_ACCENT, width=3, height=11).pack(side="left")
+    tk.Label(head, text=title.upper(), font=FONT_LABEL, fg=FG_MUTED, bg=BG_PANEL,
+             anchor="w").pack(side="left", padx=(6, 0))
     body = tk.Frame(box, bg=BG_PANEL)
-    body.pack(fill="x", padx=6, pady=(0, 7))
+    body.pack(fill="x", padx=6, pady=(0, 8))
     return box, body

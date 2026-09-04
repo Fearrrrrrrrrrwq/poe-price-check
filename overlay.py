@@ -10,10 +10,10 @@ import webbrowser
 
 import theme
 from i18n import t
-from theme import (BG, BG_INPUT, BG_PANEL, BG_ROW, BORDER, FG, FG_ACCENT,
-                   FG_ERROR, FG_MUTED, FG_OK, FG_TITLE, FG_WARN, FONT_BADGE,
-                   FONT_BIG, FONT_BODY, FONT_HEAD, FONT_LABEL, FONT_PRICE,
-                   FONT_SMALL, FONT_TITLE, GAP, PAD, TIGHT)
+from theme import (BG, BG_INPUT, BG_PANEL, BG_ROW, BG_ROW_HOVER, BORDER, FG,
+                   FG_ACCENT, FG_ERROR, FG_MUTED, FG_OK, FG_TITLE, FG_WARN,
+                   FONT_BADGE, FONT_BIG, FONT_BODY, FONT_HEAD, FONT_LABEL,
+                   FONT_PRICE, FONT_SMALL, FONT_TITLE, GAP, PAD, TIGHT)
 from winutil import window_is_foreground
 
 
@@ -61,12 +61,29 @@ class _ModRow:
         if self.searchable:
             for widget in (self.frame, self.check, self.badge, self.text):
                 widget.bind("<Button-1>", self._on_click)
+                widget.bind("<Enter>", self._on_enter)
+                widget.bind("<Leave>", self._on_leave)
         self._refresh()
 
     def _on_click(self, _event=None) -> str:
         self.option.enabled = not self.option.enabled
         self._refresh()
         return "break"
+
+    def _on_enter(self, _event=None) -> None:
+        self._paint(BG_ROW_HOVER)
+
+    def _on_leave(self, _event=None) -> None:
+        self._paint(self.row_bg)
+
+    def _paint(self, bg: str) -> None:
+        """Podswietlenie calego klikalnego wiersza pod kursorem - bez tego
+        wiersze wygladaja martwo, mimo ze cale sa klikalne."""
+        self.frame.config(bg=bg)
+        self.text.config(bg=bg)
+        self.badge.config(bg=bg)
+        if not self.option.enabled:
+            self.check.config(bg=bg)
 
     def _refresh(self) -> None:
         if not self.searchable:
@@ -228,18 +245,23 @@ class ResultWindow:
                                anchor="w", justify="left", wraplength=420,
                                padx=10, pady=6)
 
-        # --- odpowiedz ----------------------------------------------------
-        self.value_box = tk.Frame(self.outer, bg=BG_PANEL, highlightthickness=1,
-                                  highlightbackground=BORDER)
-        tk.Label(self.value_box, text=t("res.value"), font=FONT_LABEL,
-                 fg=FG_MUTED, bg=BG_PANEL, anchor="w").pack(fill="x", padx=12,
-                                                            pady=(8, 0))
+        # --- odpowiedz ------------------------------------------------------
+        #
+        # To jest hero-element calego okna - po nie uruchamia sie program - wiec
+        # dostaje wlasny akcent u gory zamiast zlewac sie z reszta kafelkow.
+        # Bez ramki (jak wszystko od refreshu 2026): elewacje daje kontrast
+        # BG_PANEL na BG.
+        self.value_box = tk.Frame(self.outer, bg=BG_PANEL)
+        tk.Frame(self.value_box, bg=FG_ACCENT, height=2).pack(fill="x")
+        tk.Label(self.value_box, text=t("res.value").upper(), font=FONT_LABEL,
+                 fg=FG_MUTED, bg=BG_PANEL, anchor="w").pack(fill="x", padx=14,
+                                                            pady=(10, 0))
         self.value_main = tk.Label(self.value_box, text="", font=FONT_BIG,
                                    fg=FG_TITLE, bg=BG_PANEL, anchor="w")
-        self.value_main.pack(fill="x", padx=12)
+        self.value_main.pack(fill="x", padx=14)
         self.value_sub = tk.Label(self.value_box, text="", font=FONT_SMALL,
                                   fg=FG_MUTED, bg=BG_PANEL, anchor="w")
-        self.value_sub.pack(fill="x", padx=12, pady=(0, 9))
+        self.value_sub.pack(fill="x", padx=14, pady=(1, 12))
 
         # --- sekcje sterujace ---------------------------------------------
         self.mods_box, self.mods_rows = theme.section(self.outer, t("res.mods"))

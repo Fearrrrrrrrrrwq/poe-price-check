@@ -202,7 +202,7 @@ def page(lang: str) -> str:
 
     features = "".join(
         f'<article class="feature"><h3>{esc(t[f"f{n}_t"])}</h3>'
-        f'<p>{esc(t[f"f{n}_b"])}</p></article>' for n in (1, 2, 3, 4))
+        f'<p>{esc(t[f"f{n}_b"])}</p></article>' for n in (1, 2, 3, 4, 5, 6))
 
     steps = "".join(
         f'<li><span class="num">{n}</span><h3>{esc(t[f"how_{n}_t"])}</h3>'

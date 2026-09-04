@@ -78,6 +78,12 @@ C["en"] = {
     "f4_t": "Everything, not just rares",
     "f4_b": "Uniques, rares, magic items, gems, flasks, jewels, maps - plus "
             "currency, cards and fragments through the bulk exchange.",
+    "f5_t": "Windows and macOS",
+    "f5_b": "The same hotkey and matching engine run natively on both - macOS "
+            "support is new and experimental, Apple Silicon included.",
+    "f6_t": "One shortcut, either way",
+    "f6_b": "A toggle switches the main hotkey between the Boosteroid bridge and "
+            "your local clipboard - no need to remember two shortcuts.",
     "privacy_title": "About your data",
     "privacy_body": "The program sends an anonymous counter: version, language, "
                     "league, number of checks. Never items, prices, account names "
@@ -187,6 +193,13 @@ C["pl"] = {
     "f4_t": "Wszystko, nie tylko rzadkie",
     "f4_b": "Unikaty, rzadkie, magiczne, kamienie, flaszki, klejnoty, mapy - a "
             "waluta, karty i fragmenty przez giełdę wymiany.",
+    "f5_t": "Windows i macOS",
+    "f5_b": "Ten sam skrót i silnik dopasowania działają natywnie na obu - "
+            "wsparcie macOS jest nowe i eksperymentalne, także na Apple Silicon.",
+    "f6_t": "Jeden skrót, dwa tryby",
+    "f6_b": "Przełącznik zmienia zachowanie głównego skrótu między mostem "
+            "Boosteroid a lokalnym schowkiem - nie trzeba pamiętać dwóch "
+            "różnych skrótów.",
     "privacy_title": "O twoich danych",
     "privacy_body": "Program wysyła anonimowy licznik: wersja, język, liga, liczba "
                     "wycen. Nigdy przedmiotów, cen, nazw kont ani twojego "
@@ -295,6 +308,14 @@ C["de"] = {
     "f4_t": "Alles, nicht nur Raritäten",
     "f4_b": "Uniques, Raritäten, magische Gegenstände, Gems, Fläschchen, Juwelen, "
             "Karten - Währung, Divinationskarten und Fragmente über den Massenhandel.",
+    "f5_t": "Windows und macOS",
+    "f5_b": "Derselbe Shortcut und dieselbe Abgleich-Engine laufen nativ auf "
+            "beiden - die macOS-Unterstützung ist neu und experimentell, auch "
+            "auf Apple Silicon.",
+    "f6_t": "Ein Shortcut, zwei Modi",
+    "f6_b": "Ein Schalter wechselt den Haupt-Shortcut zwischen der "
+            "Boosteroid-Brücke und der lokalen Zwischenablage - kein Merken von "
+            "zwei verschiedenen Tastenkürzeln nötig.",
     "privacy_title": "Zu deinen Daten",
     "privacy_body": "Das Programm sendet einen anonymen Zähler: Version, Sprache, "
                     "Liga, Anzahl der Abfragen. Niemals Gegenstände, Preise, "
@@ -405,6 +426,14 @@ C["es"] = {
     "f4_t": "Todo, no solo raros",
     "f4_b": "Únicos, raros, mágicos, gemas, frascos, joyas, mapas - y moneda, cartas "
             "y fragmentos por el intercambio masivo.",
+    "f5_t": "Windows y macOS",
+    "f5_b": "El mismo atajo y el mismo motor de coincidencia funcionan de forma "
+            "nativa en ambos - el soporte de macOS es nuevo y experimental, "
+            "también en Apple Silicon.",
+    "f6_t": "Un atajo, dos modos",
+    "f6_b": "Un interruptor cambia el atajo principal entre el puente de "
+            "Boosteroid y el portapapeles local - sin tener que recordar dos "
+            "atajos distintos.",
     "privacy_title": "Sobre tus datos",
     "privacy_body": "El programa envía un contador anónimo: versión, idioma, liga y "
                     "número de consultas. Nunca objetos, precios, nombres de cuenta "
@@ -515,6 +544,14 @@ C["pt"] = {
     "f4_t": "Tudo, não só raros",
     "f4_b": "Únicos, raros, mágicos, gemas, frascos, joias, mapas - e moeda, cartas "
             "e fragmentos pela troca em massa.",
+    "f5_t": "Windows e macOS",
+    "f5_b": "O mesmo atalho e o mesmo mecanismo de correspondência rodam "
+            "nativamente em ambos - o suporte a macOS é novo e experimental, "
+            "incluindo Apple Silicon.",
+    "f6_t": "Um atalho, dois modos",
+    "f6_b": "Um alternador muda o atalho principal entre a ponte do Boosteroid "
+            "e a área de transferência local - sem precisar lembrar dois "
+            "atalhos diferentes.",
     "privacy_title": "Sobre seus dados",
     "privacy_body": "O programa envia um contador anônimo: versão, idioma, liga e "
                     "número de consultas. Nunca itens, preços, nomes de conta ou seu "
@@ -624,6 +661,14 @@ C["ru"] = {
     "f4_t": "Всё, а не только редкие",
     "f4_b": "Уникальные, редкие, магические, камни, фляги, самоцветы, карты - а "
             "валюта, карты гадания и фрагменты через биржу обмена.",
+    "f5_t": "Windows и macOS",
+    "f5_b": "Тот же хоткей и тот же движок сопоставления работают нативно на "
+            "обеих системах - поддержка macOS новая и экспериментальная, "
+            "включая Apple Silicon.",
+    "f6_t": "Один хоткей, два режима",
+    "f6_b": "Переключатель меняет поведение основного хоткея между мостом "
+            "Boosteroid и локальным буфером обмена - не нужно запоминать два "
+            "разных хоткея.",
     "privacy_title": "О ваших данных",
     "privacy_body": "Программа отправляет анонимный счётчик: версия, язык, лига и "
                     "число оценок. Никогда - предметы, цены, имена аккаунтов или ваш "

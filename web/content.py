@@ -127,6 +127,14 @@ C["en"] = {
                "sure which kind it is? Copy something locally, then try "
                "pasting it inside the cloud session - if it shows up, you "
                "don't need this.",
+    "faq_7_q": "Why doesn't my clipboard work in Path of Exile on Boosteroid?",
+    "faq_7_a": "Because Boosteroid only syncs the clipboard one way, from your "
+               "machine into the cloud session, never back out. Copying an "
+               "item's text inside the game has nowhere to go - your local "
+               "clipboard never receives it, which is why Ctrl+C followed by "
+               "pasting into a price checker on your own PC comes up empty. "
+               "This tool sidesteps that by routing the item text out through "
+               "a document instead of the clipboard.",
     "download_title": "Get it",
     "download_body": "One file. Run it, the wizard does the rest.",
     "download_cta": "Download for Windows",
@@ -251,6 +259,14 @@ C["pl"] = {
                "nie wiesz, która to wersja? Skopiuj coś lokalnie i spróbuj "
                "wkleić w sesji chmurowej - jeśli się pojawi, tego narzędzia "
                "nie potrzebujesz.",
+    "faq_7_q": "Dlaczego schowek nie działa w Path of Exile na Boosteroidzie?",
+    "faq_7_a": "Bo Boosteroid synchronizuje schowek tylko w jedną stronę - z "
+               "Twojego komputera do sesji w chmurze, nigdy z powrotem. "
+               "Skopiowanie tekstu przedmiotu w grze nie ma dokąd trafić - "
+               "Twój lokalny schowek nigdy go nie dostaje, dlatego Ctrl+C i "
+               "wklejenie do price checkera na własnym PC daje pustkę. To "
+               "narzędzie omija ten problem, przesyłając tekst przedmiotu "
+               "przez dokument zamiast przez schowek.",
     "download_title": "Pobierz",
     "download_body": "Jeden plik. Uruchom, resztą zajmie się kreator.",
     "download_cta": "Pobierz na Windows",
@@ -378,6 +394,15 @@ C["de"] = {
                "Cloud-Dienst und weißt nicht, welche Art das ist: kopiere "
                "lokal etwas und versuche es in der Cloud-Sitzung einzufügen "
                "- erscheint es dort, brauchst du dieses Tool nicht.",
+    "faq_7_q": "Warum funktioniert die Zwischenablage in Path of Exile auf "
+               "Boosteroid nicht?",
+    "faq_7_a": "Weil Boosteroid die Zwischenablage nur in eine Richtung "
+               "synchronisiert - von deinem Rechner in die Cloud-Sitzung, "
+               "nie zurück. Der kopierte Item-Text hat nirgendwo hin - deine "
+               "lokale Zwischenablage bekommt ihn nie, weshalb Strg+C und "
+               "Einfügen in einen Price-Checker auf dem eigenen PC leer "
+               "bleibt. Dieses Tool umgeht das, indem es den Item-Text über "
+               "ein Dokument statt über die Zwischenablage schleust.",
     "download_title": "Holen",
     "download_body": "Eine Datei. Starten, den Rest macht der Assistent.",
     "download_cta": "Für Windows herunterladen",
@@ -504,6 +529,15 @@ C["es"] = {
                "tipo es? Copia algo localmente e intenta pegarlo dentro de "
                "la sesión en la nube - si aparece, no necesitas esta "
                "herramienta.",
+    "faq_7_q": "¿Por qué no funciona el portapapeles en Path of Exile en "
+               "Boosteroid?",
+    "faq_7_a": "Porque Boosteroid sincroniza el portapapeles solo en un "
+               "sentido - de tu máquina hacia la sesión en la nube, nunca al "
+               "revés. El texto del objeto copiado no tiene adónde ir - tu "
+               "portapapeles local nunca lo recibe, por eso Ctrl+C y pegar en "
+               "un price checker en tu propio PC no trae nada. Esta "
+               "herramienta evita eso enviando el texto del objeto a través "
+               "de un documento en lugar del portapapeles.",
     "download_title": "Descárgalo",
     "download_body": "Un archivo. Ejecútalo y el asistente hace el resto.",
     "download_cta": "Descargar para Windows",
@@ -629,6 +663,15 @@ C["pt"] = {
                "qual é o tipo? Copie algo localmente e tente colar dentro "
                "da sessão na nuvem - se aparecer, você não precisa desta "
                "ferramenta.",
+    "faq_7_q": "Por que a área de transferência não funciona no Path of Exile "
+               "no Boosteroid?",
+    "faq_7_a": "Porque o Boosteroid sincroniza a área de transferência só em "
+               "um sentido - da sua máquina para a sessão na nuvem, nunca de "
+               "volta. O texto do item copiado não tem para onde ir - sua "
+               "área de transferência local nunca o recebe, por isso Ctrl+C e "
+               "colar num price checker no seu próprio PC não traz nada. Esta "
+               "ferramenta contorna isso enviando o texto do item por um "
+               "documento em vez da área de transferência.",
     "download_title": "Baixe",
     "download_body": "Um arquivo. Execute e o assistente faz o resto.",
     "download_cta": "Baixar para Windows",
@@ -753,6 +796,15 @@ C["ru"] = {
                "облачном сервисе и не знаете, какой у него тип? Скопируйте "
                "что-нибудь локально и попробуйте вставить внутри облачной "
                "сессии - если появилось, этот инструмент вам не нужен.",
+    "faq_7_q": "Почему буфер обмена не работает в Path of Exile на "
+               "Boosteroid?",
+    "faq_7_a": "Потому что Boosteroid синхронизирует буфер обмена только в "
+               "одну сторону - с вашего компьютера в облачную сессию, "
+               "никогда обратно. Скопированному тексту предмета некуда "
+               "деваться - ваш локальный буфер обмена его никогда не "
+               "получает, поэтому Ctrl+C и вставка в прайс-чекер на своём ПК "
+               "дают пустоту. Эта программа обходит это, передавая текст "
+               "предмета через документ вместо буфера обмена.",
     "download_title": "Скачать",
     "download_body": "Один файл. Запустите - остальное сделает мастер.",
     "download_cta": "Скачать для Windows",

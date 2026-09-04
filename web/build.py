@@ -139,7 +139,7 @@ def json_ld(lang: str, t: dict) -> str:
         "mainEntity": [
             {"@type": "Question", "name": t[f"faq_{n}_q"],
              "acceptedAnswer": {"@type": "Answer", "text": t[f"faq_{n}_a"]}}
-            for n in (1, 2, 3, 4, 5, 6)
+            for n in (1, 2, 3, 4, 5, 6, 7)
         ],
     }
     return "\n".join(
@@ -210,7 +210,7 @@ def page(lang: str) -> str:
 
     faq = "".join(
         f'<details><summary>{esc(t[f"faq_{n}_q"])}</summary>'
-        f'<p>{esc(t[f"faq_{n}_a"])}</p></details>' for n in (1, 2, 3, 4, 5, 6))
+        f'<p>{esc(t[f"faq_{n}_a"])}</p></details>' for n in (1, 2, 3, 4, 5, 6, 7))
 
     return f"""<!DOCTYPE html>
 <html lang="{lang}" dir="{t['dir']}">

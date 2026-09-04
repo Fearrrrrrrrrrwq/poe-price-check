@@ -88,6 +88,9 @@ C["en"] = {
     "f6_t": "One shortcut, either way",
     "f6_b": "A toggle switches the main hotkey between the Boosteroid bridge and "
             "your local clipboard - no need to remember two shortcuts.",
+    "f7_t": "Know the ceiling before you craft",
+    "f7_b": "One button checks what the base itself is worth on the market, "
+            "before you commit currency to modifying it.",
     "privacy_title": "About your data",
     "privacy_body": "The program sends an anonymous counter: version, language, "
                     "league, number of checks. Never items, prices, account names "
@@ -208,6 +211,9 @@ C["pl"] = {
     "f6_b": "Przełącznik zmienia zachowanie głównego skrótu między mostem "
             "Boosteroid a lokalnym schowkiem - nie trzeba pamiętać dwóch "
             "różnych skrótów.",
+    "f7_t": "Sufit ceny, zanim zaczniesz craftować",
+    "f7_b": "Jeden przycisk sprawdza, ile warta jest sama baza na rynku, "
+            "zanim zainwestujesz w nią walutę na modyfikacje.",
     "privacy_title": "O twoich danych",
     "privacy_body": "Program wysyła anonimowy licznik: wersja, język, liga, liczba "
                     "wycen. Nigdy przedmiotów, cen, nazw kont ani twojego "
@@ -330,6 +336,9 @@ C["de"] = {
     "f6_b": "Ein Schalter wechselt den Haupt-Shortcut zwischen der "
             "Boosteroid-Brücke und der lokalen Zwischenablage - kein Merken von "
             "zwei verschiedenen Tastenkürzeln nötig.",
+    "f7_t": "Die Preisobergrenze vor dem Craften kennen",
+    "f7_b": "Ein Knopf prüft, was die Basis selbst auf dem Markt wert ist, "
+            "bevor du Währung in ihre Veränderung investierst.",
     "privacy_title": "Zu deinen Daten",
     "privacy_body": "Das Programm sendet einen anonymen Zähler: Version, Sprache, "
                     "Liga, Anzahl der Abfragen. Niemals Gegenstände, Preise, "
@@ -453,6 +462,9 @@ C["es"] = {
     "f6_b": "Un interruptor cambia el atajo principal entre el puente de "
             "Boosteroid y el portapapeles local - sin tener que recordar dos "
             "atajos distintos.",
+    "f7_t": "Conoce el techo antes de craftear",
+    "f7_b": "Un botón comprueba cuánto vale la base en sí en el mercado, antes "
+            "de invertir moneda en modificarla.",
     "privacy_title": "Sobre tus datos",
     "privacy_body": "El programa envía un contador anónimo: versión, idioma, liga y "
                     "número de consultas. Nunca objetos, precios, nombres de cuenta "
@@ -576,6 +588,9 @@ C["pt"] = {
     "f6_b": "Um alternador muda o atalho principal entre a ponte do Boosteroid "
             "e a área de transferência local - sem precisar lembrar dois "
             "atalhos diferentes.",
+    "f7_t": "Saiba o teto de preço antes de craftar",
+    "f7_b": "Um botão verifica quanto a própria base vale no mercado, antes de "
+            "você investir moeda para modificá-la.",
     "privacy_title": "Sobre seus dados",
     "privacy_body": "O programa envia um contador anônimo: versão, idioma, liga e "
                     "número de consultas. Nunca itens, preços, nomes de conta ou seu "
@@ -698,6 +713,9 @@ C["ru"] = {
     "f6_b": "Переключатель меняет поведение основного хоткея между мостом "
             "Boosteroid и локальным буфером обмена - не нужно запоминать два "
             "разных хоткея.",
+    "f7_t": "Узнайте потолок цены перед крафтом",
+    "f7_b": "Одна кнопка показывает, сколько стоит сама база на рынке, прежде "
+            "чем вы вложите в неё валюту на модификацию.",
     "privacy_title": "О ваших данных",
     "privacy_body": "Программа отправляет анонимный счётчик: версия, язык, лига и "
                     "число оценок. Никогда - предметы, цены, имена аккаунтов или ваш "

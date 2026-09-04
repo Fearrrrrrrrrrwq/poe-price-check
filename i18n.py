@@ -44,8 +44,8 @@ STRINGS["en"] = {
     "app.discord": "Discord",
     "app.boosteroid_toggle": "Run for Boosteroid",
     "app.boosteroid_toggle_note": "On: {hotkey} goes through the bridge (Shift+Tab/F7) into "
-                                  "the document. Off: {hotkey} reads the local clipboard "
-                                  "directly.",
+                                  "the document. Off: {hotkey} copies the item under your "
+                                  "cursor and checks it directly.",
     "app.league_local": "league {league}  ·  local mode",
     "update.available": "Version {version} is available",
     "update.current": "You are running {version}",
@@ -170,8 +170,8 @@ STRINGS["pl"] = {
     "app.discord": "Discord",
     "app.boosteroid_toggle": "Uruchom dla Boosteroid",
     "app.boosteroid_toggle_note": "Zaznaczone: {hotkey} idzie przez most (Shift+Tab/F7) do "
-                                  "dokumentu. Odznaczone: {hotkey} czyta wprost lokalny "
-                                  "schowek.",
+                                  "dokumentu. Odznaczone: {hotkey} kopiuje przedmiot pod "
+                                  "kursorem i od razu go wycenia.",
     "app.league_local": "liga {league}  ·  tryb lokalny",
     "update.available": "Dostępna jest wersja {version}",
     "update.current": "Używasz wersji {version}",
@@ -289,8 +289,8 @@ STRINGS["de"] = {
     "app.discord": "Discord",
     "app.boosteroid_toggle": "Für Boosteroid starten",
     "app.boosteroid_toggle_note": "An: {hotkey} läuft über die Brücke (Shift+Tab/F7) ins "
-                                  "Dokument. Aus: {hotkey} liest direkt die lokale "
-                                  "Zwischenablage.",
+                                  "Dokument. Aus: {hotkey} kopiert den Gegenstand unter dem "
+                                  "Cursor und prüft ihn direkt.",
     "app.league_local": "Liga {league}  ·  lokaler Modus",
     "update.available": "Version {version} ist verfügbar",
     "update.current": "Du nutzt Version {version}",
@@ -409,8 +409,8 @@ STRINGS["es"] = {
     "app.discord": "Discord",
     "app.boosteroid_toggle": "Ejecutar para Boosteroid",
     "app.boosteroid_toggle_note": "Activado: {hotkey} pasa por el puente (Shift+Tab/F7) al "
-                                  "documento. Desactivado: {hotkey} lee el portapapeles "
-                                  "local directamente.",
+                                  "documento. Desactivado: {hotkey} copia el objeto bajo el "
+                                  "cursor y lo consulta directamente.",
     "app.league_local": "liga {league}  ·  modo local",
     "update.available": "La versión {version} está disponible",
     "update.current": "Estás usando la versión {version}",
@@ -528,8 +528,8 @@ STRINGS["pt"] = {
     "app.discord": "Discord",
     "app.boosteroid_toggle": "Executar para Boosteroid",
     "app.boosteroid_toggle_note": "Ativado: {hotkey} passa pela ponte (Shift+Tab/F7) até o "
-                                  "documento. Desativado: {hotkey} lê a área de "
-                                  "transferência local diretamente.",
+                                  "documento. Desativado: {hotkey} copia o item sob o "
+                                  "cursor e o avalia diretamente.",
     "app.league_local": "liga {league}  ·  modo local",
     "update.available": "A versão {version} está disponível",
     "update.current": "Você está usando a versão {version}",
@@ -647,7 +647,8 @@ STRINGS["ru"] = {
     "app.discord": "Discord",
     "app.boosteroid_toggle": "Запуск для Boosteroid",
     "app.boosteroid_toggle_note": "Вкл: {hotkey} идёт через мост (Shift+Tab/F7) в документ. "
-                                  "Выкл: {hotkey} читает локальный буфер обмена напрямую.",
+                                  "Выкл: {hotkey} копирует предмет под курсором и сразу "
+                                  "его оценивает.",
     "app.league_local": "лига {league}  ·  локальный режим",
     "update.available": "Доступна версия {version}",
     "update.current": "У вас версия {version}",

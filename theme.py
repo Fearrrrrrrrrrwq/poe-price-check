@@ -13,8 +13,14 @@ from paths import resource_path
 # DwmSetWindowAttribute: 20 na Win11 i Win10 2004+, 19 na starszych kompilacjach.
 _DARK_MODE_ATTRIBUTES = (20, 19)
 _DWMWA_CAPTION_COLOR = 35        # Win11 22000+; pozwala dobrac kolor belki dokladnie
-_DWMWA_CORNER_PREFERENCE = 33    # Win11 22000+; zaokraglone rogi calego okna
-_DWMWCP_ROUND = 2
+
+# UWAGA: byl tu jeszcze DWMWA_WINDOW_CORNER_PREFERENCE (zaokraglone rogi
+# calego okna) - wycofane. Zglaszal to realny uzytkownik (zrzut ekranu):
+# tapeta pulpitu przebijala sie przez dolna czesc okna, wyglada na usterke
+# kompozytora przy laczeniu zaokraglonych rogow z legacy powierzchnia GDI,
+# ktorej uzywa Tk. Nie warto ryzykowac tego dla czysto kosmetycznego
+# efektu, ktorego i tak nie da sie tu przetestowac na prawdziwym Windows 11
+# przed wydaniem.
 
 # --- kolory -------------------------------------------------------------
 #
@@ -96,15 +102,6 @@ def dark_titlebar(window: tk.Misc) -> None:
         colour = ctypes.c_int((blue << 16) | (green << 8) | red)
         ctypes.windll.dwmapi.DwmSetWindowAttribute(
             hwnd, _DWMWA_CAPTION_COLOR, ctypes.byref(colour), ctypes.sizeof(colour))
-
-        # Zaokraglone rogi calego okna - natywny mechanizm kompozytora Win11,
-        # nie rysunek. Na starszym Windows DwmSetWindowAttribute po prostu
-        # zwroci blad dla tej stalej, co i tak lapiemy w except nizej -
-        # okno zostaje kwadratowe, tak jak zawsze bylo.
-        preference = ctypes.c_int(_DWMWCP_ROUND)
-        ctypes.windll.dwmapi.DwmSetWindowAttribute(
-            hwnd, _DWMWA_CORNER_PREFERENCE, ctypes.byref(preference),
-            ctypes.sizeof(preference))
     except Exception:  # noqa: BLE001 - wyglad belki nie moze przerwac startu
         pass
 

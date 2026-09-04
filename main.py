@@ -228,7 +228,7 @@ class PriceChecker:
             set_foreground(self._game_hwnd)
             time.sleep(0.15)
 
-    def _run_job(self, use_bridge: bool) -> None:
+    def _run_job(self, use_bridge: bool, auto_copy: bool = False) -> None:
         if not self._busy.acquire(blocking=False):
             return  # poprzednie sprawdzenie jeszcze trwa
         try:
@@ -249,6 +249,15 @@ class PriceChecker:
                     ))
                     return
             else:
+                if auto_copy:
+                    # Glowny skrot w trybie lokalnym (checkbox "Uruchom dla
+                    # Boosteroid" odznaczony) ma dzialac tak samo wygodnie jak
+                    # tryb mostu - najedz i wcisnij, bez recznego Ctrl+C przed
+                    # kazda wycena. local_clipboard_hotkey (Ctrl+Alt+D) tego
+                    # NIE dostaje - jego sens to wycena tego, co juz jest w
+                    # schowku (np. wklejone spoza gry), a nie odswiezanie go.
+                    hotkeys.send("ctrl+c")
+                    time.sleep(0.08)  # daj grze chwile na wypelnienie schowka
                 raw, changed = read_local_clipboard(), True
                 if not raw:
                     self.telemetry.record_check(ok=False, kind="schowek_pusty")
@@ -275,8 +284,9 @@ class PriceChecker:
         finally:
             self._busy.release()
 
-    def trigger(self, use_bridge: bool = True) -> None:
-        threading.Thread(target=self._run_job, args=(use_bridge,), daemon=True).start()
+    def trigger(self, use_bridge: bool = True, auto_copy: bool = False) -> None:
+        threading.Thread(target=self._run_job, args=(use_bridge, auto_copy),
+                         daemon=True).start()
 
 
 def pump_events(window: ResultWindow, checker: PriceChecker, status=None,
@@ -367,7 +377,12 @@ def run_gui(config: dict, league: str) -> int:
 
     # status.boosteroid_mode czytany W CHWILI wcisniecia skrotu, nie raz przy
     # starcie - przelacznik w oknie dziala od razu, bez restartu programu.
-    hotkeys.add_hotkey(hotkey, lambda: checker.trigger(use_bridge=status.boosteroid_mode))
+    # auto_copy=True w trybie lokalnym: glowny skrot ma dzialac "najedz i
+    # wcisnij", tak samo wygodnie jak tryb mostu, gdzie kopiowanie tez robi
+    # program. local_hotkey (Ctrl+Alt+D) zostaje bez auto-kopiowania - jego
+    # sens to wycena tego, co juz jest w schowku, nie jego odswiezanie.
+    hotkeys.add_hotkey(hotkey, lambda: checker.trigger(
+        use_bridge=status.boosteroid_mode, auto_copy=not status.boosteroid_mode))
     hotkeys.add_hotkey(local_hotkey, lambda: checker.trigger(use_bridge=False))
     # Skrot leci z watku biblioteki keyboard, a Tk wolno dotykac tylko z watku
     # glownego - dlatego zamkniecie przekazujemy przez kolejke zdarzen Tk.

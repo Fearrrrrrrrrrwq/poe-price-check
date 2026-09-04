@@ -499,11 +499,20 @@ class ResultWindow:
                 (listing.account, 18, FONT_SMALL, FG_MUTED),
                 (listing.age_text(), 6, FONT_SMALL, FG_MUTED),
             )
+            widgets = [row]
             for text, width, font, colour in cells:
                 # 'width' w Label to szerokosc MINIMALNA - dluzszy nick rozpycha
                 # kolumne i rozjezdza wiersz, wiec przycinamy go sami.
-                tk.Label(row, text=_ellipsis(text, width), font=font, fg=colour,
-                         bg=row_bg, width=width, anchor="w").pack(side="left")
+                label = tk.Label(row, text=_ellipsis(text, width), font=font, fg=colour,
+                                 bg=row_bg, width=width, anchor="w", pady=2)
+                label.pack(side="left")
+                widgets.append(label)
+            # Sam podglad, nic tu nie da sie kliknac - ale bez podswietlenia
+            # gesty rzad ofert wyglada na martwa tabele, nie na liste do
+            # przegladania.
+            for widget in widgets:
+                widget.bind("<Enter>", lambda _e, ws=widgets: _paint_row(ws, BG_ROW_HOVER))
+                widget.bind("<Leave>", lambda _e, ws=widgets, bg=row_bg: _paint_row(ws, bg))
         self.rows.pack(fill="x")
 
     # ------------------------------------------------------------------ akcje
@@ -535,3 +544,8 @@ def _fmt_number(value: float) -> str:
 
 def _ellipsis(text: str, width: int) -> str:
     return text if len(text) <= width else text[: max(1, width - 1)] + "…"
+
+
+def _paint_row(widgets: list[tk.Widget], bg: str) -> None:
+    for widget in widgets:
+        widget.config(bg=bg)

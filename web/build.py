@@ -295,6 +295,7 @@ def page(lang: str) -> str:
     <div class="wrap">
       <p class="eyebrow">{esc(t['eyebrow_how'])}</p>
       <h2>{esc(t['how_title'])}</h2>
+      <p class="note">{esc(t['how_cloud_note'])}</p>
       <ol class="steps">{steps}</ol>
     </div>
   </section>

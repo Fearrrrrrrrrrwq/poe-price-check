@@ -55,6 +55,10 @@ C["en"] = {
                         "document you own, then asks the official trade API. You "
                         "press one key and see the price.",
     "how_title": "Three steps, once",
+    "how_cloud_note": "Steps 1 and 2 are only for cloud gaming (Boosteroid, "
+                      "GeForce NOW). On a normal PC, skip straight to step 3 - "
+                      "the setup wizard asks first and skips the bridge "
+                      "entirely if you're not in the cloud.",
     "how_1_t": "Create a bridge document",
     "how_1_b": "An ordinary Google Doc. The setup wizard walks you through sharing "
                "it and checks it works.",
@@ -170,6 +174,10 @@ C["pl"] = {
                         "dokument, który należy do ciebie, a potem pyta oficjalne "
                         "API rynku. Wciskasz jeden klawisz i widzisz cenę.",
     "how_title": "Trzy kroki, raz",
+    "how_cloud_note": "Kroki 1 i 2 dotyczą tylko grania w chmurze (Boosteroid, "
+                      "GeForce NOW). Na zwykłym PC możesz przejść od razu do "
+                      "kroku 3 - kreator konfiguracji pyta o to na starcie i "
+                      "całkowicie pomija most, jeśli nie grasz w chmurze.",
     "how_1_t": "Utwórz dokument-most",
     "how_1_b": "Zwykły dokument Google. Kreator przeprowadzi cię przez "
                "udostępnienie i sprawdzi, czy działa.",
@@ -285,6 +293,12 @@ C["de"] = {
                         "aus der Sitzung, das dir gehört, und fragt dann die "
                         "offizielle Handels-API. Eine Taste, ein Preis.",
     "how_title": "Drei Schritte, einmalig",
+    "how_cloud_note": "Schritt 1 und 2 gelten nur für Cloud-Gaming "
+                      "(Boosteroid, GeForce NOW). Auf einem normalen PC "
+                      "kannst du direkt zu Schritt 3 springen - der "
+                      "Einrichtungsassistent fragt das zu Beginn ab und "
+                      "überspringt die Brücke komplett, wenn du nicht in der "
+                      "Cloud spielst.",
     "how_1_t": "Brücken-Dokument anlegen",
     "how_1_b": "Ein gewöhnliches Google-Dokument. Der Assistent führt dich durch die "
                "Freigabe und prüft, ob es funktioniert.",
@@ -403,6 +417,11 @@ C["es"] = {
                         "de un documento que es tuyo y luego consulta la API oficial "
                         "del mercado. Pulsas una tecla y ves el precio.",
     "how_title": "Tres pasos, una vez",
+    "how_cloud_note": "Los pasos 1 y 2 son solo para juego en la nube "
+                      "(Boosteroid, GeForce NOW). En un PC normal puedes ir "
+                      "directo al paso 3 - el asistente de configuración lo "
+                      "pregunta al principio y omite el puente por completo "
+                      "si no juegas en la nube.",
     "how_1_t": "Crea un documento puente",
     "how_1_b": "Un documento de Google corriente. El asistente te guía para "
                "compartirlo y comprueba que funciona.",
@@ -521,6 +540,11 @@ C["pt"] = {
                         "que é seu e depois consulta a API oficial do mercado. Você "
                         "aperta uma tecla e vê o preço.",
     "how_title": "Três passos, uma vez",
+    "how_cloud_note": "Os passos 1 e 2 são apenas para jogo em nuvem "
+                      "(Boosteroid, GeForce NOW). Em um PC normal, você pode "
+                      "ir direto para o passo 3 - o assistente de "
+                      "configuração pergunta isso logo no início e pula a "
+                      "ponte por completo se você não jogar na nuvem.",
     "how_1_t": "Crie um documento ponte",
     "how_1_b": "Um documento comum do Google. O assistente orienta o "
                "compartilhamento e verifica se funciona.",
@@ -638,6 +662,11 @@ C["ru"] = {
                         "документ, который принадлежит вам, и затем обращается к "
                         "официальному API рынка. Нажимаете клавишу - видите цену.",
     "how_title": "Три шага, один раз",
+    "how_cloud_note": "Шаги 1 и 2 нужны только для облачного гейминга "
+                      "(Boosteroid, GeForce NOW). На обычном ПК можно сразу "
+                      "переходить к шагу 3 - мастер настройки спрашивает об "
+                      "этом в самом начале и полностью пропускает мост, если "
+                      "вы не играете в облаке.",
     "how_1_t": "Создайте документ-мост",
     "how_1_b": "Обычный документ Google. Мастер настройки проведёт через открытие "
                "доступа и проверит, что всё работает.",

@@ -24,10 +24,19 @@ DISCORD_URL = "https://discord.gg/FjAnFqGNh4"
 class StatusWindow:
     """Glowne okno aplikacji. Trzyma obiekt Tk, reszta okien jest podrzedna."""
 
-    def __init__(self, league: str, hotkeys: dict, on_quit=None) -> None:
+    def __init__(self, league: str, hotkeys: dict, on_quit=None,
+                 boosteroid_mode: bool = True, on_boosteroid_mode_change=None) -> None:
         self.on_quit = on_quit
         self._checks = 0
         self._discord_url = DISCORD_URL
+        self._league = league
+        self._main_hotkey = hotkeys.get("hotkey", "ctrl+d")
+        # Zwykly atrybut, nie tk.BooleanVar - musi byc bezpiecznie czytelny z
+        # watku skrotu (hotkeys_windows/hotkeys_macos wolaja callback poza
+        # watkiem Tk), a odczyt atrybutu w CPythonie jest atomowy dzieki GIL.
+        # Pisany jest tylko z watku glownego (komenda checkboxa).
+        self.boosteroid_mode = boosteroid_mode
+        self._on_boosteroid_mode_change = on_boosteroid_mode_change
 
         self.root = tk.Tk()
         self.root.title("PoE Price Check")
@@ -67,7 +76,7 @@ class StatusWindow:
         tk.Label(line, text=t("app.running"), font=FONT_BODY, fg=FG,
                  bg=BG_PANEL).pack(side="left", padx=(6, 0))
 
-        self.state = tk.Label(state_card.body, text=t("app.league_bridge", league=league),
+        self.state = tk.Label(state_card.body, text=self._state_text(),
                               font=FONT_SMALL, fg=FG_MUTED, bg=BG_PANEL, anchor="w")
         self.state.pack(fill="x", padx=12, pady=(1, 11))
 
@@ -91,6 +100,24 @@ class StatusWindow:
         tk.Label(main_card.body, text=t("app.price_check"), font=FONT_LABEL,
                  fg=FG_MUTED, bg=BG_PANEL, anchor="w").pack(fill="x", padx=12,
                                                             pady=(5, 11))
+
+        # --- przelacznik trybu Boosteroid --------------------------------
+        #
+        # Bez tego trzeba bylo pamietac dwa rozne skroty (glowny - przez
+        # most, i local_clipboard_hotkey - bez mostu). Ten przelacznik
+        # zmienia zachowanie GLOWNEGO skrotu w locie, bez restartu programu -
+        # main.py czyta status.boosteroid_mode w momencie kazdego wcisniecia,
+        # nie raz przy starcie.
+        toggle_row = tk.Frame(outer, bg=BG)
+        toggle_row.pack(fill="x", pady=(0, TIGHT))
+        self._boosteroid_var = tk.BooleanVar(value=self.boosteroid_mode)
+        theme.checkbox(
+            toggle_row, t("app.boosteroid_toggle"), self._boosteroid_var,
+            command=self._on_toggle_boosteroid,
+        ).pack(anchor="w")
+        tk.Label(outer, text=t("app.boosteroid_toggle_note", hotkey=self._main_hotkey),
+                 font=FONT_LABEL, fg=FG_MUTED, bg=BG, anchor="w", justify="left",
+                 wraplength=300).pack(fill="x", pady=(0, GAP + 2))
 
         # --- pozostale skroty ------------------------------------------------
         tk.Label(outer, text=t("app.other_hotkeys"), font=FONT_LABEL, fg=FG_MUTED,
@@ -123,6 +150,18 @@ class StatusWindow:
 
         self.root.update_idletasks()
         self._centre()
+
+    # -------------------------------------------------------- tryb Boosteroid
+
+    def _state_text(self) -> str:
+        key = "app.league_bridge" if self.boosteroid_mode else "app.league_local"
+        return t(key, league=self._league)
+
+    def _on_toggle_boosteroid(self) -> None:
+        self.boosteroid_mode = self._boosteroid_var.get()
+        self.state.config(text=self._state_text())
+        if self._on_boosteroid_mode_change:
+            self._on_boosteroid_mode_change(self.boosteroid_mode)
 
     # ---------------------------------------------------------------- widok
 

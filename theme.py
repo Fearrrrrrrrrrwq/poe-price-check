@@ -131,6 +131,18 @@ def entry(parent: tk.Misc, textvariable=None, width: int = 20, **kwargs) -> tk.E
     )
 
 
+def checkbox(parent: tk.Misc, text: str, variable: tk.BooleanVar, command=None,
+             bg: str = BG) -> tk.Checkbutton:
+    """Checkbox w stylu aplikacji. Domyslny Tk na ciemnym tle jest nieczytelny
+    bez recznego dobrania selectcolor (kwadracik zostaje bialy na bialym)."""
+    return tk.Checkbutton(
+        parent, text=text, variable=variable, command=command,
+        font=FONT_BODY, fg=FG, bg=bg, activebackground=bg, activeforeground=FG,
+        selectcolor=BG_INPUT, highlightthickness=0, bd=0, anchor="w",
+        cursor="hand2",
+    )
+
+
 def keycap(parent: tk.Misc, text: str, bg: str = BG_PANEL) -> tk.Label:
     """Etykieta udajaca klawisz - czytelniejsza niz sam zolty tekst."""
     return tk.Label(

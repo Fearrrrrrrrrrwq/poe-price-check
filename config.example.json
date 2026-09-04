@@ -15,6 +15,8 @@
   "gdoc_id": "",
   "appsscript_url": "",
 
+  "_boosteroid_mode_comment": "true = 'hotkey' idzie przez most (Boosteroid). false = 'hotkey' czyta lokalny schowek wprost, tak jak local_clipboard_hotkey. Przelacznik w oknie aplikacji nadpisuje to przy kazdym uruchomieniu.",
+  "boosteroid_mode": true,
   "hotkey": "ctrl+d",
   "local_clipboard_hotkey": "ctrl+alt+d",
   "quit_hotkey": "ctrl+alt+q",

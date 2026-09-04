@@ -347,10 +347,16 @@ def run_gui(config: dict, league: str) -> int:
     local_hotkey = config.get("local_clipboard_hotkey", "ctrl+alt+d")
     quit_hotkey = config.get("quit_hotkey", "ctrl+alt+q")
 
+    def _save_boosteroid_mode(enabled: bool) -> None:
+        config["boosteroid_mode"] = enabled
+        save_config(config)
+
     status = StatusWindow(
         league=league,
         hotkeys={"hotkey": hotkey, "local": local_hotkey, "quit": quit_hotkey},
         on_quit=telemetry.stop,
+        boosteroid_mode=bool(config.get("boosteroid_mode", True)),
+        on_boosteroid_mode_change=_save_boosteroid_mode,
     )
     # Okno wyniku jest podrzedne wobec glownego - jeden obiekt Tk na proces.
     window = ResultWindow(
@@ -359,7 +365,9 @@ def run_gui(config: dict, league: str) -> int:
         close_on_focus_loss=config.get("close_on_focus_loss", True),
     )
 
-    hotkeys.add_hotkey(hotkey, lambda: checker.trigger(use_bridge=True))
+    # status.boosteroid_mode czytany W CHWILI wcisniecia skrotu, nie raz przy
+    # starcie - przelacznik w oknie dziala od razu, bez restartu programu.
+    hotkeys.add_hotkey(hotkey, lambda: checker.trigger(use_bridge=status.boosteroid_mode))
     hotkeys.add_hotkey(local_hotkey, lambda: checker.trigger(use_bridge=False))
     # Skrot leci z watku biblioteki keyboard, a Tk wolno dotykac tylko z watku
     # glownego - dlatego zamkniecie przekazujemy przez kolejke zdarzen Tk.

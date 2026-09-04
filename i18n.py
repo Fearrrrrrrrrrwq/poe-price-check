@@ -42,6 +42,11 @@ STRINGS["en"] = {
     "app.minimise": "You can minimise this -\nshortcuts keep working.",
     "app.quit": "Quit",
     "app.discord": "Discord",
+    "app.boosteroid_toggle": "Run for Boosteroid",
+    "app.boosteroid_toggle_note": "On: {hotkey} goes through the bridge (Shift+Tab/F7) into "
+                                  "the document. Off: {hotkey} reads the local clipboard "
+                                  "directly.",
+    "app.league_local": "league {league}  ·  local mode",
     "update.available": "Version {version} is available",
     "update.current": "You are running {version}",
     "update.open": "See what changed",
@@ -163,6 +168,11 @@ STRINGS["pl"] = {
     "app.minimise": "Możesz zminimalizować -\nskróty działają w tle.",
     "app.quit": "Zakończ",
     "app.discord": "Discord",
+    "app.boosteroid_toggle": "Uruchom dla Boosteroid",
+    "app.boosteroid_toggle_note": "Zaznaczone: {hotkey} idzie przez most (Shift+Tab/F7) do "
+                                  "dokumentu. Odznaczone: {hotkey} czyta wprost lokalny "
+                                  "schowek.",
+    "app.league_local": "liga {league}  ·  tryb lokalny",
     "update.available": "Dostępna jest wersja {version}",
     "update.current": "Używasz wersji {version}",
     "update.open": "Zobacz, co się zmieniło",
@@ -277,6 +287,11 @@ STRINGS["de"] = {
     "app.minimise": "Du kannst minimieren -\ndie Tastenkürzel laufen weiter.",
     "app.quit": "Beenden",
     "app.discord": "Discord",
+    "app.boosteroid_toggle": "Für Boosteroid starten",
+    "app.boosteroid_toggle_note": "An: {hotkey} läuft über die Brücke (Shift+Tab/F7) ins "
+                                  "Dokument. Aus: {hotkey} liest direkt die lokale "
+                                  "Zwischenablage.",
+    "app.league_local": "Liga {league}  ·  lokaler Modus",
     "update.available": "Version {version} ist verfügbar",
     "update.current": "Du nutzt Version {version}",
     "update.open": "Änderungen ansehen",
@@ -392,6 +407,11 @@ STRINGS["es"] = {
     "app.minimise": "Puedes minimizar -\nlos atajos siguen activos.",
     "app.quit": "Salir",
     "app.discord": "Discord",
+    "app.boosteroid_toggle": "Ejecutar para Boosteroid",
+    "app.boosteroid_toggle_note": "Activado: {hotkey} pasa por el puente (Shift+Tab/F7) al "
+                                  "documento. Desactivado: {hotkey} lee el portapapeles "
+                                  "local directamente.",
+    "app.league_local": "liga {league}  ·  modo local",
     "update.available": "La versión {version} está disponible",
     "update.current": "Estás usando la versión {version}",
     "update.open": "Ver los cambios",
@@ -506,6 +526,11 @@ STRINGS["pt"] = {
     "app.minimise": "Você pode minimizar -\nos atalhos continuam funcionando.",
     "app.quit": "Sair",
     "app.discord": "Discord",
+    "app.boosteroid_toggle": "Executar para Boosteroid",
+    "app.boosteroid_toggle_note": "Ativado: {hotkey} passa pela ponte (Shift+Tab/F7) até o "
+                                  "documento. Desativado: {hotkey} lê a área de "
+                                  "transferência local diretamente.",
+    "app.league_local": "liga {league}  ·  modo local",
     "update.available": "A versão {version} está disponível",
     "update.current": "Você está usando a versão {version}",
     "update.open": "Ver o que mudou",
@@ -620,6 +645,10 @@ STRINGS["ru"] = {
     "app.minimise": "Можно свернуть -\nсочетания работают в фоне.",
     "app.quit": "Выход",
     "app.discord": "Discord",
+    "app.boosteroid_toggle": "Запуск для Boosteroid",
+    "app.boosteroid_toggle_note": "Вкл: {hotkey} идёт через мост (Shift+Tab/F7) в документ. "
+                                  "Выкл: {hotkey} читает локальный буфер обмена напрямую.",
+    "app.league_local": "лига {league}  ·  локальный режим",
     "update.available": "Доступна версия {version}",
     "update.current": "У вас версия {version}",
     "update.open": "Что изменилось",

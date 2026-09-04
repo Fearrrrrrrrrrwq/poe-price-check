@@ -256,8 +256,20 @@ class PriceChecker:
                     # kazda wycena. local_clipboard_hotkey (Ctrl+Alt+D) tego
                     # NIE dostaje - jego sens to wycena tego, co juz jest w
                     # schowku (np. wklejone spoza gry), a nie odswiezanie go.
+                    #
+                    # _yield_focus_to_game() JEST tu konieczne, nie kosmetyka:
+                    # po pierwszej wycenie fokus ma nasze okno wyniku, wiec bez
+                    # oddania go z powrotem grze synteyczny Ctrl+C lecialby w
+                    # nasz panel, schowek nigdy by sie nie odswiezal i kazda
+                    # kolejna wycena czytalaby ten sam, stary tekst - dokladnie
+                    # to zglosil tester.
+                    self._yield_focus_to_game()
                     hotkeys.send("ctrl+c")
-                    time.sleep(0.08)  # daj grze chwile na wypelnienie schowka
+                    # Ten sam odstep co po Ctrl+C w trybie mostu
+                    # (timing.after_copy_ms, domyslnie 250ms) - lokalny
+                    # schowek jest szybszy niz Boosteroid, ale gra wciaz
+                    # potrzebuje chwili, zeby go wypelnic.
+                    time.sleep(self.timing.after_copy_ms / 1000)
                 raw, changed = read_local_clipboard(), True
                 if not raw:
                     self.telemetry.record_check(ok=False, kind="schowek_pusty")

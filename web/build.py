@@ -20,7 +20,6 @@ from datetime import date
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
-from community_content import COMMUNITY
 from content import C, DEFAULT, LANGS, LOCALES
 from privacy_content import PRIVACY
 # Wersja i sklejanie archiwum siedza w package.py, zeby plik ze strony
@@ -277,7 +276,7 @@ def page(lang: str) -> str:
         </p>
       </div>
       <figure class="shot hero-shot">
-        <img src="{asset('app-result.png')}" width="462" height="679"
+        <img src="{asset('app-result.png')}" width="460" height="645"
              alt="{esc(t['shot_result_alt'])}" fetchpriority="high">
       </figure>
     </div>
@@ -315,7 +314,7 @@ def page(lang: str) -> str:
         <p class="privacy-note">{esc(t['privacy_body'])}</p>
       </div>
       <figure class="shot shot-small">
-        <img src="{asset('app-status.png')}" width="304" height="411"
+        <img src="{asset('app-status.png')}" width="300" height="441"
              alt="{esc(t['shot_status_alt'])}" loading="lazy">
       </figure>
     </div>
@@ -352,8 +351,7 @@ def page(lang: str) -> str:
     <p class="disclaimer">{esc(t['footer_disclaimer'])}</p>
     <p class="disclaimer"><a href="{SOURCE_URL}/blob/main/SIGNING-POLICY.md"
        rel="noopener noreferrer">Code signing policy</a>
-       &middot; <a href="/{lang}/privacy/">{esc(PRIVACY[lang]['title'])}</a>
-       &middot; <a href="/{lang}/community/">{esc(COMMUNITY[lang]['title'])}</a></p>
+       &middot; <a href="/{lang}/privacy/">{esc(PRIVACY[lang]['title'])}</a></p>
   </div>
 </footer>
 </body>
@@ -387,68 +385,6 @@ def privacy_page(lang: str) -> str:
   <h1>{esc(p['title'])}</h1>
   <p class="note">{esc(p['updated'])}</p>
   {sections}
-</main>
-<footer>
-  <div class="wrap">
-    <nav class="langs" aria-label="{esc(t['footer_lang'])}">{lang_switch(lang)}</nav>
-  </div>
-</footer>
-</body>
-</html>
-"""
-
-
-def community_page(lang: str) -> str:
-    """Publiczna, zagregowana statystyka uzycia - dane leca z
-    /api/public-stats (Cloudflare Function czytajaca ta sama tabele pings
-    co panel admina), tutaj tylko szkielet i etykiety. Zero logowania,
-    zero danych, ktorych nie obiecuje juz polityka prywatnosci."""
-    c = COMMUNITY[lang]
-    t = C[lang]
-    tiles = [
-        ("cs-installs", c["tile_installs"]),
-        ("cs-installs-week", c["tile_installs_week"]),
-        ("cs-checks-week", c["tile_checks_week"]),
-        ("cs-session", c["tile_session"]),
-    ]
-    tile_html = "".join(
-        f'<div class="tile"><span class="tile-label">{esc(label)}</span>'
-        f'<b id="{key}">–</b></div>'
-        for key, label in tiles)
-
-    sections = [
-        ("systems", c["section_systems"]),
-        ("leagues", c["section_leagues"]),
-        ("versions", c["section_versions"]),
-        ("languages", c["section_languages"]),
-        ("transports", c["section_transports"]),
-    ]
-    section_html = "".join(
-        f'<section><h2>{esc(label)}</h2>'
-        f'<div data-bars="{key}"></div></section>'
-        for key, label in sections)
-
-    return f"""<!DOCTYPE html>
-<html lang="{lang}" dir="{t['dir']}">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>{esc(c['title'])} - PoE Price Check</title>
-  <meta name="description" content="{esc(c['description'])}">
-  <meta name="robots" content="index, follow">
-  <link rel="canonical" href="{SITE_URL}/{lang}/community/">
-  <link rel="icon" href="{asset('icon.png')}" type="image/png">
-  <link rel="stylesheet" href="{asset('style.css')}">
-  <script src="{asset('community.js')}" defer></script>
-</head>
-<body>
-<main class="wrap narrow legal" id="cs-board">
-  <p><a href="/{lang}/">{esc(c['back'])}</a></p>
-  <h1>{esc(c['heading'])}</h1>
-  <p class="note">{esc(c['intro'])}</p>
-  <div class="tiles">{tile_html}</div>
-  {section_html}
-  <p class="note">{esc(c['updated_prefix'])} <span id="cs-updated">…</span></p>
 </main>
 <footer>
   <div class="wrap">
@@ -939,17 +875,6 @@ def build() -> None:
                 f"Polityka prywatnosci dla {code!r} niezgodna: "
                 f"brakuje {sorted(missing)}, nadmiar {sorted(extra)}")
 
-    community_base = set(COMMUNITY[DEFAULT])
-    for code in LANGS:
-        if code not in COMMUNITY:
-            raise SystemExit(f"Brak strony spolecznosci dla {code!r}")
-        missing = community_base - set(COMMUNITY[code])
-        extra = set(COMMUNITY[code]) - community_base
-        if missing or extra:
-            raise SystemExit(
-                f"Strona spolecznosci dla {code!r} niezgodna: "
-                f"brakuje {sorted(missing)}, nadmiar {sorted(extra)}")
-
     if DIST.exists():
         shutil.rmtree(DIST)
     (DIST / "assets").mkdir(parents=True)
@@ -961,9 +886,6 @@ def build() -> None:
         (target / "privacy").mkdir()
         (target / "privacy" / "index.html").write_text(
             privacy_page(code), encoding="utf-8")
-        (target / "community").mkdir()
-        (target / "community" / "index.html").write_text(
-            community_page(code), encoding="utf-8")
 
     (DIST / "index.html").write_text(root_redirect(), encoding="utf-8")
     (DIST / "admin").mkdir()

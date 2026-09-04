@@ -58,6 +58,22 @@ STRINGS["en"] = {
     "setup.next": "Next",
     "setup.back": "Back",
     "setup.finish": "Save and start",
+    "setup.mode_title": "How do you play?",
+    "setup.mode_intro": "This decides what the wizard sets up next - you can "
+                        "change it later from the checkbox in the main window.",
+    "setup.mode_cloud_t": "Cloud gaming",
+    "setup.mode_cloud_b": "Boosteroid, GeForce NOW or similar - the game runs "
+                          "on a machine that isn't yours, so the clipboard "
+                          "needs a bridge.",
+    "setup.mode_local_t": "Normal PC",
+    "setup.mode_local_b": "The game runs on this computer. Nothing to set up "
+                          "- the hotkey reads your local clipboard directly.",
+    "setup.mode_choose": "Choose this",
+    "setup.local_title": "You're all set",
+    "setup.local_body": "Hover an item and press the hotkey - it copies the "
+                        "item and checks it directly, no Google Doc or Steam "
+                        "overlay needed. Switch to cloud mode anytime from "
+                        "the checkbox in the main window.",
     "setup.p1_title": "The bridge document",
     "setup.p1_intro": "The game runs in the cloud and Boosteroid's clipboard only "
                       "travels one way. To get an item's text out of it you need a "
@@ -184,6 +200,22 @@ STRINGS["pl"] = {
     "setup.next": "Dalej",
     "setup.back": "Wstecz",
     "setup.finish": "Zapisz i uruchom",
+    "setup.mode_title": "Jak grasz?",
+    "setup.mode_intro": "To decyduje, co kreator skonfiguruje dalej - możesz to "
+                        "zmienić później przez checkbox w oknie głównym.",
+    "setup.mode_cloud_t": "Granie w chmurze",
+    "setup.mode_cloud_b": "Boosteroid, GeForce NOW i podobne - gra działa na "
+                          "cudzej maszynie, więc schowek potrzebuje mostu.",
+    "setup.mode_local_t": "Zwykły PC",
+    "setup.mode_local_b": "Gra działa na tym komputerze. Nic do "
+                          "skonfigurowania - skrót czyta wprost lokalny "
+                          "schowek.",
+    "setup.mode_choose": "Wybierz",
+    "setup.local_title": "Gotowe",
+    "setup.local_body": "Najedź na przedmiot i wciśnij skrót - kopiuje "
+                        "przedmiot i od razu go wycenia, bez dokumentu "
+                        "Google i nakładki Steam. Tryb chmury możesz włączyć "
+                        "w każdej chwili przez checkbox w oknie głównym.",
     "setup.p1_title": "Dokument-most",
     "setup.p1_intro": "Gra działa w chmurze, a schowek Boosteroida przesyła dane "
                       "tylko w jedną stronę. Żeby wydostać z niej opis przedmiotu, "
@@ -304,6 +336,25 @@ STRINGS["de"] = {
     "setup.next": "Weiter",
     "setup.back": "Zurück",
     "setup.finish": "Speichern und starten",
+    "setup.mode_title": "Wie spielst du?",
+    "setup.mode_intro": "Das entscheidet, was der Assistent als Nächstes "
+                        "einrichtet - du kannst es später über das "
+                        "Kontrollkästchen im Hauptfenster ändern.",
+    "setup.mode_cloud_t": "Cloud-Gaming",
+    "setup.mode_cloud_b": "Boosteroid, GeForce NOW oder Ähnliches - das Spiel "
+                          "läuft auf einem fremden Rechner, daher braucht die "
+                          "Zwischenablage eine Brücke.",
+    "setup.mode_local_t": "Normaler PC",
+    "setup.mode_local_b": "Das Spiel läuft auf diesem Computer. Nichts "
+                          "einzurichten - der Shortcut liest direkt die "
+                          "lokale Zwischenablage.",
+    "setup.mode_choose": "Auswählen",
+    "setup.local_title": "Fertig",
+    "setup.local_body": "Zeige auf einen Gegenstand und drücke den Shortcut - "
+                        "er kopiert den Gegenstand und prüft ihn direkt, ohne "
+                        "Google Doc oder Steam-Overlay. Wechsle jederzeit "
+                        "über das Kontrollkästchen im Hauptfenster in den "
+                        "Cloud-Modus.",
     "setup.p1_title": "Das Brücken-Dokument",
     "setup.p1_intro": "Das Spiel läuft in der Cloud und die Zwischenablage von "
                       "Boosteroid überträgt nur in eine Richtung. Um den Text eines "
@@ -425,6 +476,25 @@ STRINGS["es"] = {
     "setup.next": "Siguiente",
     "setup.back": "Atrás",
     "setup.finish": "Guardar e iniciar",
+    "setup.mode_title": "¿Cómo juegas?",
+    "setup.mode_intro": "Esto decide qué configura el asistente a "
+                        "continuación - puedes cambiarlo después desde la "
+                        "casilla en la ventana principal.",
+    "setup.mode_cloud_t": "Juego en la nube",
+    "setup.mode_cloud_b": "Boosteroid, GeForce NOW o similar - el juego corre "
+                          "en una máquina que no es tuya, así que el "
+                          "portapapeles necesita un puente.",
+    "setup.mode_local_t": "PC normal",
+    "setup.mode_local_b": "El juego corre en este equipo. Nada que "
+                          "configurar - el atajo lee el portapapeles local "
+                          "directamente.",
+    "setup.mode_choose": "Elegir",
+    "setup.local_title": "Todo listo",
+    "setup.local_body": "Pasa el cursor sobre un objeto y pulsa el atajo - lo "
+                        "copia y lo consulta directamente, sin documento de "
+                        "Google ni overlay de Steam. Cambia al modo nube "
+                        "cuando quieras desde la casilla en la ventana "
+                        "principal.",
     "setup.p1_title": "El documento puente",
     "setup.p1_intro": "El juego corre en la nube y el portapapeles de Boosteroid solo "
                       "viaja en un sentido. Para sacar el texto de un objeto hace "
@@ -545,6 +615,25 @@ STRINGS["pt"] = {
     "setup.next": "Avançar",
     "setup.back": "Voltar",
     "setup.finish": "Salvar e iniciar",
+    "setup.mode_title": "Como você joga?",
+    "setup.mode_intro": "Isso decide o que o assistente configura em seguida "
+                        "- você pode mudar depois pela caixa de seleção na "
+                        "janela principal.",
+    "setup.mode_cloud_t": "Jogo em nuvem",
+    "setup.mode_cloud_b": "Boosteroid, GeForce NOW ou similar - o jogo roda "
+                          "em uma máquina que não é sua, então a área de "
+                          "transferência precisa de uma ponte.",
+    "setup.mode_local_t": "PC normal",
+    "setup.mode_local_b": "O jogo roda neste computador. Nada para "
+                          "configurar - o atalho lê a área de transferência "
+                          "local diretamente.",
+    "setup.mode_choose": "Escolher",
+    "setup.local_title": "Tudo pronto",
+    "setup.local_body": "Passe o cursor sobre um item e pressione o atalho - "
+                        "ele copia o item e o avalia diretamente, sem "
+                        "documento do Google ou overlay do Steam. Mude para "
+                        "o modo nuvem quando quiser pela caixa de seleção na "
+                        "janela principal.",
     "setup.p1_title": "O documento ponte",
     "setup.p1_intro": "O jogo roda na nuvem e a área de transferência do Boosteroid "
                       "só vai numa direção. Para tirar o texto de um item de lá é "
@@ -665,6 +754,23 @@ STRINGS["ru"] = {
     "setup.next": "Далее",
     "setup.back": "Назад",
     "setup.finish": "Сохранить и запустить",
+    "setup.mode_title": "Как вы играете?",
+    "setup.mode_intro": "Это определяет, что мастер настроит дальше - позже "
+                        "можно изменить через флажок в главном окне.",
+    "setup.mode_cloud_t": "Облачный гейминг",
+    "setup.mode_cloud_b": "Boosteroid, GeForce NOW и подобные - игра работает "
+                          "на чужом компьютере, поэтому буферу обмена нужен "
+                          "мост.",
+    "setup.mode_local_t": "Обычный ПК",
+    "setup.mode_local_b": "Игра работает на этом компьютере. Настраивать "
+                          "нечего - хоткей читает локальный буфер обмена "
+                          "напрямую.",
+    "setup.mode_choose": "Выбрать",
+    "setup.local_title": "Готово",
+    "setup.local_body": "Наведите на предмет и нажмите хоткей - он скопирует "
+                        "предмет и сразу его оценит, без документа Google и "
+                        "оверлея Steam. Переключиться на облачный режим "
+                        "можно в любой момент через флажок в главном окне.",
     "setup.p1_title": "Документ-мост",
     "setup.p1_intro": "Игра работает в облаке, а буфер обмена Boosteroid передаёт "
                       "данные только в одну сторону. Чтобы вытащить оттуда описание "

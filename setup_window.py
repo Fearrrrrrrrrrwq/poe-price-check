@@ -1,9 +1,17 @@
 """Kreator pierwszego uruchomienia.
 
-Dwie strony, bo konfiguracja ma dwie polowy i obie sa obowiazkowe:
-dokument-most po stronie Google i nakladka Steam po stronie Boosteroida.
-Pominiecie drugiej konczy sie tym, ze program dziala, ale nic nie znajduje -
-najgorszy mozliwy rodzaj awarii, bo wyglada na blad programu.
+Pierwszy ekran to wybor trybu: chmura (Boosteroid i podobne) albo zwykly PC.
+Bez tego wyboru KAZDY nowy uzytkownik byl zmuszany przejsc przez tworzenie
+dokumentu-mostu i konfiguracje Steam Overlay, nawet jesli w ogole nie gra w
+chmurze - a przelacznik "Uruchom dla Boosteroid" w oknie glownym (dodany w
+1.3.0) od dawna pozwala na tryb lokalny bez mostu. Kreator po prostu nie
+nadazal za ta funkcja.
+
+Tryb "chmura" to dwie strony, bo konfiguracja ma dwie polowy i obie sa
+obowiazkowe: dokument-most po stronie Google i nakladka Steam po stronie
+Boosteroida. Pominiecie drugiej konczy sie tym, ze program dziala, ale nic
+nie znajduje - najgorszy mozliwy rodzaj awarii, bo wyglada na blad programu.
+Tryb "zwykly PC" to jeden ekran informacyjny - nie ma nic do skonfigurowania.
 """
 
 import re
@@ -45,6 +53,9 @@ class SetupWindow:
     def __init__(self, config: dict) -> None:
         self.config = config
         self.saved = False
+        # None = ekran wyboru trybu (pierwszy widziany), "cloud" = dotychczasowy
+        # dwustronicowy kreator mostu, "local" = jeden ekran bez konfiguracji.
+        self.mode: str | None = None
         self.page = 0
         self._link_value = config.get("gdoc_id", "")
 
@@ -121,17 +132,51 @@ class SetupWindow:
     def _render(self) -> None:
         self.root.title(t("setup.title"))
         self._clear_body()
-        (self._page_document if self.page == 0 else self._page_steam)()
-        self.progress.config(text=t("setup.step_of", n=self.page + 1))
-        self.next_btn.config(text=t("setup.next") if self.page == 0
-                             else t("setup.finish"))
-        self.back_btn.config(text=t("setup.back"))
-        if self.page == 0:
+
+        if self.mode is None:
+            # Ekran wyboru trybu: sam wybiera dalsza sciezke (patrz
+            # _choose_cloud/_choose_local), wiec nawigacja u dolu jest tu
+            # zbedna - nie ma "dalej" bez wyboru jednej z dwoch kart.
+            self._page_mode()
+            self.progress.config(text="")
+            self.next_btn.pack_forget()
             self.back_btn.pack_forget()
-        else:
-            self.back_btn.pack(side="right", padx=(0, GAP))
+            self.root.update_idletasks()
+            self._centre()
+            return
+
+        self.next_btn.pack(side="right")
+        self.back_btn.pack(side="right", padx=(0, GAP))
+        self.back_btn.config(text=t("setup.back"))
+
+        if self.mode == "cloud":
+            (self._page_document if self.page == 0 else self._page_steam)()
+            self.progress.config(text=t("setup.step_of", n=self.page + 1))
+            self.next_btn.config(text=t("setup.next") if self.page == 0
+                                 else t("setup.finish"))
+        else:  # local - jeden ekran, bez czego konfigurowac
+            self._page_local()
+            self.progress.config(text="")
+            self.next_btn.config(text=t("setup.finish"))
+
         self.root.update_idletasks()
         self._centre()
+
+    def _page_mode(self) -> None:
+        self._heading(t("setup.mode_title"), t("setup.mode_intro"))
+
+        step = self._step("1", t("setup.mode_cloud_t"))
+        self._note(step, t("setup.mode_cloud_b"))
+        theme.button(step, t("setup.mode_choose"), self._choose_cloud,
+                     primary=True).pack(anchor="w", pady=(TIGHT, 0))
+
+        step = self._step("2", t("setup.mode_local_t"))
+        self._note(step, t("setup.mode_local_b"))
+        theme.button(step, t("setup.mode_choose"), self._choose_local).pack(
+            anchor="w", pady=(TIGHT, 0))
+
+    def _page_local(self) -> None:
+        self._heading(t("setup.local_title"), t("setup.local_body"))
 
     def _page_document(self) -> None:
         self._heading(t("setup.p1_title"), t("setup.p1_intro"))
@@ -231,21 +276,43 @@ class SetupWindow:
 
         threading.Thread(target=job, daemon=True).start()
 
+    def _choose_cloud(self) -> None:
+        self.mode = "cloud"
+        self.page = 0
+        self._render()
+
+    def _choose_local(self) -> None:
+        self.mode = "local"
+        self._render()
+
     def _next(self) -> None:
-        if self.page == 0:
-            if not extract_doc_id(self._link_value):
-                self._set_status(t("setup.st_need_link"), FG_ERROR)
+        if self.mode == "cloud":
+            if self.page == 0:
+                if not extract_doc_id(self._link_value):
+                    self._set_status(t("setup.st_need_link"), FG_ERROR)
+                    return
+                self.page = 1
+                self._render()
                 return
-            self.page = 1
-            self._render()
-            return
-        self.config["gdoc_id"] = extract_doc_id(self._link_value)
-        self.config["overlay_hotkey"] = "f7"
+            self.config["gdoc_id"] = extract_doc_id(self._link_value)
+            self.config["overlay_hotkey"] = "f7"
+            self.config["boosteroid_mode"] = True
+        else:  # local - nic do zebrania, sam wybor trybu juz wystarczy
+            self.config["boosteroid_mode"] = False
+        # Niezaleznie od trybu: bez tego needs_setup() otwieralby kreator
+        # przy kazdym starcie komus, kto wybral "zwykly PC" - dla niego
+        # gdoc_id zostaje puste na zawsze, a to byl dotychczasowy jedyny
+        # sygnal "konfiguracja skonczona".
+        self.config["setup_complete"] = True
         self.saved = True
         self.root.destroy()
 
     def _back(self) -> None:
-        self.page = 0
+        if self.mode == "cloud" and self.page == 1:
+            self.page = 0
+            self._render()
+            return
+        self.mode = None
         self._render()
 
     def _skip(self) -> None:
@@ -264,4 +331,14 @@ class SetupWindow:
 
 
 def needs_setup(config: dict) -> bool:
-    return not extract_doc_id(config.get("gdoc_id", ""))
+    """Kreator ma sie odpalic, dopoki nikt go nie skonczyl.
+
+    "setup_complete" to jedyny pewny sygnal odkad istnieje tryb lokalny -
+    ktos, kto wybral "zwykly PC", ma puste gdoc_id NA ZAWSZE, wiec samo
+    extract_doc_id() otwieraloby mu kreator przy kazdym starcie. Instalacje
+    sprzed tej flagi (maja juz gdoc_id, nie maja jeszcze klucza w configu)
+    nadal licza sie jako skonczone - stary warunek zostaje jako druga
+    galaz "or", nie znika.
+    """
+    return not config.get("setup_complete", False) and not extract_doc_id(
+        config.get("gdoc_id", ""))

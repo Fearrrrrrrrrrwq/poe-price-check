@@ -56,7 +56,17 @@ rather be sure what you are running.
 
 ### macOS (experimental)
 
-There is no `.app` build yet — run from source:
+Download `poe-price-check-<version>-macos.zip` from the
+[latest release](../../releases/latest) — it contains a packaged
+`PoE Price Check.app`, Apple Silicon included. Move it to Applications, then
+right-click → Open → Open once (it's unsigned, so Gatekeeper needs that to
+let it run the first time).
+
+macOS will prompt for **Accessibility** permission — the global hotkey and
+window switching need it. If it doesn't prompt, add it manually:
+*System Settings → Privacy & Security → Accessibility*.
+
+Running from source works too:
 
 ```bash
 python3 -m venv .venv
@@ -65,16 +75,10 @@ pip install -r requirements.txt
 python main.py
 ```
 
-macOS will prompt for **Accessibility** permission for Terminal/Python — the
-global hotkey and window switching need it. If it doesn't prompt, add it
-manually: *System Settings → Privacy & Security → Accessibility*.
-
-> **This support is new and has not been tested on real macOS hardware** —
-> the platform-specific code (`winutil_macos.py`) was written against the
-> AppleScript/System Events documentation, not verified step by step on a
-> Mac. If you're on macOS and something breaks, please open an issue or ping
-> Discord — that's how this gets solid. A packaged `.app` (the macOS
-> equivalent of `build.bat`'s `.exe`) doesn't exist yet.
+> **This support is new** — CI builds and smoke-tests every release on a
+> real macOS runner, but it hasn't seen the range of real-world setups
+> Windows has. If something breaks, please open an issue or ping Discord —
+> that's how this gets solid.
 
 ## Build from source
 
@@ -86,6 +90,9 @@ python -m PyInstaller --noconfirm poe-price-check.spec
 ```
 
 The result is a single `dist/poe-price-check.exe` with no dependencies.
+
+On macOS, use `poe-price-check-mac.spec` instead — the result is
+`dist/PoE Price Check.app`.
 
 ```
 python check_i18n.py   # translation coverage, no hardcoded interface strings

@@ -1041,6 +1041,28 @@ class TradeClient:
         # Wycena bez filtru zanizalaby ceny kilkukrotnie.
         if item.is_foulborn:
             misc["mutated"] = {"option": "true"}
+        # Ponizsze flagi parser rozpoznawal juz od dawna (item.flags), ale
+        # nigdy nie trafialy do zapytania - dokladnie ten sam rodzaj bledu co
+        # fractured_item wyzej. Kazda z nich realnie zmienia cene: lustrzana
+        # kopia i split to zupelnie inna liga cenowa niz zwykly przedmiot,
+        # nieziden. rzadki/unikat wyceni sie zupelnie inaczej niz zidenty-
+        # fikowany o tych samych widocznych modach (bo kupujacy nie widzi
+        # reszty), synteza i implanty eldrycze tak samo licza sie w wartosc
+        # jak fracture.
+        if "mirrored" in item.flags:
+            misc["mirrored"] = {"option": "true"}
+        if "split" in item.flags:
+            misc["split"] = {"option": "true"}
+        if "synthesised" in item.flags:
+            misc["synthesised_item"] = {"option": "true"}
+        if "veiled" in item.flags:
+            misc["veiled"] = {"option": "true"}
+        if "searing_item" in item.flags:
+            misc["searing_item"] = {"option": "true"}
+        if "tangled_item" in item.flags:
+            misc["tangled_item"] = {"option": "true"}
+        if "unidentified" in item.flags:
+            misc["identified"] = {"option": "false"}
         if item.gem_level is not None:
             misc["gem_level"] = {"min": item.gem_level}
         # Jakosc filtrujemy tylko dla kamieni. Dla broni/pancerzy wymuszanie

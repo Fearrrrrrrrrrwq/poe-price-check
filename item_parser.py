@@ -79,7 +79,11 @@ INFLUENCES = {
     "Warlord Item": "warlord",
 }
 
-# Linie-flagi stojace samodzielnie w sekcji.
+# Linie-flagi stojace samodzielnie w sekcji. Nazwy po prawej to identyfikatory
+# z /api/trade/data/filters (grupa misc_filters) - musza byc DOKLADNIE takie,
+# inaczej filtr milczaco nic nie robi (API nie zglasza bledu na nieznany klucz,
+# po prostu go ignoruje). "veiled_item" ponizej bylo taka pomylka - prawdziwy
+# identyfikator to "veiled", sprawdzone bezposrednio w API.
 STANDALONE_FLAGS = {
     "Corrupted": "corrupted",
     "Mirrored": "mirrored",
@@ -87,7 +91,13 @@ STANDALONE_FLAGS = {
     "Split": "split",
     "Synthesised Item": "synthesised",
     "Fractured Item": "fractured_item",
-    "Veiled Item": "veiled_item",
+    "Veiled Item": "veiled",
+    # Implanty eldrycze (Wykuwacz/Wchłaniacz) - tekst linii niepotwierdzony
+    # na zywym przedmiocie (nie mamy jak przetestowac), ale identyfikatory
+    # API (searing_item/tangled_item) sa pewne, a bledny tekst po lewej
+    # po prostu nigdy sie nie dopasuje - bezpieczny blad, nie fal.
+    "Searing Exarch Item": "searing_item",
+    "Eater of Worlds Item": "tangled_item",
 }
 
 

@@ -138,6 +138,11 @@ class ParsedItem:
     flags: set[str] = field(default_factory=set)
     seller_note: str = ""
     raw: str = ""
+    # Wlasciwosci broni - do wyliczenia DPS. Puste dla wszystkiego innego.
+    physical_damage: tuple[float, float] | None = None
+    elemental_damage: list[tuple[str, float, float]] = field(default_factory=list)
+    attacks_per_second: float | None = None
+    critical_chance: float | None = None
     # Zajete gniazda afiksow. Liczymy adnotacje w klamrach, nie linie tekstu -
     # mod hybrydowy zajmuje jedno gniazdo, a zajmuje dwie linie.
     prefix_count: int = 0
@@ -200,6 +205,28 @@ class ParsedItem:
             return False
         return bool(self.open_prefixes or self.open_suffixes)
 
+    @property
+    def physical_dps(self) -> float | None:
+        """Sredni obrazenia fizyczne * ataki/s. None, gdy brak ktoregos skladnika."""
+        if self.physical_damage is None or not self.attacks_per_second:
+            return None
+        low, high = self.physical_damage
+        return (low + high) / 2 * self.attacks_per_second
+
+    @property
+    def elemental_dps(self) -> float | None:
+        """Suma srednich wszystkich zywiolow * ataki/s (tak jak liczy to trade)."""
+        if not self.elemental_damage or not self.attacks_per_second:
+            return None
+        total_avg = sum((low + high) / 2 for _, low, high in self.elemental_damage)
+        return total_avg * self.attacks_per_second
+
+    @property
+    def total_dps(self) -> float | None:
+        """pDPS + eDPS. None, gdy bron nie ma zadnego zrodla obrazen (np. tylko chaos)."""
+        parts = [v for v in (self.physical_dps, self.elemental_dps) if v is not None]
+        return sum(parts) if parts else None
+
     def craft_summary(self) -> str:
         """Jednolinijkowy opis stanu afiksow. Pusty, gdy nie ma na czym oprzec."""
         if not self.affix_info or self.max_prefixes == 0:
@@ -251,6 +278,42 @@ def _strip_augmented(value: str) -> str:
 def _first_int(value: str) -> int | None:
     match = NUM_RE.search(value)
     return int(float(match.group(0))) if match else None
+
+
+def _first_float(value: str) -> float | None:
+    match = NUM_RE.search(value)
+    return float(match.group(0)) if match else None
+
+
+DAMAGE_RANGE_RE = re.compile(r"(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)")
+ELEMENTAL_PART_RE = re.compile(
+    r"(\d+(?:\.\d+)?)-(\d+(?:\.\d+)?)\s*\((fire|cold|lightning)\)", re.IGNORECASE
+)
+
+
+def _parse_damage_range(value: str) -> tuple[float, float] | None:
+    """'10-20 (augmented)' -> (10.0, 20.0). '(augmented)' moze siedziec przed
+    zakresem tak samo jak po nim, wiec usuwamy go zamiast liczyc na koniec linii."""
+    value = re.sub(r"\(augmented\)", "", value, flags=re.IGNORECASE)
+    match = DAMAGE_RANGE_RE.search(value)
+    if not match:
+        return None
+    return float(match.group(1)), float(match.group(2))
+
+
+def _parse_elemental_damage(value: str) -> list[tuple[str, float, float]]:
+    """'10-20 (augmented) (fire), 1-40 (cold)' -> [("fire", 10, 20), ("cold", 1, 40)].
+
+    Kazdy zywiol to osobny skladnik pola po przecinku - w odroznieniu od
+    Physical Damage nie da sie tu wziac po prostu pierwszego zakresu w linii.
+    """
+    parts: list[tuple[str, float, float]] = []
+    for chunk in value.split(","):
+        chunk = re.sub(r"\(augmented\)", "", chunk, flags=re.IGNORECASE)
+        match = ELEMENTAL_PART_RE.search(chunk)
+        if match:
+            parts.append((match.group(3).lower(), float(match.group(1)), float(match.group(2))))
+    return parts
 
 
 class ItemParseError(ValueError):
@@ -468,10 +531,18 @@ def _handle_property(
         item.sockets = value
     elif key == "Note":
         item.seller_note = value
+    elif key == "Physical Damage":
+        item.physical_damage = _parse_damage_range(value)
+    elif key == "Elemental Damage":
+        item.elemental_damage = _parse_elemental_damage(value)
+    elif key == "Attacks per Second":
+        item.attacks_per_second = _first_float(value)
+    elif key == "Critical Strike Chance":
+        item.critical_chance = _first_float(value)
     elif key in (
         "Requirements", "Requires", "Str", "Dex", "Int",
-        "Physical Damage", "Elemental Damage", "Chaos Damage", "Critical Strike Chance",
-        "Attacks per Second", "Weapon Range", "Armour", "Evasion Rating",
+        "Chaos Damage",
+        "Weapon Range", "Armour", "Evasion Rating",
         "Energy Shield", "Ward", "Block chance", "Chance to Block",
         "Stack Size", "Item Quantity", "Item Rarity", "Monster Pack Size",
         "Quality (Attack Modifiers)", "Quality (Defence Modifiers)",

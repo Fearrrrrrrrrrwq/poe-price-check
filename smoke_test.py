@@ -42,6 +42,28 @@ Item Level: 84
 Adds 3 to 9 Physical Damage to Attacks
 """
 
+WEAPON_SAMPLE = """Item Class: One Hand Swords
+Rarity: Rare
+Reaper's Bite
+Elegant Foil
+--------
+Physical Damage: 15-45 (augmented)
+Elemental Damage: 20-35 (augmented) (fire), 1-50 (augmented) (cold)
+Critical Strike Chance: 6.50%
+Attacks per Second: 1.55 (augmented)
+Weapon Range: 11
+--------
+Requirements:
+Level: 68
+--------
+Item Level: 80
+--------
+{ Prefix Modifier "Tyrannical" (Tier: 1) }
+Adds 20 to 35 Fire Damage
+{ Suffix Modifier "of the Order" (Tier: 2) }
++104 to Accuracy Rating
+"""
+
 
 def main() -> int:
     print("== ligi ==")
@@ -80,11 +102,16 @@ def main() -> int:
         print(f"grupy statystyk: znamy wszystkie {len(theirs)}")
     print()
 
-    for label, sample in (("UNIKAT", UNIQUE_SAMPLE), ("RZADKI", RARE_SAMPLE)):
+    for label, sample in (
+        ("UNIKAT", UNIQUE_SAMPLE), ("RZADKI", RARE_SAMPLE), ("BRON", WEAPON_SAMPLE),
+    ):
         print(f"== {label} ==")
         item = parse_item(sample)
         print(f"nazwa      : {item.display_name()}")
         print(f"rzadkosc   : {item.rarity}  ilvl={item.item_level}  linki={item.link_count}")
+        if item.total_dps is not None:
+            print(f"dps        : {item.total_dps:.1f}  "
+                  f"(pdps={item.physical_dps or 0:.1f}, edps={item.elemental_dps or 0:.1f})")
 
         filters, unmatched = client.match_mods(item)
         print(f"dopasowane : {len(filters)} modow")
@@ -95,8 +122,13 @@ def main() -> int:
             for mod in unmatched:
                 print(f"    [{mod.kind}] {mod.text}")
 
+        properties = client.property_options(item)
+        for prop in properties:
+            if prop.key in ("pdps", "edps", "dps"):
+                print(f"    wlasciwosc {prop.key}={prop.value} wlaczona={prop.enabled}")
+
         try:
-            result = client.price_check(item, max_listings=5)
+            result = client.price_check(item, max_listings=5, properties=properties)
         except TradeError as exc:
             print(f"BLAD wyszukiwania: {exc}\n")
             continue

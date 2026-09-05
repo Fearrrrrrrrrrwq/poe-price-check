@@ -224,7 +224,7 @@ class PropertyOption:
     lepsze przedmioty, a to wlasnie one wyznaczaja gorna polke ceny.
     """
 
-    key: str  # ilvl | links
+    key: str  # ilvl | links | pdps | edps | dps
     label: str
     value: int
     minimum: int
@@ -977,6 +977,27 @@ class TradeClient:
                 key="links", label=t("prop.links"),
                 value=links, minimum=0, maximum=6, enabled=links >= 5,
             ))
+        # DPS decyduje o cenie broni bardziej niz prawie kazdy pojedynczy mod,
+        # wiec calkowity DPS idzie wlaczony domyslnie - pDPS/eDPS zostaja do
+        # doprecyzowania, gdyby ktos chcial zawezic po samej fizyce/zywiolach.
+        if item.total_dps is not None:
+            value = round(item.total_dps)
+            options.append(PropertyOption(
+                key="dps", label=t("prop.dps"),
+                value=value, minimum=0, maximum=max(value * 2, 10), enabled=True,
+            ))
+        if item.physical_dps is not None:
+            value = round(item.physical_dps)
+            options.append(PropertyOption(
+                key="pdps", label=t("prop.pdps"),
+                value=value, minimum=0, maximum=max(value * 2, 10), enabled=False,
+            ))
+        if item.elemental_dps is not None:
+            value = round(item.elemental_dps)
+            options.append(PropertyOption(
+                key="edps", label=t("prop.edps"),
+                value=value, minimum=0, maximum=max(value * 2, 10), enabled=False,
+            ))
         return options
 
     def resolve_base_type(self, item: ParsedItem) -> str:
@@ -1075,6 +1096,7 @@ class TradeClient:
         for influence in item.influences:
             misc[f"{influence}_item"] = {"option": "true"}
         sockets: dict[str, dict] = {}
+        weapon: dict[str, dict] = {}
         if properties is None:
             properties = self.property_options(item)
         for prop in properties:
@@ -1084,11 +1106,15 @@ class TradeClient:
                 misc["ilvl"] = {"min": prop.value}
             elif prop.key == "links":
                 sockets["links"] = {"min": prop.value}
+            elif prop.key in ("pdps", "edps", "dps"):
+                weapon[prop.key] = {"min": prop.value}
 
         if misc:
             filters["misc_filters"] = {"filters": misc}
         if sockets:
             filters["socket_filters"] = {"filters": sockets}
+        if weapon:
+            filters["weapon_filters"] = {"filters": weapon}
 
         query: dict = {"status": {"option": self.status}}
         if item.is_unique and item.name:

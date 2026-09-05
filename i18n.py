@@ -134,6 +134,7 @@ STRINGS["en"] = {
     "res.open_trade": "Open on pathofexile.com/trade  →",
     "res.exchange": "bulk exchange",
     "res.offers": "{n} offers",
+    "res.dps": "{n} DPS",
     "res.rate_wait": "Path of Exile limits how often you may search - {n} s left",
 
     # kolumny
@@ -147,6 +148,9 @@ STRINGS["en"] = {
     # suwaki wlasciwosci
     "prop.ilvl": "Item level",
     "prop.links": "Links",
+    "prop.dps": "DPS",
+    "prop.pdps": "Physical DPS",
+    "prop.edps": "Elemental DPS",
 
     # afiksy
     "craft.can_modify": "Can be modified",
@@ -275,6 +279,7 @@ STRINGS["pl"] = {
     "res.open_trade": "Otwórz na pathofexile.com/trade  →",
     "res.exchange": "giełda wymiany",
     "res.offers": "{n} ofert",
+    "res.dps": "{n} DPS",
     "res.rate_wait": "Path of Exile ogranicza częstotliwość wyszukiwań - jeszcze {n} s",
 
     "col.price": "Cena",
@@ -286,6 +291,9 @@ STRINGS["pl"] = {
 
     "prop.ilvl": "Poziom przedmiotu",
     "prop.links": "Linki",
+    "prop.dps": "DPS",
+    "prop.pdps": "Fizyczny DPS",
+    "prop.edps": "Żywiołowy DPS",
 
     "craft.can_modify": "Można modyfikować",
     "craft.full": "Pełne afiksy",
@@ -415,6 +423,7 @@ STRINGS["de"] = {
     "res.open_trade": "Auf pathofexile.com/trade öffnen  →",
     "res.exchange": "Massenhandel",
     "res.offers": "{n} Angebote",
+    "res.dps": "{n} DPS",
     "res.rate_wait": "Path of Exile begrenzt die Suchhäufigkeit - noch {n} s",
 
     "col.price": "Preis",
@@ -426,6 +435,9 @@ STRINGS["de"] = {
 
     "prop.ilvl": "Gegenstandsstufe",
     "prop.links": "Verbindungen",
+    "prop.dps": "DPS",
+    "prop.pdps": "Physischer DPS",
+    "prop.edps": "Elementar-DPS",
 
     "craft.can_modify": "Kann verändert werden",
     "craft.full": "Alle Affixe belegt",
@@ -554,6 +566,7 @@ STRINGS["es"] = {
     "res.open_trade": "Abrir en pathofexile.com/trade  →",
     "res.exchange": "intercambio masivo",
     "res.offers": "{n} ofertas",
+    "res.dps": "{n} DPS",
     "res.rate_wait": "Path of Exile limita la frecuencia de búsqueda - quedan {n} s",
 
     "col.price": "Precio",
@@ -565,6 +578,9 @@ STRINGS["es"] = {
 
     "prop.ilvl": "Nivel del objeto",
     "prop.links": "Enlaces",
+    "prop.dps": "DPS",
+    "prop.pdps": "DPS físico",
+    "prop.edps": "DPS elemental",
 
     "craft.can_modify": "Se puede modificar",
     "craft.full": "Todos los afijos ocupados",
@@ -693,6 +709,7 @@ STRINGS["pt"] = {
     "res.open_trade": "Abrir em pathofexile.com/trade  →",
     "res.exchange": "troca em massa",
     "res.offers": "{n} ofertas",
+    "res.dps": "{n} DPS",
     "res.rate_wait": "Path of Exile limita a frequência de busca - faltam {n} s",
 
     "col.price": "Preço",
@@ -704,6 +721,9 @@ STRINGS["pt"] = {
 
     "prop.ilvl": "Nível do item",
     "prop.links": "Links",
+    "prop.dps": "DPS",
+    "prop.pdps": "DPS físico",
+    "prop.edps": "DPS elemental",
 
     "craft.can_modify": "Pode ser modificado",
     "craft.full": "Todos os afixos ocupados",
@@ -830,6 +850,7 @@ STRINGS["ru"] = {
     "res.open_trade": "Открыть на pathofexile.com/trade  →",
     "res.exchange": "обмен валют",
     "res.offers": "{n} предложений",
+    "res.dps": "{n} DPS",
     "res.rate_wait": "Path of Exile ограничивает частоту поиска - осталось {n} с",
 
     "col.price": "Цена",
@@ -841,6 +862,9 @@ STRINGS["ru"] = {
 
     "prop.ilvl": "Уровень предмета",
     "prop.links": "Связи",
+    "prop.dps": "DPS",
+    "prop.pdps": "Физ. DPS",
+    "prop.edps": "Стихийный DPS",
 
     "craft.can_modify": "Можно модифицировать",
     "craft.full": "Все аффиксы заняты",

@@ -388,6 +388,8 @@ class ResultWindow:
             bits.append(f"ilvl {item.item_level}")
         if item.link_count >= 5:
             bits.append(f"{item.link_count}L")
+        if item.total_dps is not None:
+            bits.append(t("res.dps", n=round(item.total_dps)))
         bits.append(result.league)
         if result.is_exchange:
             bits.append(t("res.exchange"))

@@ -998,6 +998,62 @@ class TradeClient:
                 key="edps", label=t("prop.edps"),
                 value=value, minimum=0, maximum=max(value * 2, 10), enabled=False,
             ))
+        # Obrona pancerza/tarczy decyduje o cenie tak samo jak DPS dla broni -
+        # ten sam wzorzec, wlaczone domyslnie.
+        if item.armour is not None:
+            options.append(PropertyOption(
+                key="ar", label=t("prop.ar"),
+                value=item.armour, minimum=0, maximum=max(item.armour * 2, 10), enabled=True,
+            ))
+        if item.evasion is not None:
+            options.append(PropertyOption(
+                key="ev", label=t("prop.ev"),
+                value=item.evasion, minimum=0, maximum=max(item.evasion * 2, 10), enabled=True,
+            ))
+        if item.energy_shield is not None:
+            options.append(PropertyOption(
+                key="es", label=t("prop.es"),
+                value=item.energy_shield, minimum=0,
+                maximum=max(item.energy_shield * 2, 10), enabled=True,
+            ))
+        if item.ward is not None:
+            options.append(PropertyOption(
+                key="ward", label=t("prop.ward"),
+                value=item.ward, minimum=0, maximum=max(item.ward * 2, 10), enabled=True,
+            ))
+        if item.block_chance is not None:
+            options.append(PropertyOption(
+                key="block", label=t("prop.block"),
+                value=item.block_chance, minimum=0,
+                maximum=max(item.block_chance * 2, 10), enabled=True,
+            ))
+        # Wlasciwosci mapy - obok tieru to one wyznaczaja cene. Area Level
+        # wylaczony domyslnie, bo w odroznieniu od IIQ/IIR/pack size rzadko
+        # jest tym, po czym ktos faktycznie chce zawezac.
+        if item.item_quantity is not None:
+            options.append(PropertyOption(
+                key="map_iiq", label=t("prop.map_iiq"),
+                value=item.item_quantity, minimum=0,
+                maximum=max(item.item_quantity * 2, 10), enabled=True,
+            ))
+        if item.item_rarity is not None:
+            options.append(PropertyOption(
+                key="map_iir", label=t("prop.map_iir"),
+                value=item.item_rarity, minimum=0,
+                maximum=max(item.item_rarity * 2, 10), enabled=True,
+            ))
+        if item.monster_pack_size is not None:
+            options.append(PropertyOption(
+                key="map_packsize", label=t("prop.map_packsize"),
+                value=item.monster_pack_size, minimum=0,
+                maximum=max(item.monster_pack_size * 2, 10), enabled=True,
+            ))
+        if item.area_level is not None:
+            options.append(PropertyOption(
+                key="area_level", label=t("prop.area_level"),
+                value=item.area_level, minimum=0,
+                maximum=max(item.area_level * 2, 10), enabled=False,
+            ))
         return options
 
     def resolve_base_type(self, item: ParsedItem) -> str:
@@ -1097,6 +1153,8 @@ class TradeClient:
             misc[f"{influence}_item"] = {"option": "true"}
         sockets: dict[str, dict] = {}
         weapon: dict[str, dict] = {}
+        armour: dict[str, dict] = {}
+        maps: dict[str, dict] = {}
         if properties is None:
             properties = self.property_options(item)
         for prop in properties:
@@ -1108,6 +1166,10 @@ class TradeClient:
                 sockets["links"] = {"min": prop.value}
             elif prop.key in ("pdps", "edps", "dps"):
                 weapon[prop.key] = {"min": prop.value}
+            elif prop.key in ("ar", "ev", "es", "ward", "block"):
+                armour[prop.key] = {"min": prop.value}
+            elif prop.key in ("map_iiq", "map_iir", "map_packsize", "area_level"):
+                maps[prop.key] = {"min": prop.value}
 
         if misc:
             filters["misc_filters"] = {"filters": misc}
@@ -1115,6 +1177,10 @@ class TradeClient:
             filters["socket_filters"] = {"filters": sockets}
         if weapon:
             filters["weapon_filters"] = {"filters": weapon}
+        if armour:
+            filters["armour_filters"] = {"filters": armour}
+        if maps:
+            filters["map_filters"] = {"filters": maps}
 
         query: dict = {"status": {"option": self.status}}
         if item.is_unique and item.name:

@@ -143,6 +143,17 @@ class ParsedItem:
     elemental_damage: list[tuple[str, float, float]] = field(default_factory=list)
     attacks_per_second: float | None = None
     critical_chance: float | None = None
+    # Obrona pancerza/tarczy - jak DPS, glowny czynnik ceny dla tej kategorii.
+    armour: int | None = None
+    evasion: int | None = None
+    energy_shield: int | None = None
+    ward: int | None = None
+    block_chance: int | None = None
+    # Wlasciwosci mapy - obok Map Tier decyduja o cenie.
+    item_quantity: int | None = None
+    item_rarity: int | None = None
+    monster_pack_size: int | None = None
+    area_level: int | None = None
     # Zajete gniazda afiksow. Liczymy adnotacje w klamrach, nie linie tekstu -
     # mod hybrydowy zajmuje jedno gniazdo, a zajmuje dwie linie.
     prefix_count: int = 0
@@ -539,15 +550,31 @@ def _handle_property(
         item.attacks_per_second = _first_float(value)
     elif key == "Critical Strike Chance":
         item.critical_chance = _first_float(value)
+    elif key == "Armour":
+        item.armour = _first_int(value)
+    elif key == "Evasion Rating":
+        item.evasion = _first_int(value)
+    elif key == "Energy Shield":
+        item.energy_shield = _first_int(value)
+    elif key == "Ward":
+        item.ward = _first_int(value)
+    elif key in ("Block chance", "Chance to Block"):
+        item.block_chance = _first_int(value)
+    elif key == "Item Quantity":
+        item.item_quantity = _first_int(value)
+    elif key == "Item Rarity":
+        item.item_rarity = _first_int(value)
+    elif key == "Monster Pack Size":
+        item.monster_pack_size = _first_int(value)
+    elif key == "Area Level":
+        item.area_level = _first_int(value)
     elif key in (
         "Requirements", "Requires", "Str", "Dex", "Int",
-        "Chaos Damage",
-        "Weapon Range", "Armour", "Evasion Rating",
-        "Energy Shield", "Ward", "Block chance", "Chance to Block",
-        "Stack Size", "Item Quantity", "Item Rarity", "Monster Pack Size",
+        "Chaos Damage", "Weapon Range",
+        "Stack Size",
         "Quality (Attack Modifiers)", "Quality (Defence Modifiers)",
         "Quality (Life and Mana Modifiers)", "Quality (Resistance Modifiers)",
-        "Radius", "Limited to", "Talisman Tier", "Area Level", "Experience",
+        "Radius", "Limited to", "Talisman Tier", "Experience",
     ):
         pass  # znana wlasciwosc, ktorej nie uzywamy w zapytaniu
     else:

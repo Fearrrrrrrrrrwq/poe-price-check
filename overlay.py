@@ -390,6 +390,16 @@ class ResultWindow:
             bits.append(f"{item.link_count}L")
         if item.total_dps is not None:
             bits.append(t("res.dps", n=round(item.total_dps)))
+        if item.armour is not None:
+            bits.append(f"{item.armour} AR")
+        if item.evasion is not None:
+            bits.append(f"{item.evasion} EV")
+        if item.energy_shield is not None:
+            bits.append(f"{item.energy_shield} ES")
+        if item.item_quantity is not None:
+            bits.append(f"+{item.item_quantity}% IIQ")
+        if item.item_rarity is not None:
+            bits.append(f"+{item.item_rarity}% IIR")
         bits.append(result.league)
         if result.is_exchange:
             bits.append(t("res.exchange"))

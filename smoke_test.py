@@ -64,6 +64,22 @@ Adds 20 to 35 Fire Damage
 +104 to Accuracy Rating
 """
 
+ARMOUR_SAMPLE = """Item Class: Body Armours
+Rarity: Rare
+Iron Heart
+Glorious Plate
+--------
+Armour: 850 (augmented)
+--------
+Requirements:
+Level: 68
+--------
+Item Level: 82
+--------
+{ Prefix Modifier "Tyrannical" (Tier: 1) }
++120 to maximum Life
+"""
+
 
 def main() -> int:
     print("== ligi ==")
@@ -103,7 +119,8 @@ def main() -> int:
     print()
 
     for label, sample in (
-        ("UNIKAT", UNIQUE_SAMPLE), ("RZADKI", RARE_SAMPLE), ("BRON", WEAPON_SAMPLE),
+        ("UNIKAT", UNIQUE_SAMPLE), ("RZADKI", RARE_SAMPLE),
+        ("BRON", WEAPON_SAMPLE), ("PANCERZ", ARMOUR_SAMPLE),
     ):
         print(f"== {label} ==")
         item = parse_item(sample)
@@ -112,6 +129,8 @@ def main() -> int:
         if item.total_dps is not None:
             print(f"dps        : {item.total_dps:.1f}  "
                   f"(pdps={item.physical_dps or 0:.1f}, edps={item.elemental_dps or 0:.1f})")
+        if item.armour is not None or item.evasion is not None or item.energy_shield is not None:
+            print(f"obrona     : ar={item.armour} ev={item.evasion} es={item.energy_shield}")
 
         filters, unmatched = client.match_mods(item)
         print(f"dopasowane : {len(filters)} modow")
@@ -124,7 +143,10 @@ def main() -> int:
 
         properties = client.property_options(item)
         for prop in properties:
-            if prop.key in ("pdps", "edps", "dps"):
+            if prop.key in (
+                "pdps", "edps", "dps", "ar", "ev", "es", "ward", "block",
+                "map_iiq", "map_iir", "map_packsize", "area_level",
+            ):
                 print(f"    wlasciwosc {prop.key}={prop.value} wlaczona={prop.enabled}")
 
         try:

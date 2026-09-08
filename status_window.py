@@ -26,7 +26,8 @@ class StatusWindow:
 
     def __init__(self, league: str, hotkeys: dict, on_quit=None,
                  boosteroid_mode: bool = True, on_boosteroid_mode_change=None,
-                 on_hotkey_change=None) -> None:
+                 on_hotkey_change=None, game_version: str = "poe1",
+                 on_game_change=None) -> None:
         self.on_quit = on_quit
         self._checks = 0
         self._discord_url = DISCORD_URL
@@ -44,6 +45,14 @@ class StatusWindow:
         # i restartu programu.
         self._on_hotkey_change = on_hotkey_change
         self._hotkey_editing = False
+        # Wersja gry - przelaczana w locie zamiast tylko raz w kreatorze,
+        # zeby ktos testujacy oba tryby nie musial kasowac configu za kazdym
+        # razem. Zmiana leci w tle (main.py: nowy TradeClient + nowa liga,
+        # patrz resolve_league) - stad game_switching()/game_switched()/
+        # game_switch_failed() zamiast prostego, synchronicznego callbacka.
+        self.game_version = game_version
+        self._on_game_change = on_game_change
+        self._game_switching = False
 
         self.root = tk.Tk()
         self.root.title("PoE Price Check")
@@ -86,6 +95,18 @@ class StatusWindow:
         self.state = tk.Label(state_card.body, text=self._state_text(),
                               font=FONT_SMALL, fg=FG_MUTED, bg=BG_PANEL, anchor="w")
         self.state.pack(fill="x", padx=12, pady=(1, 11))
+
+        # --- wybor wersji gry -------------------------------------------------
+        game_row = tk.Frame(outer, bg=BG)
+        game_row.pack(fill="x", pady=(0, GAP))
+        tk.Label(game_row, text=t("app.game_label"), font=FONT_LABEL, fg=FG_MUTED,
+                 bg=BG).pack(side="left", padx=(0, GAP))
+        self._game_buttons = tk.Frame(game_row, bg=BG)
+        self._game_buttons.pack(side="left")
+        self._game_status = tk.Label(game_row, text="", font=FONT_LABEL,
+                                     fg=FG_MUTED, bg=BG)
+        self._game_status.pack(side="left", padx=(GAP, 0))
+        self._render_game_buttons()
 
         # --- licznik obok glownego skrotu ------------------------------------
         stats = tk.Frame(outer, bg=BG)
@@ -194,6 +215,49 @@ class StatusWindow:
         self.state.config(text=self._state_text())
         if self._on_boosteroid_mode_change:
             self._on_boosteroid_mode_change(self.boosteroid_mode)
+
+    # -------------------------------------------------------- wersja gry
+
+    def _render_game_buttons(self) -> None:
+        """Przyciski PoE1/PoE2 - odtwarzane od zera przy kazdej zmianie, bo
+        theme.button() wiaze kolory hover w domkniecie przy tworzeniu (patrz
+        theme.py) i samo .config(bg=...) pozniej zostawialoby stary hover."""
+        for child in self._game_buttons.winfo_children():
+            child.destroy()
+        state = "disabled" if self._game_switching else "normal"
+        for game, label in (("poe1", "PoE 1"), ("poe2", "PoE 2")):
+            btn = theme.button(
+                self._game_buttons, label, lambda g=game: self._pick_game(g),
+                primary=(self.game_version == game),
+            )
+            btn.config(state=state)
+            btn.pack(side="left", padx=(0 if game == "poe1" else TIGHT, 0))
+
+    def _pick_game(self, game: str) -> None:
+        if self._game_switching or game == self.game_version:
+            return
+        if self._on_game_change is None:
+            return
+        self._game_switching = True
+        self._render_game_buttons()
+        self._game_status.config(text=t("app.game_switching"), fg=FG_MUTED)
+        self._on_game_change(game)
+
+    def game_switched(self, game: str, league: str) -> None:
+        """Wolac z watku Tk po udanej zmianie gry (patrz main.py)."""
+        self.game_version = game
+        self._league = league
+        self._game_switching = False
+        self.state.config(text=self._state_text())
+        self._game_status.config(text="")
+        self._render_game_buttons()
+
+    def game_switch_failed(self, message: str) -> None:
+        """Wolac z watku Tk, gdy zmiana gry sie nie uda - zostajemy przy
+        poprzedniej, dzialajacej konfiguracji zamiast wpisywac cokolwiek."""
+        self._game_switching = False
+        self._game_status.config(text=message, fg=FG_ERROR)
+        self._render_game_buttons()
 
     # ------------------------------------------------------- edycja skrotu
 

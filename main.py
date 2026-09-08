@@ -143,19 +143,9 @@ class PriceChecker:
     def __init__(self, config: dict, league: str, telemetry: Telemetry | None = None) -> None:
         self.config = config
         self.telemetry = telemetry or Telemetry({}, lambda _cfg: None, APP_VERSION)
-        self.client = TradeClient(
-            league=league,
-            user_agent=config["user_agent"],
-            poesessid=config.get("poesessid", ""),
-            status=config.get("search_status", "any"),
-            # Limity GGG potrafia wymusic kilkanascie sekund przerwy. Bez tego
-            # komunikatu okno po prostu zamiera i wyglada na zawieszone.
-            on_wait=lambda left: self.events.put(
-                ("status", t("res.rate_wait", n=left))),
-            game=config.get("game_version", "poe1"),
-        )
-        self.timing = build_timing(config.get("timing", {}))
         self.events: queue.Queue[tuple] = queue.Queue()
+        self.client = self._build_client(league, config.get("game_version", "poe1"))
+        self.timing = build_timing(config.get("timing", {}))
         self._busy = threading.Lock()
         self._bridge: BoosteroidBridge | None = None
         # Ostatnio wyceniany przedmiot - potrzebny, gdy uzytkownik zmieni filtry
@@ -167,6 +157,35 @@ class PriceChecker:
         # zamiast do Boosteroida.
         self._game_hwnd = 0
         self.checks_done = 0  # licznik pokazywany w oknie glownym
+
+    def _build_client(self, league: str, game: str) -> TradeClient:
+        return TradeClient(
+            league=league,
+            user_agent=self.config["user_agent"],
+            poesessid=self.config.get("poesessid", ""),
+            status=self.config.get("search_status", "any"),
+            # Limity GGG potrafia wymusic kilkanascie sekund przerwy. Bez tego
+            # komunikatu okno po prostu zamiera i wyglada na zawieszone.
+            on_wait=lambda left: self.events.put(
+                ("status", t("res.rate_wait", n=left))),
+            game=game,
+        )
+
+    def switch_game(self, game: str, league: str) -> None:
+        """Podmienia TradeClient na nowa gre/lige w locie - bez restartu i
+        bez kasowania configu (patrz status_window.game_switched()). Stary
+        klient (z jego cache statystyk/baz danych) po prostu odpada, nowy
+        buduje swoj wlasny - oba sa juz i tak rozdzielone cache'em per gra
+        (patrz trade_api.TradeClient._cached).
+        """
+        self.client = self._build_client(league, game)
+        self.config["game_version"] = game
+        self.config["league"] = league
+        # Poprzedni przedmiot pochodzi z innej gry - powtorzenie wyszukiwania
+        # (np. po zmianie filtrow w oknie) musialoby isc przez slownik
+        # statystyk gry, z ktorej NIE pochodzi ten przedmiot.
+        self._last_item = None
+        self._last_unmatched = 0
 
     @property
     def bridge(self) -> BoosteroidBridge:
@@ -459,6 +478,33 @@ def run_gui(config: dict, league: str) -> int:
         print(f"  {hotkey:<12} wycen przedmiot pod kursorem (przez Boosteroida) [zmieniono]")
         return True
 
+    def _change_game(new_game: str) -> None:
+        """Przelacza PoE1/PoE2 bez restartu i bez kasowania configu.
+
+        resolve_league() robi zapytanie sieciowe (lista lig danej gry), wiec
+        leci w watku w tle - inaczej klikniecie przycisku na chwile
+        zamrozaloby cale okno. Wynik wraca do watku Tk przez status.root.after,
+        tak jak weryfikacja dokumentu w kreatorze (patrz setup_window._verify).
+        """
+        def job() -> None:
+            try:
+                new_league = resolve_league({**config, "game_version": new_game,
+                                             "league": "auto"})
+                checker.switch_game(new_game, new_league)
+                save_config(config)
+            except TradeError as exc:
+                status.root.after(0, status.game_switch_failed, str(exc))
+                return
+            except Exception as exc:  # noqa: BLE001 - przelacznik nie moze ubic programu
+                traceback.print_exc()
+                status.root.after(0, status.game_switch_failed,
+                                  f"{type(exc).__name__}: {exc}")
+                return
+            print(f"[gra] przelaczono na {new_game} - liga {new_league}")
+            status.root.after(0, status.game_switched, new_game, new_league)
+
+        threading.Thread(target=job, daemon=True).start()
+
     status = StatusWindow(
         league=league,
         hotkeys={"hotkey": hotkey, "local": local_hotkey, "quit": quit_hotkey},
@@ -466,6 +512,8 @@ def run_gui(config: dict, league: str) -> int:
         boosteroid_mode=bool(config.get("boosteroid_mode", True)),
         on_boosteroid_mode_change=_save_boosteroid_mode,
         on_hotkey_change=_change_hotkey,
+        game_version=config.get("game_version", "poe1"),
+        on_game_change=_change_game,
     )
     # Okno wyniku jest podrzedne wobec glownego - jeden obiekt Tk na proces.
     window = ResultWindow(

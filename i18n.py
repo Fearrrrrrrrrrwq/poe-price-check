@@ -37,6 +37,8 @@ STRINGS["en"] = {
     "app.price_check": "price check an item",
     "app.other_hotkeys": "OTHER SHORTCUTS",
     "app.hk_clipboard": "price check clipboard",
+    "app.game_label": "Game:",
+    "app.game_switching": "Switching...",
     "app.hk_save": "Save",
     "app.hk_cancel": "Cancel",
     "app.hk_invalid": "That combo didn't work - try something like ctrl+d, or "
@@ -208,6 +210,8 @@ STRINGS["pl"] = {
     "app.price_check": "wyceń przedmiot",
     "app.other_hotkeys": "POZOSTAŁE SKRÓTY",
     "app.hk_clipboard": "wyceń zawartość schowka",
+    "app.game_label": "Gra:",
+    "app.game_switching": "Przełączam...",
     "app.hk_save": "Zapisz",
     "app.hk_cancel": "Anuluj",
     "app.hk_invalid": "Ta kombinacja nie zadziałała - spróbuj np. ctrl+d albo "
@@ -373,6 +377,8 @@ STRINGS["de"] = {
     "app.price_check": "Gegenstand prüfen",
     "app.other_hotkeys": "WEITERE TASTENKÜRZEL",
     "app.hk_clipboard": "Zwischenablage prüfen",
+    "app.game_label": "Spiel:",
+    "app.game_switching": "Wechsle...",
     "app.hk_save": "Speichern",
     "app.hk_cancel": "Abbrechen",
     "app.hk_invalid": "Diese Kombination hat nicht funktioniert - versuche z. B. "
@@ -543,6 +549,8 @@ STRINGS["es"] = {
     "app.price_check": "consultar objeto",
     "app.other_hotkeys": "OTROS ATAJOS",
     "app.hk_clipboard": "consultar portapapeles",
+    "app.game_label": "Juego:",
+    "app.game_switching": "Cambiando...",
     "app.hk_save": "Guardar",
     "app.hk_cancel": "Cancelar",
     "app.hk_invalid": "Esa combinación no funcionó - prueba algo como ctrl+d, o "
@@ -712,6 +720,8 @@ STRINGS["pt"] = {
     "app.price_check": "consultar item",
     "app.other_hotkeys": "OUTROS ATALHOS",
     "app.hk_clipboard": "consultar área de transferência",
+    "app.game_label": "Jogo:",
+    "app.game_switching": "Alternando...",
     "app.hk_save": "Salvar",
     "app.hk_cancel": "Cancelar",
     "app.hk_invalid": "Essa combinação não funcionou - tente algo como ctrl+d, "
@@ -881,6 +891,8 @@ STRINGS["ru"] = {
     "app.price_check": "оценить предмет",
     "app.other_hotkeys": "ОСТАЛЬНЫЕ СОЧЕТАНИЯ",
     "app.hk_clipboard": "оценить из буфера обмена",
+    "app.game_label": "Игра:",
+    "app.game_switching": "Переключаю...",
     "app.hk_save": "Сохранить",
     "app.hk_cancel": "Отмена",
     "app.hk_invalid": "Эта комбинация не сработала - попробуйте что-то вроде "

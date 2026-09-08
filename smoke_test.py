@@ -6,7 +6,7 @@ Uruchom:  python smoke_test.py
 import sys
 
 from item_parser import parse_item
-from trade_api import ALL_STAT_KINDS, BASE, TradeClient, TradeError
+from trade_api import ALL_STAT_KINDS, ALL_STAT_KINDS_POE2, BASE, TradeClient, TradeError
 
 UA = "poe-price-check/1.0 (+https://poepricecheck.eu)"
 
@@ -160,6 +160,42 @@ def main() -> int:
         for listing in result.listings:
             print(f"    {listing.price_text():>18}  {listing.item_name}  @{listing.account}")
         print(f"link       : {result.browser_url()}\n")
+
+    print("== PoE2 (MVP - tylko lacznosc i ksztalt zapytania) ==")
+    try:
+        leagues2 = TradeClient.fetch_leagues(UA, game="poe2")
+    except Exception as exc:  # noqa: BLE001 - to jest test dymny
+        print(f"BLAD pobierania lig PoE2: {exc}\n")
+        return 1
+    print(", ".join(leagues2))
+    league2 = next((l for l in leagues2 if l not in ("Standard", "Hardcore")), "Standard")
+
+    client2 = TradeClient(league=league2, user_agent=UA, game="poe2")
+    data2 = client2._cached("stats", f"{BASE}/api/trade2/data/stats")
+    theirs2 = {group.get("id") for group in data2.get("result", []) if group.get("id")}
+    missing2 = sorted(theirs2 - set(ALL_STAT_KINDS_POE2))
+    if missing2:
+        print(f"UWAGA: GGG ma grupy PoE2, ktorych nie znamy: {missing2}")
+        print("       Dopisz je do ALL_STAT_KINDS_POE2 w trade_api.py.")
+    else:
+        print(f"grupy statystyk PoE2: znamy wszystkie {len(theirs2)}")
+
+    # Zaden z naszych przykladow tekstu przedmiotu nie jest zweryfikowany na
+    # prawdziwym PoE2 - zamiast zgadywac format, sprawdzamy tylko, ze
+    # zapytanie bez modow (sama nazwa bazy) faktycznie dociera do trade2.
+    try:
+        result2 = client2.price_check(
+            parse_item(
+                "Item Class: Waystones\nRarity: Normal\nWaystone (Tier 1)\n"
+                "--------\nItem Level: 1\n"
+            ),
+            max_listings=1,
+        )
+        print(f"ofert (Waystone T1, {league2}): {result2.total}")
+        print(f"link: {result2.browser_url()}\n")
+    except TradeError as exc:
+        print(f"BLAD wyszukiwania PoE2: {exc}\n")
+        return 1
 
     return 0
 

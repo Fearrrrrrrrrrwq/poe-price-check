@@ -4,6 +4,8 @@
   "_language_comment": "en | pl | de | es | pt | ru. Puste = wykryj z ustawien Windows.",
   "language": "",
 
+  "_game_version_comment": "poe1 | poe2. Kreator zapisuje to automatycznie. PoE2 jest eksperymentalne: dopasowanie modow dziala, ale linki gniazd i wlasciwosci mapy sa na razie tylko dla PoE1 (patrz README).",
+  "game_version": "poe1",
   "league": "auto",
   "_search_status_comment": "securable = Instant Buyout | available = Instant Buyout and In Person | online = In Person (Online) | onlineleague = In Person (Online in League) | any = Any (tez offline)",
   "search_status": "securable",

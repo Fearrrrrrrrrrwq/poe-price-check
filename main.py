@@ -109,7 +109,8 @@ def resolve_league(config: dict) -> str:
     league = config.get("league", "auto")
     if league and league != "auto":
         return league
-    leagues = TradeClient.fetch_leagues(config["user_agent"])
+    game = config.get("game_version", "poe1")
+    leagues = TradeClient.fetch_leagues(config["user_agent"], game=game)
     for name in leagues:
         if name not in PERMANENT_LEAGUES and not name.startswith(("SSF", "HC ", "Hardcore", "Ruthless")):
             return name
@@ -135,6 +136,7 @@ class PriceChecker:
             # komunikatu okno po prostu zamiera i wyglada na zawieszone.
             on_wait=lambda left: self.events.put(
                 ("status", t("res.rate_wait", n=left))),
+            game=config.get("game_version", "poe1"),
         )
         self.timing = build_timing(config.get("timing", {}))
         self.events: queue.Queue[tuple] = queue.Queue()
@@ -440,7 +442,8 @@ def main() -> int:
     # Bez tego sys.stdout byloby None i pierwszy print wywrocilby wszystko.
     applog.setup(has_cli_args=len(sys.argv) > 1)
     configure_console()
-    parser = argparse.ArgumentParser(description="PoE1 price check przez Boosteroida")
+    parser = argparse.ArgumentParser(
+        description="Price check dla Path of Exile 1/2 przez Boosteroida")
     parser.add_argument("--paste", action="store_true",
                         help="wycen zawartosc lokalnego schowka i zakoncz")
     parser.add_argument("--test-read", action="store_true",
@@ -458,7 +461,8 @@ def main() -> int:
     i18n.set_language(config.get("language") or i18n.detect_default())
 
     if args.leagues:
-        for name in TradeClient.fetch_leagues(config["user_agent"]):
+        game = config.get("game_version", "poe1")
+        for name in TradeClient.fetch_leagues(config["user_agent"], game=game):
             print(name)
         return 0
 

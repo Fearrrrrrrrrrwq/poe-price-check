@@ -41,6 +41,27 @@ One keypress in game, a result window on your machine a moment later.
 - Interface in English, Polish, German, Spanish, Portuguese and Russian,
   picked automatically from the Windows locale
 
+### Path of Exile 2 (experimental)
+
+The setup wizard lets you pick PoE1 or PoE2 up front (also editable later in
+`config.json` as `game_version`). Mod matching, pseudo totals (resistances,
+life, attributes) and pricing work against the real `/api/trade2/` endpoint.
+Not yet ported, and silently skipped rather than guessed at, because PoE2's
+trade API genuinely doesn't have the same shape:
+
+- **Socket links** — PoE2 has no linked-socket mechanic (gems slot into
+  skill slots, not gear), so there's no equivalent filter to send.
+- **Weapon/armour stat filters** (DPS, pDPS/eDPS, Armour/Evasion/Energy
+  Shield/Ward/Block) — PoE1 and PoE2 use the *same* filter IDs, but PoE1
+  splits them into `weapon_filters`/`armour_filters` while PoE2 merges both
+  into one `equipment_filters` group. Sending the PoE1 shape to PoE2 (or
+  vice versa) just gets silently ignored by the API, so for now these
+  sliders don't appear at all in PoE2 mode.
+- **Map/Waystone properties** (Item Quantity, Item Rarity, Pack Size, Area
+  Level) — PoE2's Waystone economy is different (no Item Quantity filter at
+  all; monster rarity/effectiveness instead), so these are PoE1-only until
+  verified against a real Waystone.
+
 ## Install
 
 Download the archive from **[poepricecheck.eu](https://poepricecheck.eu)**,

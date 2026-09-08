@@ -58,6 +58,12 @@ STRINGS["en"] = {
     "setup.next": "Next",
     "setup.back": "Back",
     "setup.finish": "Save and start",
+    "setup.game_label": "Game version:",
+    "setup.game_poe1": "Path of Exile 1",
+    "setup.game_poe2": "Path of Exile 2 (beta)",
+    "setup.game_poe2_note": "New and limited: mod matching works, but weapon/"
+                            "armour stats, socket links and map properties "
+                            "are Path of Exile 1 only for now.",
     "setup.mode_title": "How do you play?",
     "setup.mode_intro": "This decides what the wizard sets up next - you can "
                         "change it later from the checkbox in the main window.",
@@ -213,6 +219,13 @@ STRINGS["pl"] = {
     "setup.next": "Dalej",
     "setup.back": "Wstecz",
     "setup.finish": "Zapisz i uruchom",
+    "setup.game_label": "Wersja gry:",
+    "setup.game_poe1": "Path of Exile 1",
+    "setup.game_poe2": "Path of Exile 2 (beta)",
+    "setup.game_poe2_note": "Nowe i ograniczone: dopasowanie modów działa, ale "
+                            "statystyki broni/pancerza, linki gniazd i "
+                            "właściwości map są na razie tylko dla Path of "
+                            "Exile 1.",
     "setup.mode_title": "Jak grasz?",
     "setup.mode_intro": "To decyduje, co kreator skonfiguruje dalej - możesz to "
                         "zmienić później przez checkbox w oknie głównym.",
@@ -362,6 +375,13 @@ STRINGS["de"] = {
     "setup.next": "Weiter",
     "setup.back": "Zurück",
     "setup.finish": "Speichern und starten",
+    "setup.game_label": "Spielversion:",
+    "setup.game_poe1": "Path of Exile 1",
+    "setup.game_poe2": "Path of Exile 2 (Beta)",
+    "setup.game_poe2_note": "Neu und eingeschränkt: Mod-Abgleich funktioniert, "
+                            "aber Waffen-/Rüstungswerte, Sockel-Verbindungen "
+                            "und Karteneigenschaften gibt es vorerst nur für "
+                            "Path of Exile 1.",
     "setup.mode_title": "Wie spielst du?",
     "setup.mode_intro": "Das entscheidet, was der Assistent als Nächstes "
                         "einrichtet - du kannst es später über das "
@@ -515,6 +535,14 @@ STRINGS["es"] = {
     "setup.next": "Siguiente",
     "setup.back": "Atrás",
     "setup.finish": "Guardar e iniciar",
+    "setup.game_label": "Versión del juego:",
+    "setup.game_poe1": "Path of Exile 1",
+    "setup.game_poe2": "Path of Exile 2 (beta)",
+    "setup.game_poe2_note": "Nuevo y limitado: el emparejamiento de mods "
+                            "funciona, pero las estadísticas de arma/"
+                            "armadura, los enlaces de engarces y las "
+                            "propiedades de mapa son por ahora solo para "
+                            "Path of Exile 1.",
     "setup.mode_title": "¿Cómo juegas?",
     "setup.mode_intro": "Esto decide qué configura el asistente a "
                         "continuación - puedes cambiarlo después desde la "
@@ -667,6 +695,13 @@ STRINGS["pt"] = {
     "setup.next": "Avançar",
     "setup.back": "Voltar",
     "setup.finish": "Salvar e iniciar",
+    "setup.game_label": "Versão do jogo:",
+    "setup.game_poe1": "Path of Exile 1",
+    "setup.game_poe2": "Path of Exile 2 (beta)",
+    "setup.game_poe2_note": "Novo e limitado: a correspondência de mods "
+                            "funciona, mas estatísticas de arma/armadura, "
+                            "links de encaixes e propriedades de mapa são, "
+                            "por enquanto, exclusivas do Path of Exile 1.",
     "setup.mode_title": "Como você joga?",
     "setup.mode_intro": "Isso decide o que o assistente configura em seguida "
                         "- você pode mudar depois pela caixa de seleção na "
@@ -819,6 +854,13 @@ STRINGS["ru"] = {
     "setup.next": "Далее",
     "setup.back": "Назад",
     "setup.finish": "Сохранить и запустить",
+    "setup.game_label": "Версия игры:",
+    "setup.game_poe1": "Path of Exile 1",
+    "setup.game_poe2": "Path of Exile 2 (бета)",
+    "setup.game_poe2_note": "Новое и ограниченное: сопоставление модов "
+                            "работает, но характеристики оружия/брони, "
+                            "линки гнёзд и свойства карт пока доступны "
+                            "только для Path of Exile 1.",
     "setup.mode_title": "Как вы играете?",
     "setup.mode_intro": "Это определяет, что мастер настроит дальше - позже "
                         "можно изменить через флажок в главном окне.",

@@ -56,6 +56,15 @@ ALL_STAT_KINDS = (
     "imbued", "mercenary", "delve", "ultimatum", "sanctum",
 )
 
+# To samo dla PoE2 - inny slownik pod /api/trade2/data/stats, z wlasnymi
+# grupami (Augment i Desecrated zamiast Veiled, Skill dla statystyk gemow).
+# Zero wspolnych nazw grup z PoE1 poza pseudo/explicit/implicit/fractured/
+# crafted/enchant/sanctum, wiec osobna stala zamiast doklejania do gornej.
+ALL_STAT_KINDS_POE2 = (
+    "pseudo", "explicit", "implicit", "fractured", "crafted", "enchant",
+    "rune", "desecrated", "sanctum", "skill",
+)
+
 # Klasy przedmiotow, na ktorych statystyka moze byc "lokalna", czyli dotyczyc
 # samego przedmiotu, a nie postaci. Pancerz zwieksza wlasne ES, pierscien - cale.
 LOCAL_DEFENCE_CLASSES = {"Body Armours", "Helmets", "Gloves", "Boots", "Shields"}
@@ -269,10 +278,12 @@ class SearchResult:
     mods_used: int = 0  # ile modow poszlo do zapytania
     mods_unmatched: int = 0  # ilu modow nie udalo sie zmapowac na ID statystyki
     is_exchange: bool = False  # wynik z gieldy wymiany, nie z wyszukiwarki
+    game: str = "poe1"  # "poe1" -> /trade/..., "poe2" -> /trade2/...
 
     def browser_url(self) -> str:
         section = "exchange" if self.is_exchange else "search"
-        return f"{BASE}/trade/{section}/{self.league}/{self.search_id}"
+        path = "trade2" if self.game == "poe2" else "trade"
+        return f"{BASE}/{path}/{section}/{self.league}/{self.search_id}"
 
     def summary(self) -> str:
         """Szacowana wartosc liczona z pobranych ofert.
@@ -322,9 +333,18 @@ class SearchResult:
         return text
 
 
+API_PREFIX_RE = re.compile(r"/api/trade2?/")
+
+
 def _policy_of(url: str) -> str:
-    """Nazwa polityki limitow dla adresu: 'search', 'fetch', 'exchange', 'data'."""
-    tail = url.split("/api/trade/", 1)[-1]
+    """Nazwa polityki limitow dla adresu: 'search', 'fetch', 'exchange', 'data'.
+
+    Dziala tak samo dla /api/trade/ (PoE1) i /api/trade2/ (PoE2) - inaczej
+    kazdy PoE2 request ladowalby sie w jedna wspolna, blednie nazwana
+    polityke zamiast osobnych limitow per endpoint.
+    """
+    parts = API_PREFIX_RE.split(url, 1)
+    tail = parts[-1]
     return tail.split("/", 1)[0] or "other"
 
 
@@ -430,8 +450,15 @@ class TradeClient:
         poesessid: str = "",
         status: str = "securable",
         on_wait=None,
+        game: str = "poe1",
     ) -> None:
         self.league = league
+        # "poe1" -> /api/trade/..., "poe2" -> /api/trade2/... . Dwa zupelnie
+        # osobne slowniki statystyk/filtrow pod tym samym kontem GGG - stad
+        # osobny prefiks zamiast proby dzielenia jednej sciezki.
+        self.game = game if game == "poe2" else "poe1"
+        self._api = "trade2" if self.game == "poe2" else "trade"
+        self._all_kinds = ALL_STAT_KINDS_POE2 if self.game == "poe2" else ALL_STAT_KINDS
         # Odpowiednik listy "status" na stronie trade'a. Identyfikatory nie sa
         # oczywiste - pochodza z /api/trade/data/filters:
         #   available     - Instant Buyout and In Person
@@ -449,7 +476,7 @@ class TradeClient:
         if poesessid:
             self.session.cookies.set("POESESSID", poesessid, domain=".pathofexile.com")
         self.limiter = RateLimiter(on_wait=on_wait)
-        self.rates = CurrencyRates(self, league, CACHE_DIR)
+        self.rates = CurrencyRates(self, league, CACHE_DIR, api=self._api)
         self._stat_index: dict[str, str] | None = None
         self._stat_local: dict[str, str] | None = None
         self._stat_loose: dict[str, list[str]] | None = None
@@ -501,7 +528,12 @@ class TradeClient:
 
     def _cached(self, name: str, url: str) -> dict:
         CACHE_DIR.mkdir(exist_ok=True)
-        path = CACHE_DIR / f"{name}.json"
+        # Nazwa pliku niezmieniona dla PoE1 (nie kasujemy juz istniejacych
+        # cache'y userom), osobny sufiks dla PoE2 - to dwa rozne slowniki
+        # i wspolny plik oznaczalby losowe, niewytlumaczalne bledy dopasowania
+        # po przelaczeniu wersji gry.
+        cache_name = name if self.game == "poe1" else f"{name}_{self.game}"
+        path = CACHE_DIR / f"{cache_name}.json"
         if path.exists() and (time.time() - path.stat().st_mtime) < CACHE_TTL_SECONDS:
             try:
                 return json.loads(path.read_text(encoding="utf-8"))
@@ -520,13 +552,14 @@ class TradeClient:
     # ------------------------------------------------------------------- dane
 
     @staticmethod
-    def fetch_leagues(user_agent: str) -> list[str]:
+    def fetch_leagues(user_agent: str, game: str = "poe1") -> list[str]:
         """Nazwy lig. GGG zwraca je raz na realm (PC/Xbox/PS), wiec deduplikujemy."""
+        api = "trade2" if game == "poe2" else "trade"
         # To leci przy starcie, zanim cokolwiek zdazy zlapac wyjatek - a brak
         # sieci przy uruchomieniu jest calkiem prawdopodobny.
         try:
             response = requests.get(
-                f"{BASE}/api/trade/data/leagues",
+                f"{BASE}/api/{api}/data/leagues",
                 headers={"User-Agent": user_agent, "Accept": "application/json"},
                 timeout=20,
             )
@@ -548,7 +581,7 @@ class TradeClient:
         if self._stat_index is not None:
             return self._stat_index
 
-        data = self._cached("stats", f"{BASE}/api/trade/data/stats")
+        data = self._cached("stats", f"{BASE}/api/{self._api}/data/stats")
         index: dict[str, str] = {}
         local: dict[str, str] = {}
         loose: dict[str, list[str]] = {}
@@ -617,7 +650,7 @@ class TradeClient:
         ordered = [local, plain] if prefer_local else [plain, local]
 
         for source in ordered:
-            for kind in [*kinds, *ALL_STAT_KINDS]:
+            for kind in [*kinds, *self._all_kinds]:
                 stat_id = source.get(f"{kind}|{key}")
                 if stat_id:
                     return stat_id
@@ -716,7 +749,7 @@ class TradeClient:
         """
         if self._static_index is not None:
             return self._static_index
-        data = self._cached("static", f"{BASE}/api/trade/data/static")
+        data = self._cached("static", f"{BASE}/api/{self._api}/data/static")
         names: dict[str, str] = {}
         for group in data.get("result", []):
             for entry in group.get("entries", []) or []:
@@ -751,7 +784,7 @@ class TradeClient:
         }
         data = self._request(
             "POST",
-            f"{BASE}/api/trade/exchange/{requests.utils.quote(self.league)}",
+            f"{BASE}/api/{self._api}/exchange/{requests.utils.quote(self.league)}",
             data=json.dumps(payload),
         )
 
@@ -792,12 +825,13 @@ class TradeClient:
             listings=listings[:max_listings],
             league=self.league,
             is_exchange=True,
+            game=self.game,
         )
 
     def base_types(self) -> set[str]:
         if self._base_types is not None:
             return self._base_types
-        data = self._cached("items", f"{BASE}/api/trade/data/items")
+        data = self._cached("items", f"{BASE}/api/{self._api}/data/items")
         names: set[str] = set()
         for group in data.get("result", []):
             for entry in group.get("entries", []):
@@ -971,7 +1005,9 @@ class TradeClient:
                 key="ilvl", label=t("prop.ilvl"),
                 value=item.item_level, minimum=1, maximum=100, enabled=False,
             ))
-        if item.sockets:
+        # Linki gniazd nie istnieja w PoE2 (gemy nie osadzaja sie w pancerzu,
+        # tylko w slotach umiejetnosci) - GGG nie ma takiego filtra w trade2.
+        if item.sockets and self.game != "poe2":
             links = item.link_count
             options.append(PropertyOption(
                 key="links", label=t("prop.links"),
@@ -1030,30 +1066,37 @@ class TradeClient:
         # Wlasciwosci mapy - obok tieru to one wyznaczaja cene. Area Level
         # wylaczony domyslnie, bo w odroznieniu od IIQ/IIR/pack size rzadko
         # jest tym, po czym ktos faktycznie chce zawezac.
-        if item.item_quantity is not None:
-            options.append(PropertyOption(
-                key="map_iiq", label=t("prop.map_iiq"),
-                value=item.item_quantity, minimum=0,
-                maximum=max(item.item_quantity * 2, 10), enabled=True,
-            ))
-        if item.item_rarity is not None:
-            options.append(PropertyOption(
-                key="map_iir", label=t("prop.map_iir"),
-                value=item.item_rarity, minimum=0,
-                maximum=max(item.item_rarity * 2, 10), enabled=True,
-            ))
-        if item.monster_pack_size is not None:
-            options.append(PropertyOption(
-                key="map_packsize", label=t("prop.map_packsize"),
-                value=item.monster_pack_size, minimum=0,
-                maximum=max(item.monster_pack_size * 2, 10), enabled=True,
-            ))
-        if item.area_level is not None:
-            options.append(PropertyOption(
-                key="area_level", label=t("prop.area_level"),
-                value=item.area_level, minimum=0,
-                maximum=max(item.area_level * 2, 10), enabled=False,
-            ))
+        #
+        # W PoE2 ("Waystone") ekonomia jest inna: nie ma odpowiednika Item
+        # Quantity (map_iiq w ogole nie istnieje w trade2), a pack size/IIR
+        # dzialaja przez inne mechanizmy (monster effectiveness/rarity).
+        # Zamiast zgadywac mapowanie, wlasciwosci mapy zostaja wylacznie
+        # dla PoE1, dopoki nie da sie tego zweryfikowac na prawdziwym Waystone.
+        if self.game != "poe2":
+            if item.item_quantity is not None:
+                options.append(PropertyOption(
+                    key="map_iiq", label=t("prop.map_iiq"),
+                    value=item.item_quantity, minimum=0,
+                    maximum=max(item.item_quantity * 2, 10), enabled=True,
+                ))
+            if item.item_rarity is not None:
+                options.append(PropertyOption(
+                    key="map_iir", label=t("prop.map_iir"),
+                    value=item.item_rarity, minimum=0,
+                    maximum=max(item.item_rarity * 2, 10), enabled=True,
+                ))
+            if item.monster_pack_size is not None:
+                options.append(PropertyOption(
+                    key="map_packsize", label=t("prop.map_packsize"),
+                    value=item.monster_pack_size, minimum=0,
+                    maximum=max(item.monster_pack_size * 2, 10), enabled=True,
+                ))
+            if item.area_level is not None:
+                options.append(PropertyOption(
+                    key="area_level", label=t("prop.area_level"),
+                    value=item.area_level, minimum=0,
+                    maximum=max(item.area_level * 2, 10), enabled=False,
+                ))
         return options
 
     def resolve_base_type(self, item: ParsedItem) -> str:
@@ -1106,6 +1149,8 @@ class TradeClient:
         if type_filters:
             filters["type_filters"] = {"filters": type_filters}
 
+        is_poe2 = self.game == "poe2"
+
         if item.corrupted:
             misc["corrupted"] = {"option": "true"}
         # Bez tego filtru bonus z fracturu ginie w wynikach: oferty z i bez
@@ -1114,46 +1159,55 @@ class TradeClient:
         # rodzaj bledu co z Foulbornem nizej, tylko dla fracture.
         if "fractured_item" in item.flags:
             misc["fractured_item"] = {"option": "true"}
-        # Bez tego filtru wersja Foulborn miesza sie ze zwykla: dla jednego
-        # unikatu bylo 618 ofert lacznie, a tylko 57 to faktycznie Foulborny.
-        # Wycena bez filtru zanizalaby ceny kilkukrotnie.
-        if item.is_foulborn:
+        # "mutated" istnieje w obu grach pod tym samym ID, ale znaczy cos
+        # innego: w PoE1 to odmiana Foulborn, w PoE2 "Cultivated Vaal Unique"
+        # - zupelnie inny mechanizm. Wykrywanie po prefiksie "Foulborn " w
+        # nazwie (is_foulborn) dotyczy WYLACZNIE PoE1; dla PoE2 nie mamy
+        # jeszcze zweryfikowanego sposobu rozpoznania tej odmiany w tekscie
+        # przedmiotu, wiec filtr zostaje wylaczony zamiast zgadywac.
+        if item.is_foulborn and not is_poe2:
             misc["mutated"] = {"option": "true"}
-        # Ponizsze flagi parser rozpoznawal juz od dawna (item.flags), ale
-        # nigdy nie trafialy do zapytania - dokladnie ten sam rodzaj bledu co
-        # fractured_item wyzej. Kazda z nich realnie zmienia cene: lustrzana
-        # kopia i split to zupelnie inna liga cenowa niz zwykly przedmiot,
-        # nieziden. rzadki/unikat wyceni sie zupelnie inaczej niz zidenty-
-        # fikowany o tych samych widocznych modach (bo kupujacy nie widzi
-        # reszty), synteza i implanty eldrycze tak samo licza sie w wartosc
-        # jak fracture.
         if "mirrored" in item.flags:
             misc["mirrored"] = {"option": "true"}
-        if "split" in item.flags:
-            misc["split"] = {"option": "true"}
-        if "synthesised" in item.flags:
-            misc["synthesised_item"] = {"option": "true"}
+        # Ponizsze mechaniki (split, synteza, implanty eldrycze) sa specyficzne
+        # dla lig PoE1 i nie maja odpowiednika w /api/trade2/data/filters -
+        # wysylanie ich dla PoE2 skonczyloby sie blednym zapytaniem (HTTP 400,
+        # "unknown filter"), tak jak swego czasu z Foulbornem.
+        if not is_poe2:
+            if "split" in item.flags:
+                misc["split"] = {"option": "true"}
+            if "synthesised" in item.flags:
+                misc["synthesised_item"] = {"option": "true"}
+            if "searing_item" in item.flags:
+                misc["searing_item"] = {"option": "true"}
+            if "tangled_item" in item.flags:
+                misc["tangled_item"] = {"option": "true"}
+            for influence in item.influences:
+                misc[f"{influence}_item"] = {"option": "true"}
+        # "veiled" ma to samo ID w obu grach (PoE2 pokazuje je pod nazwa
+        # "Unrevealed", ale filtr gieldy zostal "veiled").
         if "veiled" in item.flags:
             misc["veiled"] = {"option": "true"}
-        if "searing_item" in item.flags:
-            misc["searing_item"] = {"option": "true"}
-        if "tangled_item" in item.flags:
-            misc["tangled_item"] = {"option": "true"}
         if "unidentified" in item.flags:
             misc["identified"] = {"option": "false"}
         if item.gem_level is not None:
             misc["gem_level"] = {"min": item.gem_level}
+        if item.map_tier is not None:
+            misc["map_tier"] = {"min": item.map_tier, "max": item.map_tier}
+
+        # ilvl/quality siedza w misc_filters w PoE1, ale GGG przeniosl je do
+        # type_filters w PoE2 - ten sam filtr wyslany do zlej grupy w
+        # zapytaniu po prostu nic nie robi, wygladajac jak dzialajacy filtr.
+        quality_target = type_filters if is_poe2 else misc
         # Jakosc filtrujemy tylko dla kamieni. Dla broni/pancerzy wymuszanie
         # konkretnej jakosci niepotrzebnie odcina wiekszosc ofert.
         if item.quality and item.is_gem:
-            misc["quality"] = {"min": item.quality}
-        if item.map_tier is not None:
-            misc["map_tier"] = {"min": item.map_tier, "max": item.map_tier}
-        for influence in item.influences:
-            misc[f"{influence}_item"] = {"option": "true"}
+            quality_target["quality"] = {"min": item.quality}
+
         sockets: dict[str, dict] = {}
         weapon: dict[str, dict] = {}
         armour: dict[str, dict] = {}
+        equipment: dict[str, dict] = {}
         maps: dict[str, dict] = {}
         if properties is None:
             properties = self.property_options(item)
@@ -1161,14 +1215,28 @@ class TradeClient:
             if not prop.enabled:
                 continue
             if prop.key == "ilvl":
-                misc["ilvl"] = {"min": prop.value}
+                (type_filters if is_poe2 else misc)["ilvl"] = {"min": prop.value}
             elif prop.key == "links":
-                sockets["links"] = {"min": prop.value}
-            elif prop.key in ("pdps", "edps", "dps"):
-                weapon[prop.key] = {"min": prop.value}
-            elif prop.key in ("ar", "ev", "es", "ward", "block"):
-                armour[prop.key] = {"min": prop.value}
+                # Brak koncepcji linkow gniazd w PoE2 (gemy nie osadza sie w
+                # pancerzu) - property_options() go dla PoE2 nie generuje,
+                # ale gdyby kiedys trafil tu z zewnatrz, lepiej pominac niz
+                # wyslac filtr, ktorego trade2 nie zna.
+                if not is_poe2:
+                    sockets["links"] = {"min": prop.value}
+            elif prop.key in ("pdps", "edps", "dps", "ar", "ev", "es", "ward", "block"):
+                # PoE1 dzieli to na weapon_filters/armour_filters; PoE2 scalil
+                # obie grupy w jedna "equipment_filters" pod tymi samymi ID.
+                if is_poe2:
+                    equipment[prop.key] = {"min": prop.value}
+                elif prop.key in ("pdps", "edps", "dps"):
+                    weapon[prop.key] = {"min": prop.value}
+                else:
+                    armour[prop.key] = {"min": prop.value}
             elif prop.key in ("map_iiq", "map_iir", "map_packsize", "area_level"):
+                # Mapy PoE2 ("Waystone") maja zupelnie inna ekonomie (brak
+                # map_iiq, inne pojecia typu monster_effectiveness) -
+                # property_options() ich dla PoE2 nie generuje, wiec ta galaz
+                # dotyczy wylacznie PoE1.
                 maps[prop.key] = {"min": prop.value}
 
         if misc:
@@ -1177,6 +1245,8 @@ class TradeClient:
             filters["socket_filters"] = {"filters": sockets}
         if weapon:
             filters["weapon_filters"] = {"filters": weapon}
+        if equipment:
+            filters["equipment_filters"] = {"filters": equipment}
         if armour:
             filters["armour_filters"] = {"filters": armour}
         if maps:
@@ -1234,6 +1304,7 @@ class TradeClient:
             league=self.league,
             mods_used=len(stat_filters),
             mods_unmatched=unmatched_count,
+            game=self.game,
         )
 
     def craft_ceiling_url(self, item: ParsedItem) -> str:
@@ -1256,12 +1327,13 @@ class TradeClient:
         search_id, _, _ = self._search(payload)
         return SearchResult(
             search_id=search_id, total=0, listings=[], league=self.league,
+            game=self.game,
         ).browser_url()
 
     def _search(self, payload: dict) -> tuple[str, int, list[str]]:
         data = self._request(
             "POST",
-            f"{BASE}/api/trade/search/{requests.utils.quote(self.league)}",
+            f"{BASE}/api/{self._api}/search/{requests.utils.quote(self.league)}",
             data=json.dumps(payload),
         )
         return data.get("id", ""), int(data.get("total", 0)), data.get("result") or []
@@ -1274,7 +1346,7 @@ class TradeClient:
             return []
         data = self._request(
             "GET",
-            f"{BASE}/api/trade/fetch/{','.join(hashes)}",
+            f"{BASE}/api/{self._api}/fetch/{','.join(hashes)}",
             params={"query": search_id},
         )
         listings: list[Listing] = []

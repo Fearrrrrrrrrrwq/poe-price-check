@@ -12,7 +12,7 @@ import json
 import statistics
 import time
 
-EXCHANGE_URL = "https://www.pathofexile.com/api/trade/exchange/{league}"
+EXCHANGE_URL = "https://www.pathofexile.com/api/{api}/exchange/{league}"
 
 CACHE_TTL_SECONDS = 3 * 3600  # kursy zmieniaja sie w ciagu dnia
 MIN_SAMPLES = 5  # ponizej tego mediana jest zbyt przypadkowa
@@ -27,10 +27,14 @@ class CurrencyRates:
     od samego wyniku.
     """
 
-    def __init__(self, client, league: str, cache_dir) -> None:
+    def __init__(self, client, league: str, cache_dir, api: str = "trade") -> None:
         self.client = client  # obiekt z metodami _request i limiterem
         self.league = league
-        self.cache_path = cache_dir / f"rates_{league.replace(' ', '_')}.json"
+        self.api = api  # "trade" (PoE1) albo "trade2" (PoE2)
+        # PoE1 i PoE2 maja czesto te same nazwy lig ("Standard", "Hardcore") -
+        # bez rozroznienia w nazwie pliku kursy jednej gry nadpisywalyby drugiej.
+        suffix = "" if api == "trade" else f"_{api}"
+        self.cache_path = cache_dir / f"rates_{league.replace(' ', '_')}{suffix}.json"
         self._rates: dict[str, float] = {"chaos": 1.0}
         self._failed: set[str] = set()
         self._load_cache()
@@ -95,7 +99,7 @@ class CurrencyRates:
         try:
             data = self.client._request(
                 "POST",
-                EXCHANGE_URL.format(league=self.league),
+                EXCHANGE_URL.format(api=self.api, league=self.league),
                 data=json.dumps(payload),
             )
         except Exception:  # noqa: BLE001 - brak kursu nie moze przerwac wyceny

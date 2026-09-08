@@ -58,6 +58,10 @@ class SetupWindow:
         self.mode: str | None = None
         self.page = 0
         self._link_value = config.get("gdoc_id", "")
+        # Wersja gry wybierana na tym samym ekranie co tryb chmura/lokalny -
+        # dwie niezalezne decyzje, ale dla nowego uzytkownika to jeden moment
+        # konfiguracji, nie dwa osobne kroki.
+        self.game_version: str = config.get("game_version", "poe1")
 
         self.root = tk.Tk()
         self.root.configure(bg=BG)
@@ -163,6 +167,7 @@ class SetupWindow:
         self._centre()
 
     def _page_mode(self) -> None:
+        self._page_game()
         self._heading(t("setup.mode_title"), t("setup.mode_intro"))
 
         step = self._step("1", t("setup.mode_cloud_t"))
@@ -174,6 +179,27 @@ class SetupWindow:
         self._note(step, t("setup.mode_local_b"))
         theme.button(step, t("setup.mode_choose"), self._choose_local).pack(
             anchor="w", pady=(TIGHT, 0))
+
+    def _page_game(self) -> None:
+        """Wybor wersji gry - nad reszta ekranu, bo dotyczy obu trybow ponizej."""
+        row = tk.Frame(self.body, bg=BG)
+        row.pack(fill="x", pady=(0, GAP))
+        tk.Label(row, text=t("setup.game_label"), font=FONT_LABEL, fg=FG_MUTED,
+                 bg=BG).pack(side="left", padx=(0, GAP))
+        theme.button(
+            row, t("setup.game_poe1"), lambda: self._choose_game("poe1"),
+            primary=self.game_version == "poe1",
+        ).pack(side="left")
+        theme.button(
+            row, t("setup.game_poe2"), lambda: self._choose_game("poe2"),
+            primary=self.game_version == "poe2",
+        ).pack(side="left", padx=(TIGHT, 0))
+        if self.game_version == "poe2":
+            self._note(self.body, t("setup.game_poe2_note"))
+
+    def _choose_game(self, version: str) -> None:
+        self.game_version = version
+        self._render()
 
     def _page_local(self) -> None:
         self._heading(t("setup.local_title"), t("setup.local_body"))
@@ -299,6 +325,7 @@ class SetupWindow:
             self.config["boosteroid_mode"] = True
         else:  # local - nic do zebrania, sam wybor trybu juz wystarczy
             self.config["boosteroid_mode"] = False
+        self.config["game_version"] = self.game_version
         # Niezaleznie od trybu: bez tego needs_setup() otwieralby kreator
         # przy kazdym starcie komus, kto wybral "zwykly PC" - dla niego
         # gdoc_id zostaje puste na zawsze, a to byl dotychczasowy jedyny

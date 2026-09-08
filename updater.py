@@ -129,6 +129,7 @@ def _apply_update(exe_bytes: bytes) -> bool:
         return False
 
     pid = os.getpid()
+    log = target.with_name(target.stem + ".update.log")
     try:
         # newline="" jest tu obowiazkowe: bez tego write_text w trybie
         # tekstowym na Windows i tak tlumaczy kazde '\n' na '\r\n', a nasz
@@ -137,17 +138,32 @@ def _apply_update(exe_bytes: bytes) -> bool:
         # co cmd.exe czyta jako puste linie miedzy komendami (nieszkodliwe
         # samo w sobie, ale znak, ze plik nie jest tym, czego oczekiwalismy -
         # zlapane przy weryfikacji zawartosci wygenerowanego .bat).
+        #
+        # "timeout" do odczekania sekundy NIE dziala tutaj - ten konkretny
+        # program w Windows wymaga prawdziwej konsoli i pod CREATE_NO_WINDOW
+        # (bez konsoli) konczy sie od razu bledem "Input redirection is not
+        # supported". "ping -n 2 127.0.0.1" to standardowy zamiennik w
+        # batchach wlasnie z tego powodu - nie dotyka konsoli w ogole.
+        #
+        # Kazdy krok dopisuje sie do osobnego logu (>> "{log}" 2>&1) - bez
+        # tego jedyny slad po nieudanej probie to porzucone .new.exe/.bat,
+        # bez zadnej wskazowki dlaczego (a "terminal mignal i zniknal" nie
+        # daje sie zdiagnozowac z poziomu Pythona, ktory juz nie zyje).
         script.write_text(
             "\r\n".join([
                 "@echo off",
+                f'echo [%date% %time%] start, czekam na PID {pid} > "{log}"',
                 ":wait",
                 f'tasklist /FI "PID eq {pid}" 2>NUL | find "{pid}" >NUL',
                 "if not errorlevel 1 (",
-                "  timeout /t 1 /nobreak >NUL",
+                "  ping -n 2 127.0.0.1 >NUL",
                 "  goto wait",
                 ")",
-                f'move /Y "{staging}" "{target}" >NUL',
+                f'echo [%date% %time%] PID zniknal, przenosze plik >> "{log}"',
+                f'move /Y "{staging}" "{target}" >> "{log}" 2>&1',
+                f'echo [%date% %time%] move errorlevel=%errorlevel% >> "{log}"',
                 f'start "" "{target}"',
+                f'echo [%date% %time%] odpalono ponownie >> "{log}"',
                 'del "%~f0"',
                 "",
             ]),
@@ -158,11 +174,14 @@ def _apply_update(exe_bytes: bytes) -> bool:
         return False
 
     try:
+        # TYLKO CREATE_NO_WINDOW - polaczenie z DETACHED_PROCESS jest wprost
+        # udokumentowane przez Microsoft jako niedozwolone ("This flag cannot
+        # be used with DETACHED_PROCESS") i w praktyce dawalo migajaca konsole,
+        # ktora znikala, zanim .bat zdazyl cokolwiek zrobic - zamiast po cichu
+        # zaplanowanego restartu.
         subprocess.Popen(
             ["cmd", "/c", str(script)],
-            creationflags=(
-                subprocess.CREATE_NO_WINDOW | subprocess.DETACHED_PROCESS
-            ),
+            creationflags=subprocess.CREATE_NO_WINDOW,
             close_fds=True,
         )
     except OSError:

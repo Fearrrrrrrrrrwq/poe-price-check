@@ -1066,12 +1066,6 @@ class TradeClient:
         # Wlasciwosci mapy - obok tieru to one wyznaczaja cene. Area Level
         # wylaczony domyslnie, bo w odroznieniu od IIQ/IIR/pack size rzadko
         # jest tym, po czym ktos faktycznie chce zawezac.
-        #
-        # W PoE2 ("Waystone") ekonomia jest inna: nie ma odpowiednika Item
-        # Quantity (map_iiq w ogole nie istnieje w trade2), a pack size/IIR
-        # dzialaja przez inne mechanizmy (monster effectiveness/rarity).
-        # Zamiast zgadywac mapowanie, wlasciwosci mapy zostaja wylacznie
-        # dla PoE1, dopoki nie da sie tego zweryfikowac na prawdziwym Waystone.
         if self.game != "poe2":
             if item.item_quantity is not None:
                 options.append(PropertyOption(
@@ -1090,6 +1084,56 @@ class TradeClient:
                     key="map_packsize", label=t("prop.map_packsize"),
                     value=item.monster_pack_size, minimum=0,
                     maximum=max(item.monster_pack_size * 2, 10), enabled=True,
+                ))
+            if item.area_level is not None:
+                options.append(PropertyOption(
+                    key="area_level", label=t("prop.area_level"),
+                    value=item.area_level, minimum=0,
+                    maximum=max(item.area_level * 2, 10), enabled=False,
+                ))
+        else:
+            # Waystone (PoE2) - zweryfikowane na zywych ofertach pod
+            # /api/trade2/: brak Item Quantity w ogole, za to Item Rarity,
+            # Pack Size (ta sama etykieta co "Monster Pack Size" w PoE1,
+            # patrz _handle_property), Monster Rarity/Effectiveness i szansa
+            # na dodatkowy Waystone z dropu. Revives/Effectiveness domyslnie
+            # wylaczone - w odroznieniu od reszty nie jest oczywiste, ze
+            # wiecej = drozej.
+            if item.item_rarity is not None:
+                options.append(PropertyOption(
+                    key="map_iir", label=t("prop.map_iir"),
+                    value=item.item_rarity, minimum=0,
+                    maximum=max(item.item_rarity * 2, 10), enabled=True,
+                ))
+            if item.monster_pack_size is not None:
+                options.append(PropertyOption(
+                    key="map_packsize", label=t("prop.map_packsize"),
+                    value=item.monster_pack_size, minimum=0,
+                    maximum=max(item.monster_pack_size * 2, 10), enabled=True,
+                ))
+            if item.monster_rarity is not None:
+                options.append(PropertyOption(
+                    key="map_rare_monsters", label=t("prop.map_rare_monsters"),
+                    value=item.monster_rarity, minimum=0,
+                    maximum=max(item.monster_rarity * 2, 10), enabled=True,
+                ))
+            if item.waystone_drop_chance is not None:
+                options.append(PropertyOption(
+                    key="map_bonus", label=t("prop.map_bonus"),
+                    value=item.waystone_drop_chance, minimum=0,
+                    maximum=max(item.waystone_drop_chance * 2, 10), enabled=True,
+                ))
+            if item.monster_effectiveness is not None:
+                options.append(PropertyOption(
+                    key="map_magic_monsters", label=t("prop.map_magic_monsters"),
+                    value=item.monster_effectiveness, minimum=0,
+                    maximum=max(item.monster_effectiveness * 2, 10), enabled=False,
+                ))
+            if item.waystone_revives is not None:
+                options.append(PropertyOption(
+                    key="map_revives", label=t("prop.map_revives"),
+                    value=item.waystone_revives, minimum=0,
+                    maximum=max(item.waystone_revives * 2, 5), enabled=False,
                 ))
             if item.area_level is not None:
                 options.append(PropertyOption(
@@ -1235,11 +1279,15 @@ class TradeClient:
                     weapon[prop.key] = {"min": prop.value}
                 else:
                     armour[prop.key] = {"min": prop.value}
-            elif prop.key in ("map_iiq", "map_iir", "map_packsize", "area_level"):
-                # Mapy PoE2 ("Waystone") maja zupelnie inna ekonomie (brak
-                # map_iiq, inne pojecia typu monster_effectiveness) -
-                # property_options() ich dla PoE2 nie generuje, wiec ta galaz
-                # dotyczy wylacznie PoE1.
+            elif prop.key in (
+                "map_iiq", "map_iir", "map_packsize", "area_level",
+                "map_rare_monsters", "map_magic_monsters", "map_revives", "map_bonus",
+            ):
+                # Grupa "map_filters" jest wspolna dla obu gier - GGG uzywa
+                # tej samej nazwy w /api/trade/ i /api/trade2/, tylko z innym
+                # zestawem ID (patrz property_options: map_iiq tylko PoE1,
+                # map_rare_monsters/map_magic_monsters/map_revives/map_bonus
+                # tylko PoE2).
                 maps[prop.key] = {"min": prop.value}
 
         if type_filters:

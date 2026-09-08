@@ -149,11 +149,20 @@ class ParsedItem:
     energy_shield: int | None = None
     ward: int | None = None
     block_chance: int | None = None
-    # Wlasciwosci mapy - obok Map Tier decyduja o cenie.
+    # Wlasciwosci mapy (PoE1) - obok Map Tier decyduja o cenie.
     item_quantity: int | None = None
     item_rarity: int | None = None
     monster_pack_size: int | None = None
     area_level: int | None = None
+    # Wlasciwosci Waystone'a (PoE2) - inna ekonomia niz mapy PoE1, zero
+    # Item Quantity, za to Monster Rarity/Effectiveness i szansa/ilosc
+    # dodatkowych Waystone'ow. "Item Rarity" i "Pack Size" (etykieta w
+    # tekscie przedmiotu inna niz PoE1 "Monster Pack Size", ale to samo
+    # pojecie) dzieli pola z PoE1 powyzej - patrz _handle_property.
+    monster_rarity: int | None = None
+    monster_effectiveness: int | None = None
+    waystone_revives: int | None = None
+    waystone_drop_chance: int | None = None
     # Zajete gniazda afiksow. Liczymy adnotacje w klamrach, nie linie tekstu -
     # mod hybrydowy zajmuje jedno gniazdo, a zajmuje dwie linie.
     prefix_count: int = 0
@@ -564,10 +573,18 @@ def _handle_property(
         item.item_quantity = _first_int(value)
     elif key == "Item Rarity":
         item.item_rarity = _first_int(value)
-    elif key == "Monster Pack Size":
+    elif key in ("Monster Pack Size", "Pack Size"):
         item.monster_pack_size = _first_int(value)
     elif key == "Area Level":
         item.area_level = _first_int(value)
+    elif key == "Monster Rarity":
+        item.monster_rarity = _first_int(value)
+    elif key == "Monster Effectiveness":
+        item.monster_effectiveness = _first_int(value)
+    elif key == "Revives Available":
+        item.waystone_revives = _first_int(value)
+    elif key == "Waystone Drop Chance":
+        item.waystone_drop_chance = _first_int(value)
     elif key in (
         "Requirements", "Requires", "Str", "Dex", "Int",
         "Chaos Damage", "Weapon Range",

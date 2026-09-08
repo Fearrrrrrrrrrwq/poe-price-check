@@ -57,10 +57,11 @@ trade API genuinely doesn't have the same shape:
   into one `equipment_filters` group. Sending the PoE1 shape to PoE2 (or
   vice versa) just gets silently ignored by the API, so for now these
   sliders don't appear at all in PoE2 mode.
-- **Map/Waystone properties** (Item Quantity, Item Rarity, Pack Size, Area
-  Level) — PoE2's Waystone economy is different (no Item Quantity filter at
-  all; monster rarity/effectiveness instead), so these are PoE1-only until
-  verified against a real Waystone.
+Waystones (PoE2 maps) *are* supported, verified against real listings:
+Item Rarity, Pack Size, Monster Rarity, Monster Effectiveness, Revives
+Available and Waystone Drop Chance all price-check correctly — there's no
+Item Quantity filter in PoE2 at all, so that one's simply absent rather than
+mapped to something wrong.
 
 ## Install
 

@@ -197,6 +197,26 @@ def main() -> int:
         print(f"BLAD wyszukiwania PoE2: {exc}\n")
         return 1
 
+    print("== WAYSTONE (PoE2 - realny format wlasciwosci, zweryfikowany na zywym API) ==")
+    waystone_text = (
+        "Item Class: Waystones\nRarity: Rare\nDark Carving\nWaystone (Tier 15)\n"
+        "--------\nRevives Available: 2\nItem Rarity: +19% (augmented)\n"
+        "Pack Size: +19% (augmented)\nMonster Rarity: +24% (augmented)\n"
+        "Monster Effectiveness: +30% (augmented)\nWaystone Drop Chance: +60% "
+        "(augmented)\n--------\nItem Level: 81\n"
+    )
+    waystone = parse_item(waystone_text)
+    props3 = client2.property_options(waystone)
+    for prop in props3:
+        print(f"    wlasciwosc {prop.key}={prop.value} wlaczona={prop.enabled}")
+    try:
+        result3 = client2.price_check(waystone, max_listings=3, properties=props3)
+        print(f"ofert (Waystone T15 z filtrami, {league2}): {result3.total}")
+        print(f"link: {result3.browser_url()}\n")
+    except TradeError as exc:
+        print(f"BLAD wyszukiwania Waystone'a PoE2: {exc}\n")
+        return 1
+
     return 0
 
 

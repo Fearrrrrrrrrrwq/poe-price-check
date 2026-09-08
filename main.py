@@ -106,11 +106,27 @@ def build_timing(timing_cfg: dict) -> BridgeTiming:
 
 
 def resolve_league(config: dict) -> str:
-    league = config.get("league", "auto")
-    if league and league != "auto":
-        return league
     game = config.get("game_version", "poe1")
-    leagues = TradeClient.fetch_leagues(config["user_agent"], game=game)
+    league = config.get("league", "auto")
+    leagues: list[str] | None = None
+    if league and league != "auto":
+        # Nazwa ligi wpisana na sztywno w configu moze pochodzic sprzed
+        # przelaczenia wersji gry (np. "Allflame" zostaje w configu, ktos
+        # zmienia game_version na poe2, a "Allflame" nigdy nie istnialo w
+        # PoE2) - wysylanie jej pod /api/trade2/ konczy sie HTTP 400
+        # "Invalid query", ktore wyglada jak awaria programu, a jest tylko
+        # nieaktualnym ustawieniem. Zamiast slepo ufac configowi, sprawdzamy
+        # liste prawdziwych lig danej gry i dopiero wtedy uznajemy ja za dobra.
+        try:
+            leagues = TradeClient.fetch_leagues(config["user_agent"], game=game)
+        except TradeError:
+            return league  # brak sieci - lepiej sprobowac niz od razu poddac sie
+        if league in leagues:
+            return league
+        print(f"[uwaga] liga '{league}' z configu nie istnieje w {game.upper()} - "
+              "dobieram automatycznie.")
+    if leagues is None:
+        leagues = TradeClient.fetch_leagues(config["user_agent"], game=game)
     for name in leagues:
         if name not in PERMANENT_LEAGUES and not name.startswith(("SSF", "HC ", "Hardcore", "Ruthless")):
             return name

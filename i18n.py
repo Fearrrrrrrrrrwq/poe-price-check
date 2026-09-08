@@ -166,6 +166,10 @@ STRINGS["en"] = {
     "prop.map_iir": "Item Rarity",
     "prop.map_packsize": "Monster Pack Size",
     "prop.area_level": "Area Level",
+    "prop.map_rare_monsters": "Monster Rarity",
+    "prop.map_magic_monsters": "Monster Effectiveness",
+    "prop.map_bonus": "Waystone Drop Chance",
+    "prop.map_revives": "Revives Available",
 
     # afiksy
     "craft.can_modify": "Can be modified",
@@ -325,6 +329,10 @@ STRINGS["pl"] = {
     "prop.map_iir": "Rzadkość przedmiotów",
     "prop.map_packsize": "Rozmiar grup potworów",
     "prop.area_level": "Poziom obszaru",
+    "prop.map_rare_monsters": "Rzadkość potworów",
+    "prop.map_magic_monsters": "Skuteczność potworów",
+    "prop.map_bonus": "Szansa na dodatkowy Waystone",
+    "prop.map_revives": "Dostępne wskrzeszenia",
 
     "craft.can_modify": "Można modyfikować",
     "craft.full": "Pełne afiksy",
@@ -485,6 +493,10 @@ STRINGS["de"] = {
     "prop.map_iir": "Gegenstandsrarität",
     "prop.map_packsize": "Monster-Gruppengröße",
     "prop.area_level": "Gebietsstufe",
+    "prop.map_rare_monsters": "Monster-Seltenheit",
+    "prop.map_magic_monsters": "Monster-Effektivität",
+    "prop.map_bonus": "Waystone-Dropchance",
+    "prop.map_revives": "Verfügbare Wiederbelebungen",
 
     "craft.can_modify": "Kann verändert werden",
     "craft.full": "Alle Affixe belegt",
@@ -645,6 +657,10 @@ STRINGS["es"] = {
     "prop.map_iir": "Rareza de objetos",
     "prop.map_packsize": "Tamaño de grupo de monstruos",
     "prop.area_level": "Nivel de área",
+    "prop.map_rare_monsters": "Rareza de monstruos",
+    "prop.map_magic_monsters": "Efectividad de monstruos",
+    "prop.map_bonus": "Probabilidad de Waystone extra",
+    "prop.map_revives": "Reanimaciones disponibles",
 
     "craft.can_modify": "Se puede modificar",
     "craft.full": "Todos los afijos ocupados",
@@ -804,6 +820,10 @@ STRINGS["pt"] = {
     "prop.map_iir": "Raridade de itens",
     "prop.map_packsize": "Tamanho do grupo de monstros",
     "prop.area_level": "Nível de área",
+    "prop.map_rare_monsters": "Raridade de monstros",
+    "prop.map_magic_monsters": "Eficácia de monstros",
+    "prop.map_bonus": "Chance de Waystone extra",
+    "prop.map_revives": "Reanimações disponíveis",
 
     "craft.can_modify": "Pode ser modificado",
     "craft.full": "Todos os afixos ocupados",
@@ -961,6 +981,10 @@ STRINGS["ru"] = {
     "prop.map_iir": "Редкость предметов",
     "prop.map_packsize": "Размер группы монстров",
     "prop.area_level": "Уровень зоны",
+    "prop.map_rare_monsters": "Редкость монстров",
+    "prop.map_magic_monsters": "Эффективность монстров",
+    "prop.map_bonus": "Шанс доп. Waystone",
+    "prop.map_revives": "Доступно воскрешений",
 
     "craft.can_modify": "Можно модифицировать",
     "craft.full": "Все аффиксы заняты",

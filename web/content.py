@@ -109,8 +109,10 @@ C["en"] = {
                "to catch the hotkey during a game - antivirus heuristics dislike "
                "both. The source is public if you would rather build it yourself.",
     "faq_4_q": "Which PoE version?",
-    "faq_4_a": "Path of Exile 1. PoE 2 uses a different trade API and is not "
-               "supported yet.",
+    "faq_4_a": "Path of Exile 1 by default, with new, experimental PoE 2 support - "
+               "pick the version in the setup wizard. PoE 2 uses a different trade "
+               "API, so mod matching and pricing work, but weapon/armour stats, "
+               "socket links and map properties are still Path of Exile 1 only.",
     "faq_5_q": "Can I just use Awakened PoE Trade instead?",
     "faq_5_a": "Not on Boosteroid or any other cloud gaming service - Awakened PoE "
                "Trade reads your local clipboard, and cloud gaming only syncs the "
@@ -240,8 +242,11 @@ C["pl"] = {
                "obu tych rzeczy. Kod źródłowy jest jawny, jeśli wolisz zbudować "
                "go samodzielnie.",
     "faq_4_q": "Która wersja PoE?",
-    "faq_4_a": "Path of Exile 1. PoE 2 ma inne API rynku i nie jest jeszcze "
-               "obsługiwane.",
+    "faq_4_a": "Domyślnie Path of Exile 1, z nowym, eksperymentalnym wsparciem "
+               "PoE 2 - wersję wybiera się w kreatorze. PoE 2 ma inne API rynku, "
+               "więc dopasowanie modów i wycena działają, ale statystyki broni/"
+               "pancerza, linki gniazd i właściwości map są na razie tylko dla "
+               "Path of Exile 1.",
     "faq_5_q": "Czy nie prościej użyć Awakened PoE Trade?",
     "faq_5_a": "Nie na Boosteroidzie ani żadnej innej chmurze - Awakened PoE Trade "
                "czyta lokalny schowek, a przy graniu w chmurze schowek "
@@ -374,8 +379,12 @@ C["de"] = {
                "Virenscanner-Heuristiken nicht. Der Quellcode ist offen, falls du "
                "lieber selbst baust.",
     "faq_4_q": "Welche PoE-Version?",
-    "faq_4_a": "Path of Exile 1. PoE 2 nutzt eine andere Handels-API und wird noch "
-               "nicht unterstützt.",
+    "faq_4_a": "Standardmäßig Path of Exile 1, mit neuer, experimenteller "
+               "PoE-2-Unterstützung - die Version wird im Einrichtungsassistenten "
+               "gewählt. PoE 2 nutzt eine andere Handels-API, daher funktionieren "
+               "Mod-Abgleich und Preisermittlung, aber Waffen-/Rüstungswerte, "
+               "Sockel-Verbindungen und Karteneigenschaften gibt es vorerst nur "
+               "für Path of Exile 1.",
     "faq_5_q": "Kann ich nicht einfach Awakened PoE Trade nutzen?",
     "faq_5_a": "Nicht bei Boosteroid oder einem anderen Cloud-Gaming-Dienst - "
                "Awakened PoE Trade liest die lokale Zwischenablage, und beim "
@@ -509,8 +518,12 @@ C["es"] = {
                "antivirus no les gusta ninguna de las dos cosas. El código es "
                "público si prefieres compilarlo tú.",
     "faq_4_q": "¿Qué versión de PoE?",
-    "faq_4_a": "Path of Exile 1. PoE 2 usa otra API de mercado y todavía no está "
-               "soportado.",
+    "faq_4_a": "Path of Exile 1 por defecto, con soporte nuevo y experimental "
+               "para PoE 2 - la versión se elige en el asistente de "
+               "configuración. PoE 2 usa otra API de mercado, así que el "
+               "emparejamiento de mods y la tasación funcionan, pero las "
+               "estadísticas de arma/armadura, los enlaces de engarces y las "
+               "propiedades de mapa son por ahora solo para Path of Exile 1.",
     "faq_5_q": "¿No puedo simplemente usar Awakened PoE Trade?",
     "faq_5_a": "No en Boosteroid ni en ningún otro servicio de juego en la nube - "
                "Awakened PoE Trade lee el portapapeles local, y al jugar en la "
@@ -643,8 +656,12 @@ C["pt"] = {
                "capturar o atalho durante o jogo - as heurísticas de antivírus não "
                "gostam de nenhum dos dois. O código é aberto, se preferir compilar.",
     "faq_4_q": "Qual versão do PoE?",
-    "faq_4_a": "Path of Exile 1. O PoE 2 usa outra API de mercado e ainda não é "
-               "suportado.",
+    "faq_4_a": "Path of Exile 1 por padrão, com suporte novo e experimental para "
+               "PoE 2 - a versão é escolhida no assistente de configuração. O "
+               "PoE 2 usa outra API de mercado, então a correspondência de mods e "
+               "a avaliação funcionam, mas estatísticas de arma/armadura, links "
+               "de encaixes e propriedades de mapa são, por enquanto, exclusivas "
+               "do Path of Exile 1.",
     "faq_5_q": "Não dá pra simplesmente usar o Awakened PoE Trade?",
     "faq_5_a": "Não no Boosteroid nem em outro serviço de jogo em nuvem - o "
                "Awakened PoE Trade lê a área de transferência local, e ao jogar "
@@ -777,8 +794,11 @@ C["ru"] = {
                "любят ни то, ни другое. Исходный код открыт, если предпочитаете "
                "собрать сами.",
     "faq_4_q": "Какая версия PoE?",
-    "faq_4_a": "Path of Exile 1. PoE 2 использует другое API рынка и пока не "
-               "поддерживается.",
+    "faq_4_a": "По умолчанию Path of Exile 1, с новой, экспериментальной "
+               "поддержкой PoE 2 - версия выбирается в мастере настройки. PoE 2 "
+               "использует другое API рынка, поэтому сопоставление модов и "
+               "оценка работают, но характеристики оружия/брони, линки гнёзд и "
+               "свойства карт пока доступны только для Path of Exile 1.",
     "faq_5_q": "Разве нельзя просто использовать Awakened PoE Trade?",
     "faq_5_a": "Не на Boosteroid и не на других облачных сервисах - Awakened PoE "
                "Trade читает локальный буфер обмена, а при облачном гейминге "

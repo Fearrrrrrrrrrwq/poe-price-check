@@ -1146,8 +1146,11 @@ class TradeClient:
         type_filters: dict[str, dict] = {}
         if rarity:
             type_filters["rarity"] = {"option": rarity}
-        if type_filters:
-            filters["type_filters"] = {"filters": type_filters}
+        # UWAGA: filters["type_filters"] przypisujemy dopiero na koncu funkcji,
+        # nie tutaj - dla PoE2 ilvl/quality doklejaja sie do tego samego
+        # slownika dalej nizej (patrz quality_target), a przypisanie w tym
+        # miejscu przegapialoby je za kazdym razem, gdy rarity jest puste
+        # (np. Gem, Currency) i type_filters bylby w tym momencie {}.
 
         is_poe2 = self.game == "poe2"
 
@@ -1239,6 +1242,8 @@ class TradeClient:
                 # dotyczy wylacznie PoE1.
                 maps[prop.key] = {"min": prop.value}
 
+        if type_filters:
+            filters["type_filters"] = {"filters": type_filters}
         if misc:
             filters["misc_filters"] = {"filters": misc}
         if sockets:

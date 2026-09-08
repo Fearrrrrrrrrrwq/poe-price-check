@@ -82,6 +82,26 @@ def read_clipboard_text(attempts: int = 5) -> str:
     return ""
 
 
+def clear_clipboard() -> bool:
+    """Czysci lokalny schowek. Uzywane przed sekwencja mostu (patrz bridge.py):
+
+    Boosteroid synchronizuje schowek CIAGLE i tylko w jedna strone (lokalnie ->
+    chmura), wiec cokolwiek siedzi lokalnie w chwili Ctrl+C w grze, jest juz w
+    schowku sesji chmurowej jako baza. Jesli Ctrl+C w grze z jakiegokolwiek
+    powodu nie zadziala (focus, timing), sekwencja i tak wklei do dokumentu
+    TO, co tam bylo wczesniej - u kogos, kto mial przed chwila skopiowany
+    link, dokladnie ten link, wygladajacy jak poprawny (ale bledny) wynik.
+    Czyszczenie na starcie sekwencji zamienia to na pusty wklejony tekst,
+    ktory nasz kod juz i tak rozpoznaje jako "nic nie przyszlo".
+    """
+    if not user32.OpenClipboard(None):
+        return False
+    try:
+        return bool(user32.EmptyClipboard())
+    finally:
+        user32.CloseClipboard()
+
+
 def foreground_hwnd() -> int:
     return int(user32.GetForegroundWindow() or 0)
 

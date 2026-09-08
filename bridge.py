@@ -17,7 +17,7 @@ from dataclasses import dataclass
 import requests
 
 import hotkeys
-from winutil import describe_foreground
+from winutil import clear_clipboard, describe_foreground
 
 GDOC_EXPORT = "https://docs.google.com/document/d/{doc_id}/export?format=txt"
 
@@ -256,6 +256,16 @@ class BoosteroidBridge:
 
         if verbose:
             print(f"  okno na wierzchu: {describe_foreground()}")
+
+        # Boosteroid synchronizuje schowek CIAGLE i tylko lokalnie -> chmura,
+        # wiec cokolwiek siedzialo tu lokalnie (np. skopiowany link) jest juz
+        # baza schowka sesji chmurowej. Jesli ponizszy ctrl+c w grze z
+        # jakiegokolwiek powodu nie zadziala (focus, timing), ctrl+v nizej
+        # wklei WLASNIE TO - starą, przypadkową tresc, ktora wyglada jak
+        # wynik, ale nim nie jest. Czyszczenie na starcie zamienia to na
+        # pusty tekst, ktory _poll_until_changed juz i tak traktuje jak brak.
+        stamp("czyszcze lokalny schowek")
+        clear_clipboard()
 
         stamp("ctrl+c - kopiuje przedmiot spod kursora")
         send_combo("ctrl+c", timing.key_hold_ms)

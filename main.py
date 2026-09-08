@@ -372,15 +372,27 @@ def pump_events(window: ResultWindow, checker: PriceChecker, status=None,
         # tworzyc spoza watku glownego - dlatego wynik odbieramy tutaj.
         # show_update() sam pilnuje, zeby pokazac pasek tylko raz, wiec nawet
         # gdyby sie wywrocil, kolejne obroty petli tego nie powtorza.
+        restarting = False
         try:
             if updates is not None and status is not None:
                 status.set_discord(updates.discord())
                 found = updates.result()
                 if found:
                     status.show_update(found["version"], found["url"])
+                pending_version = updates.restart_pending()
+                if pending_version:
+                    # Nowy .exe juz lezy obok starego, a .bat czeka tylko na
+                    # zamkniecie TEGO procesu (patrz updater._apply_update) -
+                    # window.root.quit() konczy mainloop tak samo jak przycisk
+                    # "Zakoncz", program zamyka sie normalnie, .bat dokonczy
+                    # podmiane i odpali nowa wersje sam.
+                    status.show_restarting(pending_version)
+                    window.root.after(1200, status.root.quit)
+                    restarting = True
         except Exception:  # noqa: BLE001 - powiadomienie nie moze ubic pompy
             traceback.print_exc()
-        window.root.after(60, pump_events, window, checker, status, updates)
+        if not restarting:
+            window.root.after(60, pump_events, window, checker, status, updates)
 
 
 def run_gui(config: dict, league: str) -> int:
@@ -410,12 +422,50 @@ def run_gui(config: dict, league: str) -> int:
         config["boosteroid_mode"] = enabled
         save_config(config)
 
+    # status.boosteroid_mode czytany W CHWILI wcisniecia skrotu, nie raz przy
+    # starcie - przelacznik w oknie dziala od razu, bez restartu programu.
+    # auto_copy=True w trybie lokalnym: glowny skrot ma dzialac "najedz i
+    # wcisnij", tak samo wygodnie jak tryb mostu, gdzie kopiowanie tez robi
+    # program. Wyodrebnione do nazwanej funkcji (nie lambda w miejscu
+    # rejestracji), zeby _change_hotkey() mogla ja ponownie przypiac pod
+    # nowa kombinacja bez duplikowania ciala.
+    def _price_check_hotkey() -> None:
+        checker.trigger(use_bridge=status.boosteroid_mode,
+                        auto_copy=not status.boosteroid_mode)
+
+    def _change_hotkey(new_combo: str) -> bool:
+        """Podmienia glowny skrot na zywo, bez restartu. True = udalo sie.
+
+        Nowa kombinacja rejestruje sie PRZED usunieciem starej - jesli sie
+        nie uda (zajety kod klawisza, zly format), stary skrot dalej dziala
+        zamiast zostawic uzytkownika bez zadnego dzialajacego skrotu.
+        """
+        nonlocal hotkey
+        new_combo = "+".join(
+            part.strip().lower() for part in new_combo.split("+") if part.strip()
+        )
+        if not new_combo or new_combo == hotkey:
+            return False
+        if new_combo in (local_hotkey, quit_hotkey):
+            return False  # kolidowalby z innym juz zajetym skrotem
+        try:
+            hotkeys.add_hotkey(new_combo, _price_check_hotkey)
+        except Exception:  # noqa: BLE001 - zly format/zajety kod klawisza
+            return False
+        hotkeys.remove_hotkey(hotkey)
+        hotkey = new_combo
+        config["hotkey"] = new_combo
+        save_config(config)
+        print(f"  {hotkey:<12} wycen przedmiot pod kursorem (przez Boosteroida) [zmieniono]")
+        return True
+
     status = StatusWindow(
         league=league,
         hotkeys={"hotkey": hotkey, "local": local_hotkey, "quit": quit_hotkey},
         on_quit=telemetry.stop,
         boosteroid_mode=bool(config.get("boosteroid_mode", True)),
         on_boosteroid_mode_change=_save_boosteroid_mode,
+        on_hotkey_change=_change_hotkey,
     )
     # Okno wyniku jest podrzedne wobec glownego - jeden obiekt Tk na proces.
     window = ResultWindow(
@@ -425,14 +475,7 @@ def run_gui(config: dict, league: str) -> int:
         close_on_focus_loss=config.get("close_on_focus_loss", True),
     )
 
-    # status.boosteroid_mode czytany W CHWILI wcisniecia skrotu, nie raz przy
-    # starcie - przelacznik w oknie dziala od razu, bez restartu programu.
-    # auto_copy=True w trybie lokalnym: glowny skrot ma dzialac "najedz i
-    # wcisnij", tak samo wygodnie jak tryb mostu, gdzie kopiowanie tez robi
-    # program. local_hotkey (Ctrl+Alt+D) zostaje bez auto-kopiowania - jego
-    # sens to wycena tego, co juz jest w schowku, nie jego odswiezanie.
-    hotkeys.add_hotkey(hotkey, lambda: checker.trigger(
-        use_bridge=status.boosteroid_mode, auto_copy=not status.boosteroid_mode))
+    hotkeys.add_hotkey(hotkey, _price_check_hotkey)
     hotkeys.add_hotkey(local_hotkey, lambda: checker.trigger(use_bridge=False))
     # Skrot leci z watku biblioteki keyboard, a Tk wolno dotykac tylko z watku
     # glownego - dlatego zamkniecie przekazujemy przez kolejke zdarzen Tk.

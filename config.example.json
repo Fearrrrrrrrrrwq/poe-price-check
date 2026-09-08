@@ -28,6 +28,10 @@
   "telemetry": true,
   "telemetry_url": "https://poepricecheck.eu/api/collect",
 
+  "_update_comment": "update_check=false wylacza sprawdzanie wersji w ogole. auto_update=false zostawia sam banner z linkiem do recznego pobrania (dziala wszedzie); auto_update=true (domyslnie) dodatkowo sciaga, sprawdza suma SHA-256 i podmienia .exe samo - dziala tylko w spakowanym buildzie na Windows, wszedzie indziej po cichu spada do samego bannera.",
+  "update_check": true,
+  "auto_update": true,
+
   "max_listings": 10,
   "_close_on_focus_loss_comment": "true = klikniecie poza okno je chowa. Ustaw false, jesli przeszkadza przy przechodzeniu do przegladarki.",
   "close_on_focus_loss": true,

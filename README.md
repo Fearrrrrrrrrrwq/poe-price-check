@@ -169,6 +169,21 @@ executable so you can check what you downloaded.
 How releases are approved and what would be signed:
 [SIGNING-POLICY.md](SIGNING-POLICY.md).
 
+### Updates
+
+On Windows, the app checks for a newer version on every launch and updates
+itself quietly in the background: it downloads the release archive, checks
+the SHA-256 published inside that same archive against what it downloaded,
+then swaps the executable and restarts once the old process has actually
+exited (a `.exe` can't be overwritten while it's still running, so a small
+helper script waits for that before moving anything). Any failure at any
+step — no network, a bad download, a failed check — falls back silently to
+just showing a banner with a link to the release page, same as before.
+Turn it off with `"auto_update": false` in `config.json` (or
+`"update_check": false` to disable checking entirely). macOS and dev runs
+from source always fall back to the banner — the file layout there doesn't
+support this kind of in-place swap the same way.
+
 ## Licence
 
 MIT — see [LICENSE](LICENSE).

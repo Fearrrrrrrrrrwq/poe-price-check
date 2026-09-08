@@ -69,6 +69,19 @@ def read_clipboard_text(attempts: int = 5) -> str:
     return ""
 
 
+def clear_clipboard() -> bool:
+    """Czysci schowek przez `pbcopy` z pustym wejsciem - patrz uzasadnienie w
+    winutil_windows.clear_clipboard (ten sam problem: Boosteroid synchronizuje
+    schowek ciagle i tylko lokalnie -> chmura)."""
+    try:
+        result = subprocess.run(
+            ["pbcopy"], input="", text=True, timeout=TIMEOUT,
+        )
+        return result.returncode == 0
+    except (OSError, subprocess.SubprocessError):
+        return False
+
+
 def foreground_hwnd() -> int:
     """Zwraca PID procesu na pierwszym planie - to nasz odpowiednik HWND-a."""
     out = _osascript(

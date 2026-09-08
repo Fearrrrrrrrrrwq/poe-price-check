@@ -37,6 +37,10 @@ STRINGS["en"] = {
     "app.price_check": "price check an item",
     "app.other_hotkeys": "OTHER SHORTCUTS",
     "app.hk_clipboard": "price check clipboard",
+    "app.hk_save": "Save",
+    "app.hk_cancel": "Cancel",
+    "app.hk_invalid": "That combo didn't work - try something like ctrl+d, or "
+                      "pick one not already used by another shortcut.",
     "app.hk_close": "close result window",
     "app.hk_quit": "quit the program",
     "app.minimise": "You can minimise this -\nshortcuts keep working.",
@@ -48,6 +52,7 @@ STRINGS["en"] = {
                                   "cursor and checks it directly.",
     "app.league_local": "league {league}  ·  local mode",
     "update.available": "Version {version} is available",
+    "update.restarting": "Updating to {version} - restarting...",
     "update.current": "You are running {version}",
     "update.open": "See what changed",
 
@@ -203,6 +208,10 @@ STRINGS["pl"] = {
     "app.price_check": "wyceń przedmiot",
     "app.other_hotkeys": "POZOSTAŁE SKRÓTY",
     "app.hk_clipboard": "wyceń zawartość schowka",
+    "app.hk_save": "Zapisz",
+    "app.hk_cancel": "Anuluj",
+    "app.hk_invalid": "Ta kombinacja nie zadziałała - spróbuj np. ctrl+d albo "
+                      "wybierz taką, która nie jest już zajęta przez inny skrót.",
     "app.hk_close": "zamknij okno wyniku",
     "app.hk_quit": "zakończ program",
     "app.minimise": "Możesz zminimalizować -\nskróty działają w tle.",
@@ -214,6 +223,7 @@ STRINGS["pl"] = {
                                   "kursorem i od razu go wycenia.",
     "app.league_local": "liga {league}  ·  tryb lokalny",
     "update.available": "Dostępna jest wersja {version}",
+    "update.restarting": "Aktualizuję do {version} - restart...",
     "update.current": "Używasz wersji {version}",
     "update.open": "Zobacz, co się zmieniło",
 
@@ -363,6 +373,11 @@ STRINGS["de"] = {
     "app.price_check": "Gegenstand prüfen",
     "app.other_hotkeys": "WEITERE TASTENKÜRZEL",
     "app.hk_clipboard": "Zwischenablage prüfen",
+    "app.hk_save": "Speichern",
+    "app.hk_cancel": "Abbrechen",
+    "app.hk_invalid": "Diese Kombination hat nicht funktioniert - versuche z. B. "
+                      "ctrl+d, oder wähle eine, die nicht schon von einem "
+                      "anderen Shortcut belegt ist.",
     "app.hk_close": "Ergebnisfenster schließen",
     "app.hk_quit": "Programm beenden",
     "app.minimise": "Du kannst minimieren -\ndie Tastenkürzel laufen weiter.",
@@ -374,6 +389,7 @@ STRINGS["de"] = {
                                   "Cursor und prüft ihn direkt.",
     "app.league_local": "Liga {league}  ·  lokaler Modus",
     "update.available": "Version {version} ist verfügbar",
+    "update.restarting": "Aktualisiere auf {version} - Neustart...",
     "update.current": "Du nutzt Version {version}",
     "update.open": "Änderungen ansehen",
 
@@ -527,6 +543,10 @@ STRINGS["es"] = {
     "app.price_check": "consultar objeto",
     "app.other_hotkeys": "OTROS ATAJOS",
     "app.hk_clipboard": "consultar portapapeles",
+    "app.hk_save": "Guardar",
+    "app.hk_cancel": "Cancelar",
+    "app.hk_invalid": "Esa combinación no funcionó - prueba algo como ctrl+d, o "
+                      "elige una que no esté ya usada por otro atajo.",
     "app.hk_close": "cerrar ventana de resultado",
     "app.hk_quit": "salir del programa",
     "app.minimise": "Puedes minimizar -\nlos atajos siguen activos.",
@@ -538,6 +558,7 @@ STRINGS["es"] = {
                                   "cursor y lo consulta directamente.",
     "app.league_local": "liga {league}  ·  modo local",
     "update.available": "La versión {version} está disponible",
+    "update.restarting": "Actualizando a {version} - reiniciando...",
     "update.current": "Estás usando la versión {version}",
     "update.open": "Ver los cambios",
 
@@ -691,6 +712,11 @@ STRINGS["pt"] = {
     "app.price_check": "consultar item",
     "app.other_hotkeys": "OUTROS ATALHOS",
     "app.hk_clipboard": "consultar área de transferência",
+    "app.hk_save": "Salvar",
+    "app.hk_cancel": "Cancelar",
+    "app.hk_invalid": "Essa combinação não funcionou - tente algo como ctrl+d, "
+                      "ou escolha uma que ainda não esteja em uso por outro "
+                      "atalho.",
     "app.hk_close": "fechar janela de resultado",
     "app.hk_quit": "encerrar o programa",
     "app.minimise": "Você pode minimizar -\nos atalhos continuam funcionando.",
@@ -702,6 +728,7 @@ STRINGS["pt"] = {
                                   "cursor e o avalia diretamente.",
     "app.league_local": "liga {league}  ·  modo local",
     "update.available": "A versão {version} está disponível",
+    "update.restarting": "Atualizando para {version} - reiniciando...",
     "update.current": "Você está usando a versão {version}",
     "update.open": "Ver o que mudou",
 
@@ -854,6 +881,11 @@ STRINGS["ru"] = {
     "app.price_check": "оценить предмет",
     "app.other_hotkeys": "ОСТАЛЬНЫЕ СОЧЕТАНИЯ",
     "app.hk_clipboard": "оценить из буфера обмена",
+    "app.hk_save": "Сохранить",
+    "app.hk_cancel": "Отмена",
+    "app.hk_invalid": "Эта комбинация не сработала - попробуйте что-то вроде "
+                      "ctrl+d, или выберите ту, что не занята другим "
+                      "сочетанием.",
     "app.hk_close": "закрыть окно результата",
     "app.hk_quit": "выйти из программы",
     "app.minimise": "Можно свернуть -\nсочетания работают в фоне.",
@@ -865,6 +897,7 @@ STRINGS["ru"] = {
                                   "его оценивает.",
     "app.league_local": "лига {league}  ·  локальный режим",
     "update.available": "Доступна версия {version}",
+    "update.restarting": "Обновляю до {version} - перезапуск...",
     "update.current": "У вас версия {version}",
     "update.open": "Что изменилось",
 

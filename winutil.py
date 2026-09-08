@@ -11,6 +11,7 @@ import sys
 
 if sys.platform == "darwin":
     from winutil_macos import (
+        clear_clipboard,
         describe_foreground,
         foreground_hwnd,
         foreground_process_name,
@@ -24,6 +25,7 @@ if sys.platform == "darwin":
     )
 elif sys.platform.startswith("win"):
     from winutil_windows import (
+        clear_clipboard,
         describe_foreground,
         foreground_hwnd,
         foreground_process_name,
@@ -42,6 +44,7 @@ else:
     )
 
 __all__ = [
+    "clear_clipboard",
     "describe_foreground",
     "foreground_hwnd",
     "foreground_process_name",

@@ -103,9 +103,11 @@ _MODIFIER_BIT = {
     "windows": cmdKey, "cmd": cmdKey,
 }
 
-# Referencje trzymane, zeby PyObjC/Carbon nie zwolnily rejestracji hotkeya
-# po tym, jak lokalna zmienna w add_hotkey() wyjdzie poza zasieg.
-_registered: list = []
+# Uchwyty per kombinacja, kluczowane surowym stringiem - quickHotKey() zwraca
+# funkcje z doklejonymi .register()/.unregister() (patrz zrodlo pakietu:
+# quickmachotkey/__init__.py, klasa Registerable), a nie osobny obiekt, wiec
+# to WYSTARCZY trzymac zamiast reczne zarzadzac Carbon HotKeyRef.
+_registered: dict[str, object] = {}
 
 
 def add_hotkey(combo: str, callback) -> None:
@@ -122,7 +124,13 @@ def add_hotkey(combo: str, callback) -> None:
     handler = quickHotKey(virtualKey=virtual_key, modifierMask=modifier_mask)(
         lambda: callback()
     )
-    _registered.append(handler)
+    _registered[combo] = handler
+
+
+def remove_hotkey(combo: str) -> None:
+    handler = _registered.pop(combo, None)
+    if handler is not None:
+        handler.unregister()
 
 
 # --- wysylanie/trzymanie klawiszy (CGEvent, bezposrednio przez ctypes) -----

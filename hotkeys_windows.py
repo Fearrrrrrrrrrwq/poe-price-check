@@ -9,9 +9,21 @@ implementacji, bo `keyboard` tam nie dziala, patrz docstring hotkeys_macos.py).
 
 import keyboard as _keyboard
 
+# Uchwyty z add_hotkey trzymane per kombinacja - remove_hotkey() woli je od
+# ponownego parsowania stringa przez _keyboard, ktore przy niestandardowej
+# kolejnosci modyfikatorow moglo trafic w inny wewnetrzny klucz niz ten,
+# ktorym program faktycznie zarejestrowal skrot.
+_handlers: dict[str, object] = {}
+
 
 def add_hotkey(combo: str, callback) -> None:
-    _keyboard.add_hotkey(combo, callback)
+    _handlers[combo] = _keyboard.add_hotkey(combo, callback)
+
+
+def remove_hotkey(combo: str) -> None:
+    handler = _handlers.pop(combo, None)
+    if handler is not None:
+        _keyboard.remove_hotkey(handler)
 
 
 def send(combo: str) -> None:

@@ -10,9 +10,9 @@ import webbrowser
 import theme
 from i18n import t
 from paths import APP_VERSION
-from theme import (BG, BG_PANEL, FG, FG_ACCENT, FG_MUTED, FG_OK, FG_TITLE,
-                   FONT_BIG, FONT_BODY, FONT_LABEL, FONT_SMALL, FONT_TITLE,
-                   GAP, PAD, TIGHT)
+from theme import (BG, BG_PANEL, FG, FG_ACCENT, FG_ERROR, FG_MUTED, FG_OK,
+                   FG_TITLE, FONT_BIG, FONT_BODY, FONT_LABEL, FONT_SMALL,
+                   FONT_TITLE, GAP, PAD, TIGHT)
 
 
 # Zaproszenie na Discorda. To jest adres ZAPASOWY - wlasciwy przychodzi z
@@ -25,7 +25,8 @@ class StatusWindow:
     """Glowne okno aplikacji. Trzyma obiekt Tk, reszta okien jest podrzedna."""
 
     def __init__(self, league: str, hotkeys: dict, on_quit=None,
-                 boosteroid_mode: bool = True, on_boosteroid_mode_change=None) -> None:
+                 boosteroid_mode: bool = True, on_boosteroid_mode_change=None,
+                 on_hotkey_change=None) -> None:
         self.on_quit = on_quit
         self._checks = 0
         self._discord_url = DISCORD_URL
@@ -37,6 +38,12 @@ class StatusWindow:
         # Pisany jest tylko z watku glownego (komenda checkboxa).
         self.boosteroid_mode = boosteroid_mode
         self._on_boosteroid_mode_change = on_boosteroid_mode_change
+        # Wywolywane z UI edycji glownego skrotu - main.py rejestruje nowa
+        # kombinacje, usuwa stara i zapisuje config, zwracajac True/False.
+        # Bez tego zmiana skrotu wymagalaby edycji config.json na piechote
+        # i restartu programu.
+        self._on_hotkey_change = on_hotkey_change
+        self._hotkey_editing = False
 
         self.root = tk.Tk()
         self.root.title("PoE Price Check")
@@ -95,11 +102,34 @@ class StatusWindow:
 
         main_card = theme.card(stats, accent=FG_ACCENT)
         main_card.pack(side="left", fill="both", expand=True, padx=(GAP, 0))
-        theme.keycap(main_card.body, hotkeys.get("hotkey", "ctrl+d")).pack(
-            anchor="w", padx=12, pady=(12, 0))
+        key_row = tk.Frame(main_card.body, bg=BG_PANEL)
+        key_row.pack(fill="x", padx=12, pady=(12, 0))
+        self._hotkey_keycap = theme.keycap(key_row, self._main_hotkey)
+        self._hotkey_keycap.pack(side="left")
+        # Olowek do edycji skrotu - tylko gdy main.py w ogole podal callback
+        # (tryby uzycia programu bez petli Tk, np. --paste, go nie potrzebuja).
+        if self._on_hotkey_change is not None:
+            edit_btn = tk.Label(key_row, text="✎", font=FONT_LABEL, fg=FG_MUTED,
+                                bg=BG_PANEL, cursor="hand2")
+            edit_btn.pack(side="left", padx=(6, 0))
+            edit_btn.bind("<Button-1>", lambda _e: self._toggle_hotkey_edit())
         tk.Label(main_card.body, text=t("app.price_check"), font=FONT_LABEL,
                  fg=FG_MUTED, bg=BG_PANEL, anchor="w").pack(fill="x", padx=12,
                                                             pady=(5, 11))
+
+        # --- edycja glownego skrotu (schowana, dopoki ktos nie kliknie olowka) --
+        self._hotkey_edit_row = tk.Frame(outer, bg=BG)
+        self._hotkey_var = tk.StringVar(value=self._main_hotkey)
+        theme.entry(self._hotkey_edit_row, self._hotkey_var, width=14).pack(
+            side="left")
+        theme.button(self._hotkey_edit_row, t("app.hk_save"),
+                     self._save_hotkey_edit, primary=True).pack(
+            side="left", padx=(TIGHT + 2, 0))
+        theme.button(self._hotkey_edit_row, t("app.hk_cancel"),
+                     self._cancel_hotkey_edit).pack(side="left", padx=(TIGHT, 0))
+        self._hotkey_error = tk.Label(outer, text="", font=FONT_LABEL,
+                                      fg=FG_ERROR, bg=BG, anchor="w",
+                                      justify="left", wraplength=300)
 
         # --- przelacznik trybu Boosteroid --------------------------------
         #
@@ -115,9 +145,11 @@ class StatusWindow:
             toggle_row, t("app.boosteroid_toggle"), self._boosteroid_var,
             command=self._on_toggle_boosteroid,
         ).pack(anchor="w")
-        tk.Label(outer, text=t("app.boosteroid_toggle_note", hotkey=self._main_hotkey),
-                 font=FONT_LABEL, fg=FG_MUTED, bg=BG, anchor="w", justify="left",
-                 wraplength=300).pack(fill="x", pady=(0, GAP + 2))
+        self._toggle_note = tk.Label(
+            outer, text=t("app.boosteroid_toggle_note", hotkey=self._main_hotkey),
+            font=FONT_LABEL, fg=FG_MUTED, bg=BG, anchor="w", justify="left",
+            wraplength=300)
+        self._toggle_note.pack(fill="x", pady=(0, GAP + 2))
 
         # --- pozostale skroty ------------------------------------------------
         tk.Label(outer, text=t("app.other_hotkeys"), font=FONT_LABEL, fg=FG_MUTED,
@@ -163,6 +195,46 @@ class StatusWindow:
         if self._on_boosteroid_mode_change:
             self._on_boosteroid_mode_change(self.boosteroid_mode)
 
+    # ------------------------------------------------------- edycja skrotu
+
+    def _toggle_hotkey_edit(self) -> None:
+        if self._hotkey_editing:
+            self._cancel_hotkey_edit()
+            return
+        self._hotkey_var.set(self._main_hotkey)
+        self._hotkey_error.config(text="")
+        self._hotkey_edit_row.pack(fill="x", pady=(0, GAP))
+        self._hotkey_editing = True
+        self.root.update_idletasks()
+        self._centre()
+
+    def _cancel_hotkey_edit(self) -> None:
+        self._hotkey_edit_row.pack_forget()
+        self._hotkey_error.pack_forget()
+        self._hotkey_error.config(text="")
+        self._hotkey_editing = False
+        self.root.update_idletasks()
+        self._centre()
+
+    def _save_hotkey_edit(self) -> None:
+        if self._on_hotkey_change is None:
+            return
+        new_combo = self._hotkey_var.get()
+        if not self._on_hotkey_change(new_combo):
+            self._hotkey_error.config(text=t("app.hk_invalid"))
+            self._hotkey_error.pack(fill="x", before=self._hotkey_edit_row,
+                                    pady=(0, TIGHT))
+            self.root.update_idletasks()
+            self._centre()
+            return
+        self._main_hotkey = "+".join(
+            part.strip().lower() for part in new_combo.split("+") if part.strip()
+        )
+        self._hotkey_keycap.config(text=self._main_hotkey.upper())
+        self._toggle_note.config(
+            text=t("app.boosteroid_toggle_note", hotkey=self._main_hotkey))
+        self._cancel_hotkey_edit()
+
     # ---------------------------------------------------------------- widok
 
     def _centre(self) -> None:
@@ -179,8 +251,12 @@ class StatusWindow:
     def show_update(self, version: str, url: str) -> None:
         """Pokazuje pasek 'jest nowsza wersja'. Wywolywac tylko z watku Tk.
 
-        Program niczego nie pobiera ani nie podmienia sam - przycisk tylko
-        otwiera strone wydania w przegladarce. Patrz updater.py.
+        To jest FALLBACK: kiedy auto-aktualizacja (updater.py) sie uda,
+        program zamyka sie i restartuje sam, ten pasek nigdy sie nie pokaze.
+        Widac go tylko gdy cicha podmiana z jakiegokolwiek powodu nie wyszla
+        (inny system niz Windows, dev-run z Pythona, wylaczone w configu,
+        problem z siecia/suma kontrolna) - wtedy przycisk otwiera strone
+        wydania w przegladarce, pobranie zostaje swiadoma decyzja czlowieka.
         """
         if self._update_info is not None:
             return  # pasek juz wisi, drugi raz nie ma czego pokazywac
@@ -206,6 +282,13 @@ class StatusWindow:
         self._update_holder.pack(fill="x", pady=(GAP + 2, 0), before=self._first_card)
         self.root.update_idletasks()
         self._centre()
+
+    def show_restarting(self, version: str) -> None:
+        """Program wlasnie zamyka sie, zeby .bat mogl podmienic .exe i odpalic
+        go ponownie (patrz updater._apply_update) - to jedyna informacja,
+        jaka uzytkownik dostaje w tej chwili, wiec ma byc jednoznaczna."""
+        self.state.config(text=t("update.restarting", version=version))
+        self.dot.config(fg=FG_ACCENT)
 
     def set_checks(self, count: int) -> None:
         if count != self._checks:

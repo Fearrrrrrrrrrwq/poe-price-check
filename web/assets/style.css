@@ -266,6 +266,11 @@ footer { border-top: 1px solid var(--border); padding: 32px 0 44px; background: 
 }
 .langlist a:hover { background: var(--raise); }
 
+/* Definicje gradientow dla slupkow wykresu - svg 0x0 z <defs>, referowane
+   przez fill:url(#...) w reszcie strony. position:absolute zamiast atrybutu
+   style="", bo CSP panelu admina blokuje style w atrybutach. */
+.visually-hidden { position: absolute; }
+
 /* --- panel administracyjny --------------------------------------------------- */
 .admin { padding: 36px 0 64px; }
 /* Na waskim ekranie znacznik czasu i login spychaly przycisk wylogowania poza
@@ -310,12 +315,19 @@ footer { border-top: 1px solid var(--border); padding: 32px 0 44px; background: 
 
 /* Ostrzezenie o bledach - jedyny element, ktory ma prawo krzyczec. */
 .alert {
+  display: flex; gap: 12px; align-items: flex-start;
   border-radius: var(--radius); padding: 14px 18px; margin-bottom: 22px;
   border: 1px solid; font-size: 14.5px; line-height: 1.55;
+  box-shadow: 0 12px 26px -20px rgba(0, 0, 0, .8);
+}
+.alert::before {
+  flex: none; font-size: 16px; line-height: 1; margin-top: 1px;
 }
 .alert strong { font-weight: 700; }
 .alert.warn { border-color: #7a6320; background: #241d0d; color: #e0c163; }
+.alert.warn::before { content: "⚠"; }
 .alert.danger { border-color: #7a3327; background: #251310; color: #e09080; }
+.alert.danger::before { content: "⛔"; }
 
 /* Pasek narzedzi: zakladki i zakres w jednym rzedzie. Trzyma sie gory przy
    przewijaniu, zeby przy dlugiej liscie rozkladow nie trzeba bylo wracac. */
@@ -364,28 +376,35 @@ footer { border-top: 1px solid var(--border); padding: 32px 0 44px; background: 
   position: relative; overflow: hidden;
   background: linear-gradient(160deg, var(--panel), var(--bg));
   border: 1px solid var(--border); border-radius: 14px; padding: 18px 20px;
-  display: flex; flex-direction: column; gap: 5px;
-  transition: border-color .15s, transform .15s;
+  display: flex; flex-direction: column; gap: 6px;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .02) inset, 0 10px 24px -18px rgba(0, 0, 0, .7);
+  transition: border-color .18s, transform .18s, box-shadow .18s;
 }
-.tile:hover { border-color: #4a4133; transform: translateY(-1px); }
+.tile:hover {
+  border-color: #4a4133; transform: translateY(-2px);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, .03) inset, 0 16px 28px -16px rgba(0, 0, 0, .8);
+}
 /* Cienka kreska u gory - drobiazg, ale kafelki przestaja byc plaskimi pudelkami. */
 .tile::before {
   content: ""; position: absolute; inset: 0 0 auto 0; height: 1px;
-  background: linear-gradient(90deg, transparent, rgba(201, 162, 39, .35), transparent);
+  background: linear-gradient(90deg, transparent, rgba(201, 162, 39, .4), transparent);
 }
 .tile-label { font-size: 11px; text-transform: uppercase; letter-spacing: .08em;
               color: var(--muted); font-weight: 700; }
 .tile b {
-  font-size: 32px; color: var(--title); font-weight: 600; line-height: 1.1;
+  font-size: 33px; color: var(--title); font-weight: 650; line-height: 1.15;
   font-variant-numeric: tabular-nums; letter-spacing: -.02em;
+  text-shadow: 0 0 24px rgba(244, 224, 175, .12);
 }
 .tile b.warn { color: #e0c163; }
 .tile b.bad { color: #e09080; }
 .tile-note { font-size: 12.5px; color: var(--muted); }
 
 .card {
-  background: var(--panel); border: 1px solid var(--border);
+  background: linear-gradient(175deg, var(--panel), var(--band));
+  border: 1px solid var(--border);
   border-radius: 14px; padding: 24px; margin-bottom: 16px;
+  box-shadow: 0 14px 30px -22px rgba(0, 0, 0, .75);
 }
 .splits {
   display: grid; gap: 16px;
@@ -408,20 +427,24 @@ footer { border-top: 1px solid var(--border); padding: 32px 0 44px; background: 
 .legend { display: flex; align-items: center; gap: 8px; margin: -8px 0 14px;
           font-size: 12.5px; color: var(--muted); }
 .key { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
-.key-users, .key-checks { background: #5c7f9e; }
-.key-fresh { background: var(--accent); }
-.key-fail { background: #b5544a; }
+.key-users, .key-checks { background: linear-gradient(160deg, #6f97b8, #4d6c88); }
+.key-fresh { background: linear-gradient(160deg, var(--accent-hi), #a8871f); }
+.key-fail { background: linear-gradient(160deg, #c96658, #93392e); }
 .legend .key:not(:first-child) { margin-left: 10px; }
 
 /* Wykres skaluje sie proporcjonalnie przez viewBox - wysokosc wynika
    z szerokosci karty, wiec napisy nie sa sciesnione. */
 .chart svg { display: block; width: 100%; height: auto; }
-.grid { stroke: var(--border); stroke-width: 1; }
+.grid { stroke: var(--border); stroke-width: 1; stroke-dasharray: 2 4; opacity: .8; }
 .axis { fill: var(--muted); font-size: 11px; text-anchor: middle; }
-.peak { text-anchor: start; }
-.bar-main { fill: #5c7f9e; }
-.bar-accent { fill: var(--accent); }
-.bar-bad { fill: #b5544a; }
+.peak { text-anchor: start; font-weight: 600; letter-spacing: .02em; }
+.bar-main { fill: url(#bar-main-grad); }
+.bar-accent { fill: url(#bar-accent-grad); }
+.bar-bad { fill: url(#bar-bad-grad); }
+.bar-main, .bar-accent, .bar-bad { transition: opacity .12s; }
+.chart svg:hover .bar-main:not(:hover),
+.chart svg:hover .bar-accent:not(:hover),
+.chart svg:hover .bar-bad:not(:hover) { opacity: .82; }
 
 .bar-row {
   display: grid; grid-template-columns: minmax(90px, 1fr) 2fr auto;

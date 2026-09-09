@@ -519,6 +519,23 @@ def admin_page() -> str:
   </div>
 </header>
 
+<svg width="0" height="0" class="visually-hidden" aria-hidden="true">
+  <defs>
+    <linearGradient id="bar-main-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#7fa3c4"/>
+      <stop offset="100%" stop-color="#4d6c88"/>
+    </linearGradient>
+    <linearGradient id="bar-accent-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#e6bd3a"/>
+      <stop offset="100%" stop-color="#a8871f"/>
+    </linearGradient>
+    <linearGradient id="bar-bad-grad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#d47c6e"/>
+      <stop offset="100%" stop-color="#93392e"/>
+    </linearGradient>
+  </defs>
+</svg>
+
 <main class="wrap wide admin">
 
   <div id="board">

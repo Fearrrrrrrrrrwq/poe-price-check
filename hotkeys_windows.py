@@ -30,6 +30,12 @@ def send(combo: str) -> None:
     _keyboard.send(combo)
 
 
+def write(text: str) -> None:
+    """Wpisuje tekst znak po znaku - do makr czatu ('/hideout' itp.), nie do
+    skrotow (te ida przez send())."""
+    _keyboard.write(text)
+
+
 def press(key: str) -> None:
     _keyboard.press(key)
 

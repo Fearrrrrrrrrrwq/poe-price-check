@@ -505,9 +505,11 @@ def run_gui(config: dict, league: str) -> int:
 
         threading.Thread(target=job, daemon=True).start()
 
+    chat_macros: dict[str, str] = config.get("chat_macros", {"f5": "/hideout"})
     status = StatusWindow(
         league=league,
-        hotkeys={"hotkey": hotkey, "local": local_hotkey, "quit": quit_hotkey},
+        hotkeys={"hotkey": hotkey, "local": local_hotkey, "quit": quit_hotkey,
+                "macros": chat_macros},
         on_quit=telemetry.stop,
         boosteroid_mode=bool(config.get("boosteroid_mode", True)),
         on_boosteroid_mode_change=_save_boosteroid_mode,
@@ -529,9 +531,26 @@ def run_gui(config: dict, league: str) -> int:
     # glownego - dlatego zamkniecie przekazujemy przez kolejke zdarzen Tk.
     hotkeys.add_hotkey(quit_hotkey, lambda: status.root.after(0, status.root.quit))
 
+    # Makra czatu (np. F5 -> /hideout) - w odroznieniu od price checka nie
+    # potrzebuja mostu: klawisze (w odroznieniu od schowka) i tak leca live
+    # do sesji w chmurze, wiec samo "Enter, wpisz komende, Enter" dziala
+    # identycznie lokalnie i na Boosteroidzie. Malutkie opoznienia, zeby gra
+    # zdazyla otworzyc pole czatu, zanim zaczniemy pisac.
+    def _chat_macro(command: str) -> None:
+        hotkeys.send("enter")
+        time.sleep(0.1)
+        hotkeys.write(command)
+        time.sleep(0.05)
+        hotkeys.send("enter")
+
+    for macro_key, macro_command in chat_macros.items():
+        hotkeys.add_hotkey(macro_key, lambda cmd=macro_command: _chat_macro(cmd))
+
     print(f"  {hotkey:<12} wycen przedmiot pod kursorem (przez Boosteroida)")
     print(f"  {local_hotkey:<12} wycen zawartosc lokalnego schowka")
     print(f"  {quit_hotkey:<12} wyjscie")
+    for macro_key, macro_command in chat_macros.items():
+        print(f"  {macro_key:<12} wysyla '{macro_command}' na czacie")
     print("Gotowe.")
 
     updates = UpdateCheck(config, APP_VERSION, config.get("user_agent", ""))

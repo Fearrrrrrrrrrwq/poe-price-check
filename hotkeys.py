@@ -12,14 +12,14 @@ import sys
 
 if sys.platform == "darwin":
     from hotkeys_macos import (add_hotkey, is_pressed, press, release,
-                               remove_hotkey, send)
+                               remove_hotkey, send, write)
 elif sys.platform.startswith("win"):
     from hotkeys_windows import (add_hotkey, is_pressed, press, release,
-                                 remove_hotkey, send)
+                                 remove_hotkey, send, write)
 else:
     raise SystemExit(
         f"poe-price-check nie wspiera systemu {sys.platform!r}. "
         f"Obslugiwane: Windows i macOS."
     )
 
-__all__ = ["add_hotkey", "is_pressed", "press", "release", "remove_hotkey", "send"]
+__all__ = ["add_hotkey", "is_pressed", "press", "release", "remove_hotkey", "send", "write"]

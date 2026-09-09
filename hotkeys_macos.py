@@ -54,6 +54,7 @@ pierwsze miejsce do sprawdzenia.
 
 import ctypes
 import ctypes.util
+import time
 
 from quickmachotkey import mask, quickHotKey
 from quickmachotkey.constants import cmdKey, controlKey, optionKey, shiftKey
@@ -75,6 +76,9 @@ _VK: dict[str, int] = {
     "tab": 0x30, "enter": 0x24, "return": 0x24, "esc": 0x35, "escape": 0x35,
     "space": 0x31, "backspace": 0x33, "delete": 0x75,
     "left": 0x7B, "right": 0x7C, "up": 0x7E, "down": 0x7D,
+    # Sama ukosna kreska - jedyny znak spoza liter/cyfr potrzebny do komend
+    # czatu w grze ('/hideout' itp.), patrz write() nizej.
+    "/": 0x2C,
     # Modyfikatory - traktowane jak kazdy inny klawisz, bo bridge.py
     # wysyla je jako osobne zdarzenia keyDown/keyUp, nie jako maske
     # (patrz send_combo() w bridge.py - trzymanie z jawna pauza).
@@ -188,6 +192,16 @@ def send(combo: str) -> None:
         _post_key(virtual_key, True)
     for virtual_key in reversed(keys):
         _post_key(virtual_key, False)
+
+
+def write(text: str) -> None:
+    """Wpisuje tekst znak po znaku - do makr czatu ('/hideout' itp.). Tylko
+    male litery/cyfry/'/' - wystarcza do komend czatu, nie jest to ogolny
+    zamiennik klawiatury (nie obsluguje Shift/wielkich liter/reszty symboli)."""
+    for char in text.lower():
+        _post_key(_vk_for(char), True)
+        _post_key(_vk_for(char), False)
+        time.sleep(0.03)
 
 
 def is_pressed(key: str) -> bool:

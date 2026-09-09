@@ -175,10 +175,16 @@ class StatusWindow:
         # --- pozostale skroty ------------------------------------------------
         tk.Label(outer, text=t("app.other_hotkeys"), font=FONT_LABEL, fg=FG_MUTED,
                  bg=BG, anchor="w").pack(fill="x", pady=(0, TIGHT + 1))
+        # Makra czatu (np. F5 -> /hideout) dochodza z configu, wiec lista nie
+        # jest stala jak reszta - ktos moze ich miec zero albo pieć.
+        macro_rows = [
+            (key, command) for key, command in hotkeys.get("macros", {}).items()
+        ]
         for key, description in (
             (hotkeys.get("local", "ctrl+alt+d"), t("app.hk_clipboard")),
             ("Esc", t("app.hk_close")),
             (hotkeys.get("quit", "ctrl+alt+q"), t("app.hk_quit")),
+            *macro_rows,
         ):
             row = tk.Frame(outer, bg=BG)
             row.pack(fill="x", pady=1)

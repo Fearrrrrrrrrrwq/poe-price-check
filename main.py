@@ -221,7 +221,8 @@ class PriceChecker:
             options, properties = [], []
         self.events.put(("result", item, result, options, properties, changed))
 
-    def research(self, options: list, properties: list) -> None:
+    def research(self, options: list, properties: list,
+                any_base: bool = False) -> None:
         """Powtarza wyszukiwanie po zmianie filtrow w oknie."""
         if self._last_item is None:
             return
@@ -233,7 +234,7 @@ class PriceChecker:
                 self.events.put(("status", "Szukam ponownie..."))
                 result = self.client.price_check(
                     self._last_item, self.config.get("max_listings", 10),
-                    options, self._last_unmatched, properties,
+                    options, self._last_unmatched, properties, any_base=any_base,
                 )
                 self.events.put((
                     "result", self._last_item, result, options, properties, True,

@@ -211,6 +211,9 @@ class ResultWindow:
         self._last_item = None
         self._was_focused = False
         self._styled = False
+        # "dowolna baza" - wycen same mody, bez zawezania do typu przedmiotu.
+        # Zerowane przy kazdym nowym przedmiocie (patrz show_result).
+        self._any_base = False
 
         # Okno podrzedne, nie drugi obiekt Tk - dwa rooty w jednym procesie to
         # prosta droga do zawieszen, zwlaszcza przy dostepie z watkow roboczych.
@@ -353,6 +356,7 @@ class ResultWindow:
         self._clear()
         if item is not self._last_item:
             self._show_hidden = False  # nowy przedmiot zaczyna zwiniety
+            self._any_base = False     # ...i z wlaczonym zawezaniem do bazy
             self._last_item = item
         self._options = options or []
         self._properties = properties or []
@@ -493,6 +497,13 @@ class ResultWindow:
                                    (t("res.all"), lambda: self._set_all(True)),
                                    (t("res.none"), lambda: self._set_all(False))):
                 theme.button(self.buttons, label, command).pack(side="left", padx=(TIGHT, 0))
+            # "Dowolna baza" - checkbox, nie przycisk: to zmiana zakresu
+            # wyszukiwania, ktora obowiazuje przy nastepnym "Szukaj ponownie",
+            # a nie akcja do wykonania od razu.
+            self._any_base_var = tk.BooleanVar(value=self._any_base)
+            theme.checkbox(self.buttons, t("res.any_base"), self._any_base_var,
+                           command=self._on_any_base_toggle).pack(
+                               side="left", padx=(GAP, 0))
         # Wolne gniazdo afiksu - pokaz punkt odniesienia "ile warte sa w
         # pelni obrobione takie bazy", zamiast zgadywac konkretna wartosc
         # craftu (patrz docstring TradeClient.craft_ceiling_url).
@@ -548,10 +559,13 @@ class ResultWindow:
             row.collect()
         return self._options, self._properties
 
+    def _on_any_base_toggle(self) -> None:
+        self._any_base = self._any_base_var.get()
+
     def _do_search(self) -> None:
         if self.on_search:
             options, properties = self._collect()
-            self.on_search(options, properties)
+            self.on_search(options, properties, self._any_base)
 
     def _set_all(self, enabled: bool) -> None:
         for row in self._rows:

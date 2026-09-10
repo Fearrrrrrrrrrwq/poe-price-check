@@ -1174,6 +1174,7 @@ class TradeClient:
         stat_filters: list[dict],
         properties: list[PropertyOption] | None = None,
         sort_desc: bool = False,
+        any_base: bool = False,
     ) -> dict:
         filters: dict[str, dict] = {}
         misc: dict[str, dict] = {}
@@ -1306,7 +1307,13 @@ class TradeClient:
             filters["map_filters"] = {"filters": maps}
 
         query: dict = {"status": {"option": self.status}}
-        if item.is_unique and item.name:
+        # any_base = "wycen same mody na dowolnej bazie". Zostawiamy tylko
+        # stat-filtry (i rarity/misc), bez nazwy/typu - trade API na to
+        # pozwala. Sensowne dla rzadkich; unikat ma jedna baze, wiec tam ta
+        # opcja i tak nic nie zmienia poza rozszerzeniem do "dowolny unikat".
+        if any_base:
+            pass
+        elif item.is_unique and item.name:
             query["name"] = item.name
             query["type"] = item.base_type
         else:
@@ -1328,6 +1335,7 @@ class TradeClient:
         options: list[ModOption] | None = None,
         unmatched_count: int = 0,
         properties: list[PropertyOption] | None = None,
+        any_base: bool = False,
     ) -> SearchResult:
         """Szuka przedmiotu. Bez podanych opcji bierze wszystkie mody przedmiotu.
 
@@ -1344,7 +1352,7 @@ class TradeClient:
             unmatched_count = len(unmatched)
 
         stat_filters = self.filters_from_options(options)
-        payload = self.build_query(item, stat_filters, properties)
+        payload = self.build_query(item, stat_filters, properties, any_base=any_base)
         search_id, total, hashes = self._search(payload)
 
         listings = self._fetch(hashes[:max_listings], search_id) if hashes else []

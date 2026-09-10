@@ -270,6 +270,10 @@ class ResultWindow:
         # --- sekcje sterujace ---------------------------------------------
         self.mods_box, self.mods_rows = theme.section(self.outer, t("res.mods"))
         self.props_box, self.props_rows = theme.section(self.outer, t("res.props"))
+        # Zakres wyszukiwania - osobny, wyrazny pasek nad przyciskami. Wczesniej
+        # "Dowolna baza" bylo malym checkboxem doklejonym na koncu rzedu
+        # przyciskow i ginelo.
+        self.scope = tk.Frame(self.outer, bg=BG_PANEL)
         self.buttons = tk.Frame(self.outer, bg=BG)
 
         # --- wyniki --------------------------------------------------------
@@ -292,11 +296,12 @@ class ResultWindow:
 
     def _clear(self) -> None:
         for container in (self.mods_rows, self.props_rows, self.rows,
-                          self.results_head, self.buttons):
+                          self.results_head, self.buttons, self.scope):
             for child in container.winfo_children():
                 child.destroy()
         for widget in (self.craft, self.notice, self.value_box, self.mods_box,
-                       self.props_box, self.buttons, self.results_head, self.rows):
+                       self.props_box, self.scope, self.buttons,
+                       self.results_head, self.rows):
             widget.pack_forget()
         self._rows = []
         self._prop_rows = []
@@ -368,6 +373,7 @@ class ResultWindow:
             self._render_mods()
         if self._properties:
             self._render_props()
+        self._render_scope(item)
         # can_be_modified tez otwiera rzad przyciskow (nie tylko options/
         # properties) - inaczej przycisk "sufit tej bazy" nigdy by sie nie
         # pokazal dla itemu, ktorego zaden mod nie trafil w baze statystyk
@@ -488,6 +494,39 @@ class ResultWindow:
             self._prop_rows.append(_PropRow(self.props_rows, option,
                                             BG_ROW if index % 2 else BG_PANEL))
 
+    def _render_scope(self, item) -> None:
+        """Pasek zakresu wyszukiwania - na razie jeden przelacznik: czy szukac
+        po samych modach (dowolna baza), czy zawezic do bazy/nazwy przedmiotu.
+        Wlasny, obramowany pasek nad przyciskami - inaczej ginie."""
+        if not (self._options or self._properties):
+            return
+        self.scope.configure(highlightthickness=1, highlightbackground=BORDER,
+                             highlightcolor=BORDER)
+        self.scope.pack(fill="x", pady=(GAP, 0))
+        row = tk.Frame(self.scope, bg=BG_PANEL)
+        row.pack(fill="x", padx=10, pady=7)
+
+        self._any_base_var = tk.BooleanVar(value=self._any_base)
+        self._any_base_cb = theme.checkbox(
+            row, t("res.any_base"), self._any_base_var,
+            command=self._on_any_base_toggle, bg=BG_PANEL)
+        self._any_base_cb.configure(font=FONT_BODY)
+        self._any_base_cb.pack(side="left")
+
+        hint = (t("res.any_base_hint_unique") if item.is_unique
+                else t("res.any_base_hint"))
+        self._any_base_hint = tk.Label(row, text=hint, font=FONT_LABEL,
+                                       fg=FG_MUTED, bg=BG_PANEL, anchor="w")
+        self._any_base_hint.pack(side="left", padx=(GAP, 0))
+        self._paint_scope()
+
+    def _paint_scope(self) -> None:
+        on = self._any_base
+        self.scope.configure(
+            highlightbackground=FG_ACCENT if on else BORDER,
+            highlightcolor=FG_ACCENT if on else BORDER)
+        self._any_base_cb.configure(fg=FG_TITLE if on else FG)
+
     def _render_buttons(self, item) -> None:
         self.buttons.pack(fill="x", pady=(GAP, 0))
         if self._options or self._properties:
@@ -497,13 +536,6 @@ class ResultWindow:
                                    (t("res.all"), lambda: self._set_all(True)),
                                    (t("res.none"), lambda: self._set_all(False))):
                 theme.button(self.buttons, label, command).pack(side="left", padx=(TIGHT, 0))
-            # "Dowolna baza" - checkbox, nie przycisk: to zmiana zakresu
-            # wyszukiwania, ktora obowiazuje przy nastepnym "Szukaj ponownie",
-            # a nie akcja do wykonania od razu.
-            self._any_base_var = tk.BooleanVar(value=self._any_base)
-            theme.checkbox(self.buttons, t("res.any_base"), self._any_base_var,
-                           command=self._on_any_base_toggle).pack(
-                               side="left", padx=(GAP, 0))
         # Wolne gniazdo afiksu - pokaz punkt odniesienia "ile warte sa w
         # pelni obrobione takie bazy", zamiast zgadywac konkretna wartosc
         # craftu (patrz docstring TradeClient.craft_ceiling_url).
@@ -561,6 +593,7 @@ class ResultWindow:
 
     def _on_any_base_toggle(self) -> None:
         self._any_base = self._any_base_var.get()
+        self._paint_scope()
 
     def _do_search(self) -> None:
         if self.on_search:

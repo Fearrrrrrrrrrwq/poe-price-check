@@ -1307,16 +1307,16 @@ class TradeClient:
             filters["map_filters"] = {"filters": maps}
 
         query: dict = {"status": {"option": self.status}}
-        # any_base = "wycen same mody na dowolnej bazie". Zostawiamy tylko
-        # stat-filtry (i rarity/misc), bez nazwy/typu - trade API na to
-        # pozwala. Sensowne dla rzadkich; unikat ma jedna baze, wiec tam ta
-        # opcja i tak nic nie zmienia poza rozszerzeniem do "dowolny unikat".
-        if any_base:
-            pass
-        elif item.is_unique and item.name:
+        # any_base = "nie zawezaj do bazy przedmiotu".
+        #   - unikat: zostaje NAZWA, znika typ bazy - "ten unikat niezaleznie
+        #     od bazy" (niektore unikaty maja warianty bazowe).
+        #   - rzadki/magiczny: znika i nazwa, i typ - zostaja same stat-filtry
+        #     ("ile warte sa te mody na czymkolwiek"). Trade API na to pozwala.
+        if item.is_unique and item.name:
             query["name"] = item.name
-            query["type"] = item.base_type
-        else:
+            if not any_base:
+                query["type"] = item.base_type
+        elif not any_base:
             query["type"] = self.resolve_base_type(item) or item.name
 
         if filters:

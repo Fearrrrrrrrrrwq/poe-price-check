@@ -369,8 +369,14 @@ def parse_item(raw: str) -> ParsedItem:
 
     item = ParsedItem(raw=raw)
     _parse_header(sections[0], item)
-    for section in sections[1:]:
-        _parse_section(section, item)
+    implicit_at = _implicit_section_index(sections, item)
+    for idx, section in enumerate(sections):
+        if idx == 0:
+            continue
+        _parse_section(
+            section, item,
+            force_kind="implicit" if idx == implicit_at else None,
+        )
     return item
 
 
@@ -463,7 +469,68 @@ def _affix_from_annotation(line: str) -> tuple[str, int | None, str]:
     )
 
 
-def _parse_section(lines: list[str], item: ParsedItem) -> None:
+ITEM_LEVEL_RE = re.compile(r"^Item Level:\s*\d+", re.IGNORECASE)
+_DIGIT_RE = re.compile(r"\d")
+
+
+def _is_bare_mod_section(lines: list[str]) -> bool:
+    """Czy sekcja to sam blok modow BEZ adnotacji i BEZ sufiksow rodzaju.
+
+    Taki wyglada zarowno blok implicitow, jak i blok explicitow, gdy gracz
+    NIE ma wlaczonych rozszerzonych opisow. Enchant/crafted/fractured maja
+    wtedy nadal swoj sufiks "(...)", wiec tu nie wpadaja. Tekst fabularny
+    unikatu odsiewamy przez wymog, by wiekszosc linii miala cyfre.
+    """
+    if not lines:
+        return False
+    with_digit = 0
+    for line in lines:
+        if MOD_ANNOTATION_RE.match(line) or PROPERTY_RE.match(line):
+            return False
+        if line in STANDALONE_FLAGS or line in INFLUENCES:
+            return False
+        if any(line.endswith(" " + s) for s in MOD_SUFFIXES):
+            return False
+        if _DIGIT_RE.search(line):
+            with_digit += 1
+    return with_digit * 2 >= len(lines)
+
+
+def _implicit_section_index(sections: list[list[str]], item: ParsedItem) -> int:
+    """Indeks sekcji z implicitami, gdy da sie ja rozpoznac po strukturze.
+
+    Bez rozszerzonych opisow parser oznaczylby te mody jako 'explicit', a
+    trade trzyma implicity pod OSOBNYM ID (np. chaos res: explicit.stat_2923486259
+    vs implicit.stat_2923486259) - filtr na zlej grupie wycina wszystkie oferty.
+
+    Regula: implicity to PIERWSZY z co najmniej dwoch kolejnych "golych" blokow
+    modow stojacych po linii "Item Level:". Drugi taki blok to explicity. Gdy
+    blok jest tylko jeden - to explicity (wiekszosc rzadkich bez implicitu).
+    Zwraca -1, gdy nic pewnego nie widac.
+    """
+    if item.rarity not in ("Rare", "Unique", "Magic"):
+        return -1
+    if any(MOD_ANNOTATION_RE.match(ln) for sec in sections for ln in sec):
+        return -1  # sa adnotacje - rodzaj modow ustala sciezka adnotacji
+    ilvl_at = next(
+        (i for i, sec in enumerate(sections)
+         if any(ITEM_LEVEL_RE.match(ln) for ln in sec)),
+        -1,
+    )
+    if ilvl_at < 0:
+        return -1
+    bare = [i for i in range(ilvl_at + 1, len(sections))
+            if _is_bare_mod_section(sections[i])]
+    if len(bare) < 2:
+        return -1
+    if len(sections[bare[0]]) > 4:
+        return -1  # implicitow jest 1-3 (z korupcja 4) - wiekszy blok to nie to
+    return bare[0]
+
+
+def _parse_section(
+    lines: list[str], item: ParsedItem, force_kind: str | None = None
+) -> None:
     # Sekcja wymagan tez zawiera "Level:", ale to poziom postaci, nie kamienia.
     in_requirements = any(line.rstrip(":") == "Requirements" for line in lines)
     # Rodzaj narzucony przez ostatnia adnotacje w klamrach. Obowiazuje az do
@@ -512,7 +579,11 @@ def _parse_section(lines: list[str], item: ParsedItem) -> None:
         # wlasnie sufiks i bez tego wypadaly z wyszukiwania.
         from_suffix = kind is not None
         if kind is None:
-            kind = annotated_kind or "explicit"
+            kind = annotated_kind or force_kind or "explicit"
+        # Blok implicitow rozpoznany po strukturze (brak rozszerzonych opisow):
+        # oznacz afiks, zeby na liscie modow bylo widac "I".
+        if force_kind == "implicit" and annotated_kind is None and not from_suffix:
+            annotated_affix = "I"
 
         # "+50(50-54) to maximum Mana" -> tekst "+50 to maximum Mana" + zakres (50, 54).
         # Zakres tieru jest cenniejszy od samej rolki: pozwala szukac przedmiotow

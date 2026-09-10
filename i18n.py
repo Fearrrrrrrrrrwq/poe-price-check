@@ -156,6 +156,7 @@ STRINGS["en"] = {
     # kolumny
     "col.price": "Price",
     "col.div": "≈div",
+    "col.item": "Item",
     "col.ilvl": "iLvl",
     "col.quality": "Q%",
     "col.account": "Account",
@@ -330,6 +331,7 @@ STRINGS["pl"] = {
 
     "col.price": "Cena",
     "col.div": "≈div",
+    "col.item": "Przedmiot",
     "col.ilvl": "iLvl",
     "col.quality": "Q%",
     "col.account": "Konto",
@@ -505,6 +507,7 @@ STRINGS["de"] = {
 
     "col.price": "Preis",
     "col.div": "≈div",
+    "col.item": "Gegenstand",
     "col.ilvl": "iLvl",
     "col.quality": "Q%",
     "col.account": "Konto",
@@ -679,6 +682,7 @@ STRINGS["es"] = {
 
     "col.price": "Precio",
     "col.div": "≈div",
+    "col.item": "Objeto",
     "col.ilvl": "iLvl",
     "col.quality": "Q%",
     "col.account": "Cuenta",
@@ -853,6 +857,7 @@ STRINGS["pt"] = {
 
     "col.price": "Preço",
     "col.div": "≈div",
+    "col.item": "Item",
     "col.ilvl": "iLvl",
     "col.quality": "Q%",
     "col.account": "Conta",
@@ -1025,6 +1030,7 @@ STRINGS["ru"] = {
 
     "col.price": "Цена",
     "col.div": "≈div",
+    "col.item": "Предмет",
     "col.ilvl": "iLvl",
     "col.quality": "Q%",
     "col.account": "Аккаунт",

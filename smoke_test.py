@@ -81,7 +81,41 @@ Item Level: 82
 """
 
 
+PLAIN_IMPLICIT_SAMPLE = """Item Class: Rings
+Rarity: Rare
+Doom Whorl
+Amethyst Ring
+--------
+Requirements:
+Level: 49
+--------
+Item Level: 84
+--------
++23% to Chaos Resistance
+--------
++42 to maximum Life
++35% to Cold Resistance
+"""
+
+
+def check_plain_implicit() -> bool:
+    """Bez rozszerzonych opisow blok implicitow ma trafic pod grupe 'implicit',
+    nie 'explicit' - inaczej trade filtruje po zlym ID i wycina wszystkie oferty.
+    """
+    item = parse_item(PLAIN_IMPLICIT_SAMPLE)
+    kinds = {m.text: m.kind for m in item.mods}
+    ok = (kinds.get("+23% to Chaos Resistance") == "implicit"
+          and kinds.get("+42 to maximum Life") == "explicit")
+    print("== implicit bez adnotacji ==")
+    print(f"  chaos res -> {kinds.get('+23% to Chaos Resistance')!r}, "
+          f"life -> {kinds.get('+42 to maximum Life')!r}  [{'OK' if ok else 'BLAD'}]\n")
+    return ok
+
+
 def main() -> int:
+    if not check_plain_implicit():
+        return 1
+
     print("== ligi ==")
     try:
         leagues = TradeClient.fetch_leagues(UA)

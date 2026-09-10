@@ -192,11 +192,24 @@ class Listing:
     character: str
     item_name: str
     note: str
+    item_base: str = ""  # typ bazy, np. "Vaal Regalia" - co to za przedmiot
+    is_unique: bool = False
     item_level: int | None = None
     quality: int | None = None
     indexed: str = ""  # znacznik czasu wystawienia, ISO 8601
     chaos_value: float | None = None  # rownowartosc w chaosach
     divine_value: float | None = None  # rownowartosc w divinach
+
+    def what(self) -> str:
+        """Co to za przedmiot: nazwa unikatu, a dla reszty typ bazy.
+
+        Nazwy rzadkich (losowe "Morbid Beak") pomijamy - nic nie mowia. Przy
+        wyszukiwaniu z odznaczona baza to jedyna kolumna, po ktorej widac, ze
+        wyniki to rozne bazy.
+        """
+        if self.is_unique and self.item_name and self.item_name != "?":
+            return self.item_name
+        return self.item_base or self.item_name
 
     def divine_text(self) -> str:
         if self.divine_value is None:
@@ -1424,6 +1437,9 @@ class TradeClient:
                 account=account.get("name", "?"),
                 character=(account.get("lastCharacterName") or account.get("name") or "?"),
                 item_name=(item.get("name") or item.get("typeLine") or "?").strip(),
+                item_base=(item.get("baseType") or item.get("typeLine") or "").strip(),
+                is_unique=(item.get("frameType") == 3
+                           or str(item.get("rarity", "")).lower() == "unique"),
                 note=listing.get("whisper", ""),
                 item_level=item.get("ilvl"),
                 quality=_quality_from_properties(item.get("properties")),

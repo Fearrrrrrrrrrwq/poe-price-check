@@ -547,8 +547,9 @@ class ResultWindow:
         if not result.listings:
             return
         columns = ((t("col.price"), 13), (t("col.div"), 6),
+                   (t("col.item"), 18),
                    (t("col.ilvl"), 5), (t("col.quality"), 4),
-                   (t("col.account"), 18), (t("col.age"), 6))
+                   (t("col.account"), 14), (t("col.age"), 6))
         for text, width in columns:
             tk.Label(self.results_head, text=text, font=FONT_LABEL, fg=FG_MUTED,
                      bg=BG, width=width, anchor="w").pack(side="left")
@@ -561,9 +562,10 @@ class ResultWindow:
             cells = (
                 (listing.price_text(), 13, FONT_PRICE, FG),
                 (listing.divine_text() or "-", 6, FONT_SMALL, FG_TITLE),
+                (listing.what() or "-", 18, FONT_SMALL, FG_TITLE),
                 (str(listing.item_level or "-"), 5, FONT_SMALL, FG_MUTED),
                 (str(listing.quality or "-"), 4, FONT_SMALL, FG_MUTED),
-                (listing.account, 18, FONT_SMALL, FG_MUTED),
+                (listing.account, 14, FONT_SMALL, FG_MUTED),
                 (listing.age_text(), 6, FONT_SMALL, FG_MUTED),
             )
             widgets = [row]

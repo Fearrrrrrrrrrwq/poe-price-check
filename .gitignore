@@ -28,3 +28,4 @@ venv/
 Thumbs.db
 desktop.ini
 .mcp.json
+.wrangler/

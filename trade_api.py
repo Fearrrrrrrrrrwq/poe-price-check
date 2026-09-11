@@ -1018,6 +1018,14 @@ class TradeClient:
                 key="ilvl", label=t("prop.ilvl"),
                 value=item.item_level, minimum=1, maximum=100, enabled=False,
             ))
+        # Jakosc broni/pancerza (nie gemu - ten ma twardy filtr wyzej w
+        # build_query) skaluje wprost Armour/ES/obrazenia, wiec tak jak AR/ES/DPS
+        # jest wlaczona domyslnie - to jeden z pierwszych czynnikow ceny.
+        if item.quality and not item.is_gem:
+            options.append(PropertyOption(
+                key="quality", label=t("prop.quality"),
+                value=item.quality, minimum=0, maximum=30, enabled=True,
+            ))
         # Linki gniazd nie istnieja w PoE2 (gemy nie osadzaja sie w pancerzu,
         # tylko w slotach umiejetnosci) - GGG nie ma takiego filtra w trade2.
         if item.sockets and self.game != "poe2":
@@ -1270,8 +1278,11 @@ class TradeClient:
         # type_filters w PoE2 - ten sam filtr wyslany do zlej grupy w
         # zapytaniu po prostu nic nie robi, wygladajac jak dzialajacy filtr.
         quality_target = type_filters if is_poe2 else misc
-        # Jakosc filtrujemy tylko dla kamieni. Dla broni/pancerzy wymuszanie
-        # konkretnej jakosci niepotrzebnie odcina wiekszosc ofert.
+        # Kamienie: jakosc od razu jako twardy filtr - to jedna z pierwszych
+        # rzeczy, po ktorych ocenia sie cene gemu. Broń/pancerz: jakosc idzie
+        # przez property_options() jako SUWAK (patrz "quality" nizej), zeby
+        # dalo sie ja odznaczyc - wymuszanie jej na sztywno odcinaloby oferty
+        # o innej (czesto nizszej) jakosci tej samej bazy.
         if item.quality and item.is_gem:
             quality_target["quality"] = {"min": item.quality}
 
@@ -1287,6 +1298,8 @@ class TradeClient:
                 continue
             if prop.key == "ilvl":
                 (type_filters if is_poe2 else misc)["ilvl"] = {"min": prop.value}
+            elif prop.key == "quality":
+                (type_filters if is_poe2 else misc)["quality"] = {"min": prop.value}
             elif prop.key == "links":
                 # Brak koncepcji linkow gniazd w PoE2 (gemy nie osadza sie w
                 # pancerzu) - property_options() go dla PoE2 nie generuje,

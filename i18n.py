@@ -164,6 +164,7 @@ STRINGS["en"] = {
 
     # suwaki wlasciwosci
     "prop.ilvl": "Item level",
+    "prop.quality": "Quality",
     "prop.links": "Links",
     "prop.dps": "DPS",
     "prop.pdps": "Physical DPS",
@@ -338,6 +339,7 @@ STRINGS["pl"] = {
     "col.age": "Wyst.",
 
     "prop.ilvl": "Poziom przedmiotu",
+    "prop.quality": "Jakość",
     "prop.links": "Linki",
     "prop.dps": "DPS",
     "prop.pdps": "Fizyczny DPS",
@@ -514,6 +516,7 @@ STRINGS["de"] = {
     "col.age": "Seit",
 
     "prop.ilvl": "Gegenstandsstufe",
+    "prop.quality": "Qualität",
     "prop.links": "Verbindungen",
     "prop.dps": "DPS",
     "prop.pdps": "Physischer DPS",
@@ -689,6 +692,7 @@ STRINGS["es"] = {
     "col.age": "Desde",
 
     "prop.ilvl": "Nivel del objeto",
+    "prop.quality": "Calidad",
     "prop.links": "Enlaces",
     "prop.dps": "DPS",
     "prop.pdps": "DPS físico",
@@ -864,6 +868,7 @@ STRINGS["pt"] = {
     "col.age": "Há",
 
     "prop.ilvl": "Nível do item",
+    "prop.quality": "Qualidade",
     "prop.links": "Links",
     "prop.dps": "DPS",
     "prop.pdps": "DPS físico",
@@ -1037,6 +1042,7 @@ STRINGS["ru"] = {
     "col.age": "Выст.",
 
     "prop.ilvl": "Уровень предмета",
+    "prop.quality": "Качество",
     "prop.links": "Связи",
     "prop.dps": "DPS",
     "prop.pdps": "Физ. DPS",

@@ -200,15 +200,18 @@ def _value_filter(
 ) -> dict | None:
     """Buduje warunek na wartosc statystyki - zawsze tylko dolna granica.
 
-    Gdy PoE poda zakres tieru (wymaga wlaczonych rozszerzonych opisow modow),
-    bierzemy jego dol. Dzieki temu w wynikach lada tez przedmioty z tym samym
-    modem w wyzszym tierze - bez gornej granicy nic ich nie odcina. Bez zakresu
-    zostaje sama rolka.
+    Granica to FAKTYCZNA rolka przedmiotu, nie dol zakresu tieru. Wczesniej
+    bralismy dol zakresu (zeby pokazac tez inne przedmioty z tym samym modem
+    w tym samym tierze) i przy szerokich zakresach dawalo to rezultat odwrotny
+    do zamierzonego: "+4(1-4) to Level of all Fire Skill Gems" szukalo od +1,
+    czyli wsrod najtanszych wariantow, i wycena wychodzila kilkukrotnie za
+    niska. Gorna granicy nadal nie ma, wiec lepsze rolki zostaja w wynikach,
+    a do rozluznienia sluzy przycisk "Szeroki -10%".
     """
-    if ranges:
-        return {"min": ranges[0][0]}
     if values:
         return {"min": min(values)}
+    if ranges:
+        return {"min": ranges[0][0]}
     return None
 
 

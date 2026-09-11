@@ -68,6 +68,8 @@ ALL_STAT_KINDS_POE2 = (
 # Klasy przedmiotow, na ktorych statystyka moze byc "lokalna", czyli dotyczyc
 # samego przedmiotu, a nie postaci. Pancerz zwieksza wlasne ES, pierscien - cale.
 LOCAL_DEFENCE_CLASSES = {"Body Armours", "Helmets", "Gloves", "Boots", "Shields"}
+# Klasy broni PoE2 bez slowa z WEAPON_CLASS_HINTS w nazwie.
+POE2_WEAPON_CLASSES = {"Crossbows", "Quarterstaves", "Spears", "Flails", "Traps"}
 WEAPON_CLASS_HINTS = ("Sword", "Axe", "Mace", "Bow", "Wand", "Dagger", "Claw",
                       "Sceptre", "Stave", "Staff", "Fishing Rod")
 DEFENCE_WORDS = ("armour", "evasion", "energy shield", "ward", "block")
@@ -77,6 +79,37 @@ WEAPON_WORDS = ("attack speed", "critical strike chance", "accuracy", "weapon ra
                 # Te tez maja warianty lokalne wylacznie na broni.
                 "leeched", "poison on hit", "chance to bleed", "maim on hit",
                 "hits can't be evaded")
+
+
+def _item_category(item: ParsedItem) -> str | None:
+    """Kategoria w rozumieniu danych z gry (stat_data, strategia "select").
+
+    Rozstrzyga miedzy wariantem lokalnym a globalnym tego samego tekstu:
+    "+# to maximum Energy Shield" na pancerzu to inna statystyka niz na
+    pierscieniu.
+    """
+    item_class = item.item_class or ""
+    if item_class in LOCAL_DEFENCE_CLASSES:
+        return "ARMOUR"
+    if any(hint in item_class for hint in WEAPON_CLASS_HINTS) or item_class in POE2_WEAPON_CLASSES:
+        return "WEAPON"
+    if item_class.startswith("Heist") or item_class in ("Contracts", "Blueprints"):
+        return "HEIST_EQUIPMENT"
+    if "Tincture" in item_class:
+        return "Tincture"
+    if "Relic" in item_class:
+        return "Sanctum Relic"
+    return None
+
+
+# Rodzaj moda z parsera -> rodzaje w danych z gry, w kolejnosci prob. Crafted/
+# fractured/veiled trade indeksuje pod WLASNA grupa, ale gdy danych dla niej
+# brak, zostaje pula explicit (tak dzialal stary silnik).
+GAME_KIND_ORDER = {
+    "crafted": ("crafted", "explicit"),
+    "fractured": ("fractured", "explicit"),
+    "veiled": ("veiled", "explicit"),
+}
 
 
 def _prefers_local(item: ParsedItem, pattern: str) -> bool:
@@ -496,6 +529,13 @@ class TradeClient:
         self._stat_text: dict[str, str] | None = None
         self._base_types: set[str] | None = None
         self._static_index: dict[str, str] | None = None
+        # Silnik dopasowania na danych z gry (stat_data.py). Ladowany leniwie
+        # przy pierwszej wycenie; None po nieudanym ladowaniu = zostajemy przy
+        # starym silniku. use_game_stats=False wymusza stary silnik (porownania).
+        self.use_game_stats = True
+        self._user_agent = user_agent
+        self._game_stats = None
+        self._game_stats_tried = False
 
     # ---------------------------------------------------------------- requests
 
@@ -588,6 +628,107 @@ class TradeClient:
             if entry.get("id"):
                 seen.setdefault(entry["id"], None)
         return list(seen)
+
+    def game_stats(self):
+        """Dane z gry dla nowego silnika dopasowania (patrz stat_data.py)."""
+        if not self._game_stats_tried:
+            self._game_stats_tried = True
+            try:
+                import stat_data
+                self._game_stats = stat_data.load_game_stats(
+                    self.game, CACHE_DIR, self._user_agent)
+            except Exception as exc:  # noqa: BLE001 - awaria = stary silnik
+                print(f"[uwaga] dane statystyk z gry niedostepne ({exc}) - stary silnik.")
+                self._game_stats = None
+        return self._game_stats
+
+    def _infer_implicits(self, item: ParsedItem) -> None:
+        """Rozpoznaje blok implicitow w zwyklej kopii (Ctrl+C) na danych z gry.
+
+        Zwykla kopia nie oznacza implicitow. Parser zgaduje je po strukturze
+        (item_parser._implicit_section_index), ale wymaga cyfr w liniach, zeby
+        nie wziac tekstu fabularnego unikatu za mody - przez co gubi implicity
+        typu "Cannot be Poisoned". Tu mamy lepszy test: linia jest modem, jesli
+        gra zna taka statystyke jako implicit.
+
+        Regula: pierwszy blok modow po "Item Level:" to implicity, gdy
+          - kazda jego linia to znany implicit, oraz
+          - dalej stoi drugi blok ze znanymi modami (explicity) ALBO przedmiot
+            jest Unidentified (wtedy explicitow nie widac, a to, co widac, to
+            wlasnie implicity).
+        """
+        data = self.game_stats() if self.use_game_stats else None
+        if (data is None or item.affix_info or item.item_level_section < 0
+                or item.rarity not in ("Rare", "Unique", "Magic")):
+            return
+        groups: dict[int, list[Mod]] = {}
+        for mod in item.mods:
+            if mod.section > item.item_level_section and mod.kind in ("explicit", "implicit"):
+                groups.setdefault(mod.section, []).append(mod)
+        if not groups:
+            return
+        order = sorted(groups)
+        first = groups[order[0]]
+        if any(m.kind == "implicit" for m in first) or len(first) > 4:
+            return  # parser juz rozstrzygnal albo blok za duzy na implicity
+        category = _item_category(item)
+
+        def all_known(mods: list[Mod], kind: str) -> bool:
+            i = 0
+            while i < len(mods):
+                hit = data.match([m.text for m in mods[i:]], kind, category)
+                if not hit:
+                    return False
+                i += hit.consumed
+            return True
+
+        later = [m for sec in order[1:] for m in groups[sec]]
+        has_explicits = any(data.match([m.text], "explicit", category) for m in later)
+        if not (has_explicits or "unidentified" in item.flags):
+            return
+        if all_known(first, "implicit"):
+            for mod in first:
+                mod.kind = "implicit"
+                mod.affix = mod.affix or "I"
+
+    def _match_game(
+        self, mods: list[Mod], i: int, item: ParsedItem
+    ) -> tuple[str, list[float], list[tuple[float, float]], int] | None:
+        """Dopasowanie na danych z gry. None = niech sprobuje stary silnik."""
+        data = self.game_stats() if self.use_game_stats else None
+        if data is None:
+            return None
+        mod = mods[i]
+        # Linie tworzace jeden wieloliniowy mod musza byc tego samego rodzaju.
+        lines = [mod.text]
+        for following in mods[i + 1:i + 4]:
+            if following.kind != mod.kind:
+                break
+            lines.append(following.text)
+        known = self._stat_text or {}
+        category = _item_category(item)
+        for kind in GAME_KIND_ORDER.get(mod.kind, (mod.kind,)):
+            hit = data.match(lines, kind, category)
+            if not hit:
+                continue
+            # Dane z gry moga wyprzedzac albo nie nadazac za trade - ID musi
+            # istniec w aktualnym slowniku trade, inaczej filtr bylby martwy.
+            stat_id = next((sid for sid in hit.trade_ids if sid in known), None)
+            if stat_id is None:
+                continue
+            used = mods[i:i + hit.consumed]
+            ranges = [r for m in used for r in m.ranges]
+            if hit.negated:
+                ranges = [(-high, -low) for low, high in ranges]
+            values = hit.values
+            # "Adds # to # Fire Damage": trade porownuje SREDNIA z dwoch liczb.
+            if len(values) == 2:
+                values = [(values[0] + values[1]) / 2]
+                if len(ranges) == 2:
+                    ranges = [((ranges[0][0] + ranges[1][0]) / 2,
+                               (ranges[0][1] + ranges[1][1]) / 2)]
+            return stat_id, values, ranges, hit.consumed
+        return None
 
     def stat_index(self) -> dict[str, str]:
         """Mapuje skanonizowany wzorzec moda ('kind|tekst') na ID statystyki."""
@@ -866,6 +1007,7 @@ class TradeClient:
         options: list[ModOption] = []
         unmatched: list[Mod] = []
 
+        self._infer_implicits(item)
         mods = [m for m in item.mods if m.kind != "scourge"]
         i = 0
         while i < len(mods):
@@ -880,6 +1022,11 @@ class TradeClient:
                 mod=mod,
                 stat_id=stat_id,
                 min_value=value.get("min") if value else None,
+                # Craft z warsztatu kazdy kupujacy moze zdjac i zrobic sam -
+                # o cenie decyduja mody naturalne. Wymaganie tego samego
+                # crafta (crafted.stat_...) wycinaloby porownywalne
+                # przedmioty z modem naturalnym. Zostaje do recznego wlaczenia.
+                enabled=mod.kind != "crafted",
             ))
             i += consumed
 
@@ -946,6 +1093,11 @@ class TradeClient:
         # jako moda, a doliczanie tego do sufiksu dawalo filtr na 53% i zero ofert.
         if item.affix_info and not mod.annotated:
             return None, [], [], 1
+
+        # 0) Nowy silnik: dokladne szablony tekstow z plikow gry.
+        game_hit = self._match_game(mods, i, item)
+        if game_hit:
+            return game_hit
 
         # Mody z sufiksem (fractured)/(crafted) i tak leza w puli explicit.
         kinds = ["explicit"] if mod.kind in ("crafted", "fractured", "veiled") else [mod.kind]

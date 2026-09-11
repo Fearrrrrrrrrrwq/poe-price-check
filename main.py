@@ -195,6 +195,7 @@ class PriceChecker:
                 transport=make_transport(self.config),
                 timing=self.timing,
                 overlay_hotkey=self.config.get("overlay_hotkey", "shift+tab"),
+                copy_combo=self.config.get("copy_combo", "ctrl+alt+c"),
             )
         return self._bridge
 
@@ -321,7 +322,9 @@ class PriceChecker:
                     # kolejna wycena czytalaby ten sam, stary tekst - dokladnie
                     # to zglosil tester.
                     self._yield_focus_to_game()
-                    hotkeys.send("ctrl+c")
+                    # Ta sama kombinacja co w trybie mostu (domyslnie Ctrl+Alt+C
+                    # - zaawansowana kopia z rodzajami modow, patrz bridge.py).
+                    hotkeys.send(self.config.get("copy_combo", "ctrl+alt+c"))
                     # Ten sam odstep co po Ctrl+C w trybie mostu
                     # (timing.after_copy_ms, domyslnie 250ms) - lokalny
                     # schowek jest szybszy niz Boosteroid, ale gra wciaz

@@ -42,7 +42,12 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('config.example.json', '.'), ('icon.png', '.')],
+    datas=[('config.example.json', '.'), ('icon.png', '.'),
+           # Dane statystyk z gry dla silnika dopasowania (stat_data.py) -
+           # kopia zapasowa, gdy nie da sie pobrac swiezych z sieci.
+           ('data/stats_poe1.ndjson', 'data'), ('data/stats_poe2.ndjson', 'data'),
+           ('data/LICENSE-awakened-poe-trade.txt', 'data'),
+           ('data/LICENSE-exiled-exchange-2.txt', 'data')],
     hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={},

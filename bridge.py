@@ -175,7 +175,13 @@ def _clear_modifiers(timeout: float = 2.0) -> None:
 class BoosteroidBridge:
     """Wysyla do okna Boosteroida sekwencje: kopiuj -> overlay -> wklej -> zamknij."""
 
-    def __init__(self, transport: Transport, timing: BridgeTiming, overlay_hotkey: str) -> None:
+    def __init__(self, transport: Transport, timing: BridgeTiming, overlay_hotkey: str,
+                 copy_combo: str = "ctrl+alt+c") -> None:
+        # Ctrl+Alt+C = "zaawansowana kopia": gra dokleja do kazdego moda
+        # adnotacje { Prefix Modifier ... } z rodzajem (implicit / crafted /
+        # fractured), tierem i zakresem rolki. Zwykle Ctrl+C tego NIE oznacza,
+        # przez co crafted/fractured nie da sie odroznic od explicitow.
+        self.copy_combo = copy_combo or "ctrl+c"
         self.transport = transport
         self.timing = timing
         self.overlay_hotkey = overlay_hotkey
@@ -267,8 +273,8 @@ class BoosteroidBridge:
         stamp("czyszcze lokalny schowek")
         clear_clipboard()
 
-        stamp("ctrl+c - kopiuje przedmiot spod kursora")
-        send_combo("ctrl+c", timing.key_hold_ms)
+        stamp(f"{self.copy_combo} - kopiuje przedmiot spod kursora")
+        send_combo(self.copy_combo, timing.key_hold_ms)
         self._sleep_ms(timing.after_copy_ms)
 
         stamp(f"{self.overlay_hotkey} - otwieram Steam Overlay")

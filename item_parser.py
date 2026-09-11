@@ -43,8 +43,13 @@ QUALIFIER_RE = re.compile(r"\s*\((?=[^)]*[A-Za-z])(?![^)]*\d)[^)]*\)")
 ANNOTATION_KINDS = (
     ("implicit", "implicit"),
     ("enchant", "enchant"),
-    ("crafted", "crafted"),
+    # PoE2: enchant nazywa sie "Enhancement" ("Corruption Enhancement" to
+    # enchant z korupcji). Fractured przed crafted/desecrated - w PoE2 mod
+    # potrafi byc "Fractured Desecrated ..." i wtedy liczy sie fracture.
+    ("enhancement", "enchant"),
     ("fractured", "fractured"),
+    ("crafted", "crafted"),
+    ("desecrated", "desecrated"),
     ("scourge", "scourge"),
     ("veiled", "veiled"),
     ("crucible", "crucible"),
@@ -68,6 +73,11 @@ MOD_SUFFIXES = {
     "(scourge)": "scourge",
     "(crucible)": "crucible",
     "(veiled)": "veiled",
+    # PoE2: runy (grupa trade "rune", w interfejsie "Augment") i mody
+    # "Desecrated" (nastepca Veiled).
+    "(rune)": "rune",
+    "(added rune)": "rune",
+    "(desecrated)": "desecrated",
 }
 
 INFLUENCES = {
@@ -114,6 +124,7 @@ class Mod:
     tier: int | None = None  # numer tieru z adnotacji
     group: str = ""  # nazwa afiksu, np. "Gentian"
     annotated: bool = False  # czy poprzedzala go adnotacja w klamrach
+    section: int = -1  # numer sekcji (bloku miedzy '--------') w tekscie
 
     def badge(self) -> str:
         """Krotka etykieta do wyswietlenia, np. 'P6', 'S4', 'I'."""
@@ -138,6 +149,7 @@ class ParsedItem:
     flags: set[str] = field(default_factory=set)
     seller_note: str = ""
     raw: str = ""
+    item_level_section: int = -1  # numer sekcji z linia "Item Level:"
     # Wlasciwosci broni - do wyliczenia DPS. Puste dla wszystkiego innego.
     physical_damage: tuple[float, float] | None = None
     elemental_damage: list[tuple[str, float, float]] = field(default_factory=list)
@@ -357,6 +369,10 @@ def parse_item(raw: str) -> ParsedItem:
     raw = raw.replace("\r\n", "\n").strip()
     if not raw:
         raise ItemParseError("Pusty tekst przedmiotu.", kind="tekst_pusty")
+    # Znaczniki slow kluczowych z opisu gry: "[Intangibility]" albo
+    # "[Intangibility|Intangibility]" (ukryty klucz | tekst). Trade trzyma sam
+    # tekst - bez zdjecia znacznika taki mod nigdy by sie nie dopasowal.
+    raw = MARKUP_RE.sub(r"\1", raw)
 
     sections = [
         [line.strip() for line in block.split("\n") if line.strip()]
@@ -370,13 +386,22 @@ def parse_item(raw: str) -> ParsedItem:
     item = ParsedItem(raw=raw)
     _parse_header(sections[0], item)
     implicit_at = _implicit_section_index(sections, item)
+    item.item_level_section = next(
+        (i for i, sec in enumerate(sections)
+         if i > 0 and any(ITEM_LEVEL_RE.match(ln) for ln in sec)),
+        -1,
+    )
     for idx, section in enumerate(sections):
         if idx == 0:
             continue
+        first_mod = len(item.mods)
         _parse_section(
             section, item,
             force_kind="implicit" if idx == implicit_at else None,
+            allow_mods=item.item_level_section < 0 or idx >= item.item_level_section,
         )
+        for mod in item.mods[first_mod:]:
+            mod.section = idx
     return item
 
 
@@ -470,6 +495,8 @@ def _affix_from_annotation(line: str) -> tuple[str, int | None, str]:
 
 
 ITEM_LEVEL_RE = re.compile(r"^Item Level:\s*\d+", re.IGNORECASE)
+MARKUP_RE = re.compile(r"\[(?:[^\]|\n]*\|)?([^\]\n]+)\]")
+UNSCALABLE_SUFFIX = " — Unscalable Value"
 _DIGIT_RE = re.compile(r"\d")
 
 
@@ -481,13 +508,15 @@ def _is_bare_mod_section(lines: list[str]) -> bool:
     wtedy nadal swoj sufiks "(...)", wiec tu nie wpadaja. Tekst fabularny
     unikatu odsiewamy przez wymog, by wiekszosc linii miala cyfre.
     """
+    # Flagi potrafia stac W TEJ SAMEJ sekcji co explicity, bez separatora:
+    # "Searing Exarch Item" / "Eater of Worlds Item" pod ostatnim modem.
+    # Pomijamy je; sekcja zlozona WYLACZNIE z flag ("Corrupted") to nie mody.
+    lines = [ln for ln in lines if ln not in STANDALONE_FLAGS and ln not in INFLUENCES]
     if not lines:
         return False
     with_digit = 0
     for line in lines:
         if MOD_ANNOTATION_RE.match(line) or PROPERTY_RE.match(line):
-            return False
-        if line in STANDALONE_FLAGS or line in INFLUENCES:
             return False
         if any(line.endswith(" " + s) for s in MOD_SUFFIXES):
             return False
@@ -529,7 +558,8 @@ def _implicit_section_index(sections: list[list[str]], item: ParsedItem) -> int:
 
 
 def _parse_section(
-    lines: list[str], item: ParsedItem, force_kind: str | None = None
+    lines: list[str], item: ParsedItem, force_kind: str | None = None,
+    allow_mods: bool = True,
 ) -> None:
     # Sekcja wymagan tez zawiera "Level:", ale to poziom postaci, nie kamienia.
     in_requirements = any(line.rstrip(":") == "Requirements" for line in lines)
@@ -537,8 +567,20 @@ def _parse_section(
     # nastepnej adnotacji, bo jeden mod potrafi zajac dwie linie.
     annotated_kind: str | None = None
     annotated_affix, annotated_tier, annotated_group = "", None, ""
+    in_reminder = False
 
     for line in lines:
+        # Zaawansowana kopia (Ctrl+Alt+C) dokleja do moda objasnienia w
+        # nawiasach, np. "(Maim: Enemies are slowed...)", czasem na kilka linii.
+        # To nie sa mody - trade ich nie zna, a sklejone z modem psulyby
+        # dopasowanie wieloliniowe.
+        if in_reminder or (line.startswith("(") and not MOD_ANNOTATION_RE.match(line)):
+            in_reminder = not line.endswith(")")
+            continue
+        # " — Unscalable Value": dopisek zaawansowanej kopii przy rolkach,
+        # ktorych nie skaluje np. Divine Orb. Czesc opisu, nie tekstu moda.
+        if line.endswith(UNSCALABLE_SUFFIX):
+            line = line[: -len(UNSCALABLE_SUFFIX)].rstrip()
         if MOD_ANNOTATION_RE.match(line):
             annotated_kind = _kind_from_annotation(line)
             annotated_affix, annotated_tier, annotated_group = _affix_from_annotation(line)
@@ -573,6 +615,13 @@ def _parse_section(
                 match.group(1), match.group(2), item, in_requirements
             ):
                 continue
+
+        # Przed linia "Item Level:" gra nie wypisuje zadnych modow - to sa
+        # wlasciwosci bazy, w tym opis dzialania flaszki ("Onslaught", "+1500
+        # to Armour" w trakcie efektu). Brane za mody dawaly filtr, ktorego
+        # trade nie indeksuje, i zero ofert dla kazdej unikatowej flaszki.
+        if not allow_mods:
+            continue
 
         # Sufiks w rodzaju "(enchant)" jest rownie dobrym dowodem, ze to prawdziwy
         # mod, co adnotacja w klamrach - enchanty klejnotow klastrowych maja

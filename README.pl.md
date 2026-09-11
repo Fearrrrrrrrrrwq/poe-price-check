@@ -189,17 +189,20 @@ python smoke_test.py
 
 ## Ograniczenia
 
-- **Rzadkie przedmioty.** Skrypt najpierw szuka z wszystkimi modami. Realny rzadki
-  item prawie zawsze da 0 trafień, więc automatycznie powtarza zapytanie
-  z modami wyłączonymi i **wyraźnie to oznacza** — pokazana cena jest wtedy ceną
-  za samą bazę, nie za twój przedmiot. Prawdziwa wycena to kliknięcie w link
-  i zaznaczenie na stronie tych modów, które mają znaczenie. Automatyczny wybór
-  „które mody są cenne" to naturalny następny krok, ale wymaga danych o wagach
-  modów (np. z poe.ninja).
-- Nie obsługuje wymiany walut (endpoint `/exchange`) — waluty wyceniają się przez
-  zwykłe wyszukiwanie.
+- **Rzadkie przedmioty.** Domyślnie zaznaczone są wszystkie mody, a dobry rzadki
+  przedmiot z kompletem modów często ma 0–2 oferty. To nie błąd — w oknie wyniku
+  odznacz mniej ważne mody albo użyj „Szeroki -10%". Program nie zgaduje sam,
+  które mody są cenne.
 - Klaster jewels, memories i inne przedmioty z opcjami wyboru w filtrach mogą się
   nie dopasować w pełni.
+
+## Dane o modach
+
+Dopasowanie modów korzysta z danych statystyk wyciągniętych z plików gry, z
+projektów [Awakened PoE Trade](https://github.com/SnosMe/awakened-poe-trade)
+(PoE1) i [Exiled Exchange 2](https://github.com/Kvan7/Exiled-Exchange-2) (PoE2),
+oba na licencji MIT — ich licencje są w katalogu `data/`. Program odświeża te
+dane z sieci co kilka dni, a bez sieci używa kopii dołączonej do programu.
 - Skrypt musi mieć prawo wysyłania klawiszy do okna Boosteroida. Jeśli Boosteroid
   chodzi jako administrator, uruchom też skrypt jako administrator.
 

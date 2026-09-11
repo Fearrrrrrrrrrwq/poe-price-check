@@ -32,6 +32,12 @@ One keypress in game, a result window on your machine a moment later.
 
 ## Features
 
+- Mod matching on the game's own stat data (every text variant the game can
+  print, mapped to trade stat IDs per mod type, local vs global) rather than
+  guessing from the trade site's stat list — measured against ~600 real
+  listings: 99.9% of stats matched in PoE1, 100% in PoE2
+- Copies items in the advanced format (Ctrl+C in PoE1 since 3.29, Ctrl+Alt+C
+  in PoE2), so implicit / crafted / fractured mods and tiers are known exactly
 - Interactive mod panel — untick what does not matter, search again in place
 - Tier ranges read from the item, minimum only, so better rolls still show up
 - Pseudo totals: total elemental resistance, total life, attributes
@@ -46,17 +52,12 @@ One keypress in game, a result window on your machine a moment later.
 The setup wizard lets you pick PoE1 or PoE2 up front (also editable later in
 `config.json` as `game_version`). Mod matching, pseudo totals (resistances,
 life, attributes) and pricing work against the real `/api/trade2/` endpoint.
-Not yet ported, and silently skipped rather than guessed at, because PoE2's
-trade API genuinely doesn't have the same shape:
+Weapon/armour filters (DPS, Armour/Evasion/Energy Shield, quality) go to
+PoE2's merged `equipment_filters` group instead of PoE1's split
+`weapon_filters`/`armour_filters`. Socket links are skipped — PoE2 has no
+linked-socket mechanic (gems slot into skill slots, not gear), so there's no
+equivalent filter to send.
 
-- **Socket links** — PoE2 has no linked-socket mechanic (gems slot into
-  skill slots, not gear), so there's no equivalent filter to send.
-- **Weapon/armour stat filters** (DPS, pDPS/eDPS, Armour/Evasion/Energy
-  Shield/Ward/Block) — PoE1 and PoE2 use the *same* filter IDs, but PoE1
-  splits them into `weapon_filters`/`armour_filters` while PoE2 merges both
-  into one `equipment_filters` group. Sending the PoE1 shape to PoE2 (or
-  vice versa) just gets silently ignored by the API, so for now these
-  sliders don't appear at all in PoE2 mode.
 Waystones (PoE2 maps) *are* supported, verified against real listings:
 Item Rarity, Pack Size, Monster Rarity, Monster Effectiveness, Revives
 Available and Waystone Drop Chance all price-check correctly — there's no
@@ -128,6 +129,7 @@ python smoke_test.py   # live round trip against the trade API
 | `main.py` | entry point, hotkeys, wiring |
 | `item_parser.py` | parses the clipboard text the game produces |
 | `trade_api.py` | maps mods to stat ids, builds and runs trade queries |
+| `stat_data.py`, `data/` | mod matching on the game's stat data (see Licence) |
 | `bridge.py` | the cloud-session clipboard bridge |
 | `overlay.py`, `status_window.py`, `setup_window.py` | Tk interface |
 | `i18n.py` | translations, six languages |
@@ -187,6 +189,13 @@ support this kind of in-place swap the same way.
 ## Licence
 
 MIT — see [LICENSE](LICENSE).
+
+The stat data in `data/stats_poe1.ndjson` and `data/stats_poe2.ndjson` (also
+refreshed at runtime from the same source) comes from
+[Awakened PoE Trade](https://github.com/SnosMe/awakened-poe-trade) and
+[Exiled Exchange 2](https://github.com/Kvan7/Exiled-Exchange-2), both MIT —
+their licence texts ship alongside, in `data/`. The matching algorithm in
+`stat_data.py` follows theirs. Thank you.
 
 ---
 

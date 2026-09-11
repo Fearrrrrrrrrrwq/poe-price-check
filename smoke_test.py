@@ -112,6 +112,33 @@ def check_plain_implicit() -> bool:
     return ok
 
 
+def _first_stat(client: TradeClient, raw: str, text: str) -> str:
+    options, _ = client.analyze_mods(parse_item(raw))
+    return next((o.stat_id for o in options if o.mod.text == text and not o.sources), "")
+
+
+def check_game_engine(client: TradeClient) -> bool:
+    """Silnik na danych z gry: dane sie laduja, lokalne vs globalne ES
+    rozstrzygniete, opis efektu flaszki nie jest brany za mody."""
+    ok = client.game_stats() is not None
+    armour = ("Item Class: Body Armours\nRarity: Rare\nX\nVaal Regalia\n--------\n"
+              "Item Level: 84\n--------\n+80 to maximum Energy Shield\n")
+    ring = ("Item Class: Rings\nRarity: Rare\nX\nMoonstone Ring\n--------\n"
+            "Item Level: 84\n--------\n+30 to maximum Energy Shield\n")
+    flask = ("Item Class: Utility Flasks\nRarity: Unique\nLion's Roar\nGranite Flask\n"
+             "--------\nLasts 6 Seconds\n+1500 to Armour\n--------\nItem Level: 84\n"
+             "--------\n9% more Melee Physical Damage during effect\n")
+    local = _first_stat(client, armour, "+80 to maximum Energy Shield")
+    glob = _first_stat(client, ring, "+30 to maximum Energy Shield")
+    flask_mods = [m.text for m in parse_item(flask).mods]
+    ok = ok and local == "explicit.stat_4052037485" and glob == "explicit.stat_3489782002"
+    ok = ok and "+1500 to Armour" not in flask_mods
+    print("== silnik na danych z gry ==")
+    print(f"  ES pancerz -> {local}, ES pierscien -> {glob}, flaszka: {flask_mods}"
+          f"  [{'OK' if ok else 'BLAD'}]\n")
+    return ok
+
+
 def main() -> int:
     if not check_plain_implicit():
         return 1
@@ -151,6 +178,9 @@ def main() -> int:
     else:
         print(f"grupy statystyk: znamy wszystkie {len(theirs)}")
     print()
+
+    if not check_game_engine(client):
+        return 1
 
     for label, sample in (
         ("UNIKAT", UNIQUE_SAMPLE), ("RZADKI", RARE_SAMPLE),

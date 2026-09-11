@@ -176,11 +176,9 @@ class BoosteroidBridge:
     """Wysyla do okna Boosteroida sekwencje: kopiuj -> overlay -> wklej -> zamknij."""
 
     def __init__(self, transport: Transport, timing: BridgeTiming, overlay_hotkey: str,
-                 copy_combo: str = "ctrl+alt+c") -> None:
-        # Ctrl+Alt+C = "zaawansowana kopia": gra dokleja do kazdego moda
-        # adnotacje { Prefix Modifier ... } z rodzajem (implicit / crafted /
-        # fractured), tierem i zakresem rolki. Zwykle Ctrl+C tego NIE oznacza,
-        # przez co crafted/fractured nie da sie odroznic od explicitow.
+                 copy_combo: str = "ctrl+c") -> None:
+        # Kombinacja kopiowania zalezy od gry (PoE1 ctrl+c, PoE2 ctrl+alt+c) -
+        # PriceChecker.copy_combo() ustawia ja przed kazda wycena.
         self.copy_combo = copy_combo or "ctrl+c"
         self.transport = transport
         self.timing = timing

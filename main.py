@@ -22,7 +22,7 @@ from dataclasses import fields
 import applog
 import hotkeys
 import i18n
-from bridge import BoosteroidBridge, BridgeError, BridgeTiming, make_transport
+from bridge import BoosteroidBridge, BridgeError, BridgeTiming, make_transport, send_combo
 from i18n import t
 from item_parser import ItemParseError, parse_item
 from overlay import ResultWindow
@@ -187,6 +187,20 @@ class PriceChecker:
         self._last_item = None
         self._last_unmatched = 0
 
+    def copy_combo(self) -> str:
+        """Kombinacja kopiujaca przedmiot w grze.
+
+        PoE1 od 3.29 kopiuje ZAWSZE w formacie zaawansowanym (adnotacje
+        { Prefix Modifier ... } z rodzajem moda i tierem) - wystarczy zwykle
+        Ctrl+C. PoE2 daje ten format tylko z klawiszem "pokaz szczegoly modow"
+        (domyslnie Alt), stad Ctrl+Alt+C. Tak samo robia Awakened PoE Trade i
+        Exiled Exchange 2. "copy_combo" w configu nadpisuje oba.
+        """
+        explicit = self.config.get("copy_combo")
+        if explicit:
+            return explicit
+        return "ctrl+alt+c" if self.client.game == "poe2" else "ctrl+c"
+
     @property
     def bridge(self) -> BoosteroidBridge:
         """Most budujemy dopiero przy pierwszym uzyciu - tryb --paste go nie potrzebuje."""
@@ -195,8 +209,10 @@ class PriceChecker:
                 transport=make_transport(self.config),
                 timing=self.timing,
                 overlay_hotkey=self.config.get("overlay_hotkey", "shift+tab"),
-                copy_combo=self.config.get("copy_combo", "ctrl+alt+c"),
+                copy_combo=self.copy_combo(),
             )
+        # Gre mozna przelaczyc w locie - kombinacja idzie za nia.
+        self._bridge.copy_combo = self.copy_combo()
         return self._bridge
 
     def warm_up(self) -> None:
@@ -322,9 +338,13 @@ class PriceChecker:
                     # kolejna wycena czytalaby ten sam, stary tekst - dokladnie
                     # to zglosil tester.
                     self._yield_focus_to_game()
-                    # Ta sama kombinacja co w trybie mostu (domyslnie Ctrl+Alt+C
-                    # - zaawansowana kopia z rodzajami modow, patrz bridge.py).
-                    hotkeys.send(self.config.get("copy_combo", "ctrl+alt+c"))
+                    # Ta sama kombinacja i ten sam sposob wysylania co w trybie
+                    # mostu: modyfikatory WCISNIETE z przytrzymaniem, dopiero
+                    # potem C. hotkeys.send() wciska wszystko w zerowym czasie -
+                    # dla Ctrl+C gra to lapala, ale Ctrl+Alt+C (PoE2) gubila
+                    # i schowek zostawal pusty. Exiled Exchange 2 z tego samego
+                    # powodu puszcza modyfikatory z opoznieniem.
+                    send_combo(self.copy_combo(), self.timing.key_hold_ms)
                     # Ten sam odstep co po Ctrl+C w trybie mostu
                     # (timing.after_copy_ms, domyslnie 250ms) - lokalny
                     # schowek jest szybszy niz Boosteroid, ale gra wciaz

@@ -23,8 +23,8 @@
   "local_clipboard_hotkey": "ctrl+alt+d",
   "quit_hotkey": "ctrl+alt+q",
   "overlay_hotkey": "f7",
-  "_copy_combo_comment": "kombinacja kopiujaca przedmiot w grze. ctrl+alt+c = 'zaawansowana kopia': gra oznacza przy kazdym modzie, czy to implicit/crafted/fractured, oraz podaje tier i zakres rolki - wycena jest wtedy wyraznie dokladniejsza. Gdyby na Twoim ukladzie klawiatury Ctrl+Alt+C wpisywalo znak (np. 'ć') zamiast kopiowac, ustaw 'ctrl+c'.",
-  "copy_combo": "ctrl+alt+c",
+  "_copy_combo_comment": "kombinacja kopiujaca przedmiot w grze. Puste = automatycznie: PoE1 ctrl+c (od 3.29 gra i tak kopiuje format zaawansowany z rodzajem moda i tierem), PoE2 ctrl+alt+c (Alt = klawisz szczegolow modow - bez niego PoE2 nie podaje tierow). Wpisz wlasna, jesli w PoE2 zmieniles klawisz szczegolow modow albo Ctrl+Alt+C wpisuje u Ciebie znak (np. 'ć').",
+  "copy_combo": "",
 
   "_chat_macros_comment": "skrot -> komenda czatu, wysylana jako Enter+tekst+Enter (np. F5 wpisuje '/hideout' i teleportuje do hideoutu). Dziala tak samo lokalnie i na Boosteroidzie - klawisze, w odroznieniu od schowka, i tak leca live do sesji w chmurze. Puste {} wylacza makra.",
   "chat_macros": { "f5": "/hideout" },

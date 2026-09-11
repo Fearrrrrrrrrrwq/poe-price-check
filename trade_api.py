@@ -1157,20 +1157,30 @@ class TradeClient:
         return options
 
     def resolve_base_type(self, item: ParsedItem) -> str:
-        """Wyluskuje baze z nazwy przedmiotu magicznego.
+        """Wyluskuje prawdziwa baze, gdy w tekscie sa doklejone dodatkowe slowa.
 
-        PoE oddaje magiczny przedmiot jedna linia, z afiksami wtopionymi w nazwe:
-        "Shimmering Iron Ring of the Walrus". Trade oczekuje samej bazy, wiec
-        szukamy najdluzszego ciagu slow, ktory wystepuje na oficjalnej liscie baz.
-        Najdluzszego, bo inaczej "Two-Stone Ring" przegralby z samym "Ring".
+        Dwa niezalezne przypadki:
+        - Magiczny przedmiot to jedna linia z afiksami wtopionymi w nazwe:
+          "Shimmering Iron Ring of the Walrus".
+        - PoE2 dokleja do KAZDEJ rzadkosci przymiotnik zalezny od poziomu
+          jakosci ("Exceptional Apostle Leggings" przy wysokim Quality) -
+          trade w ogole go nie zna, wyszukiwanie po takim "type" daje zero
+          wynikow. Prawdziwa baza to "Apostle Leggings".
+        W obu przypadkach szukamy najdluzszego ciagu slow, ktory wystepuje na
+        oficjalnej liscie baz - najdluzszego, bo inaczej "Two-Stone Ring"
+        przegralby z samym "Ring". Gdy caly tekst juz jest znana baza (typowy
+        Rare/Unique bez doklejonych slow), nie ma czego szukac - wracamy od razu.
         """
-        if item.rarity != "Magic" or not item.base_type:
+        if not item.base_type:
             return item.base_type
 
         try:
             bases = self.base_types()
         except TradeError:
             return item.base_type  # bez listy baz zostajemy przy tym, co mamy
+
+        if item.base_type in bases:
+            return item.base_type
 
         words = item.base_type.split()
         best = ""
@@ -1328,7 +1338,7 @@ class TradeClient:
         if item.is_unique and item.name:
             query["name"] = item.name
             if not any_base:
-                query["type"] = item.base_type
+                query["type"] = self.resolve_base_type(item) or item.base_type
         elif not any_base:
             query["type"] = self.resolve_base_type(item) or item.name
 

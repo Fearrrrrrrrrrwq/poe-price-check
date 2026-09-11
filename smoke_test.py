@@ -205,6 +205,21 @@ def main() -> int:
     league2 = next((l for l in leagues2 if l not in ("Standard", "Hardcore")), "Standard")
 
     client2 = TradeClient(league=league2, user_agent=UA, game="poe2")
+
+    # PoE2 dokleja do nazwy przymiotnik zalezny od jakosci ("Exceptional Apostle
+    # Leggings") - trade go nie zna, resolve_base_type() musi go zdjac.
+    quality_item = parse_item(
+        "Item Class: Boots\nRarity: Normal\nExceptional Apostle Leggings\n"
+        "--------\nQuality: +26%\nArmour: 169\n"
+    )
+    resolved = client2.resolve_base_type(quality_item)
+    ok_quality = resolved == "Apostle Leggings"
+    print("== przymiotnik jakosci PoE2 w nazwie bazy ==")
+    print(f"  'Exceptional Apostle Leggings' -> {resolved!r}  "
+          f"[{'OK' if ok_quality else 'BLAD'}]\n")
+    if not ok_quality:
+        return 1
+
     data2 = client2._cached("stats", f"{BASE}/api/trade2/data/stats")
     theirs2 = {group.get("id") for group in data2.get("result", []) if group.get("id")}
     missing2 = sorted(theirs2 - set(ALL_STAT_KINDS_POE2))

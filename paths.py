@@ -9,7 +9,7 @@ oznacza cos innego na kazdym systemie, patrz app_dir().
 import sys
 from pathlib import Path
 
-APP_VERSION = "1.17.0"
+APP_VERSION = "1.17.1"
 
 
 def app_dir() -> Path:

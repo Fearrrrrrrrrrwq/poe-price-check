@@ -67,7 +67,9 @@ ALL_STAT_KINDS_POE2 = (
 
 # Klasy przedmiotow, na ktorych statystyka moze byc "lokalna", czyli dotyczyc
 # samego przedmiotu, a nie postaci. Pancerz zwieksza wlasne ES, pierscien - cale.
-LOCAL_DEFENCE_CLASSES = {"Body Armours", "Helmets", "Gloves", "Boots", "Shields"}
+# "Foci" - PoE2: ES na fokusie jest lokalne (sprawdzone na zywym trade2).
+LOCAL_DEFENCE_CLASSES = {"Body Armours", "Helmets", "Gloves", "Boots", "Shields", "Foci",
+                         "Bucklers"}
 # Klasy broni PoE2 bez slowa z WEAPON_CLASS_HINTS w nazwie.
 POE2_WEAPON_CLASSES = {"Crossbows", "Quarterstaves", "Spears", "Flails", "Traps"}
 WEAPON_CLASS_HINTS = ("Sword", "Axe", "Mace", "Bow", "Wand", "Dagger", "Claw",
@@ -118,7 +120,8 @@ def _prefers_local(item: ParsedItem, pattern: str) -> bool:
     text = pattern.lower()
     if item_class in LOCAL_DEFENCE_CLASSES:
         return any(word in text for word in DEFENCE_WORDS)
-    if any(hint in item_class for hint in WEAPON_CLASS_HINTS):
+    if (any(hint in item_class for hint in WEAPON_CLASS_HINTS)
+            or item_class in POE2_WEAPON_CLASSES):
         return any(word in text for word in WEAPON_WORDS)
     return False
 
@@ -711,9 +714,19 @@ class TradeClient:
             hit = data.match(lines, kind, category)
             if not hit:
                 continue
+            candidates = [sid for sid in hit.trade_ids if sid in known]
+            # Dane PoE2 (Exiled Exchange 2) nie maja grup "select" jak PoE1 -
+            # wariant lokalny i globalny siedza w jednej statystyce jako dwa
+            # ID ("+# to maximum Energy Shield" -> globalne i "(Local)").
+            # Rozstrzygamy ta sama regula co stary silnik.
+            if len(candidates) > 1:
+                local = [sid for sid in candidates if LOCAL_SUFFIX_RE.search(known[sid])]
+                other = [sid for sid in candidates if sid not in local]
+                want_local = _prefers_local(item, mod.text)
+                candidates = (local + other) if want_local else (other + local)
             # Dane z gry moga wyprzedzac albo nie nadazac za trade - ID musi
             # istniec w aktualnym slowniku trade, inaczej filtr bylby martwy.
-            stat_id = next((sid for sid in hit.trade_ids if sid in known), None)
+            stat_id = candidates[0] if candidates else None
             if stat_id is None:
                 continue
             used = mods[i:i + hit.consumed]

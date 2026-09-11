@@ -185,6 +185,18 @@ class GameStats:
         if stat is None:
             return None
         ids = list(stat.ids.get(kind) or [])
+        # PoE2: kilka ID pod jednym tekstem ("# to Spirit" -> 3981240776 i
+        # 2704225257). Najpierw to, ktore statystyka ma w najwiekszej liczbie
+        # grup (implicit/crafted/enchant...) - to wariant ogolny; waski wariant
+        # (np. tylko na berlach) zostaje alternatywa. Rozstrzygniecie lokalny/
+        # globalny po "(Local)" robi dalej trade_api.
+        if len(ids) > 1:
+            suffix_count: dict[str, int] = {}
+            for kind_ids in stat.ids.values():
+                for sid in kind_ids:
+                    num = sid.split(".", 1)[-1]
+                    suffix_count[num] = suffix_count.get(num, 0) + 1
+            ids.sort(key=lambda sid: -suffix_count.get(sid.split(".", 1)[-1], 0))
         for extra in extra_ids:
             if extra not in ids:
                 ids.append(extra)

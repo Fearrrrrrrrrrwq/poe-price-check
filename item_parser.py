@@ -150,6 +150,8 @@ class ParsedItem:
     seller_note: str = ""
     raw: str = ""
     item_level_section: int = -1  # numer sekcji z linia "Item Level:"
+    # PoE2, gem: jakosc doliczona przez modyfikatory przedmiotu, nie przez gem.
+    global_quality: int | None = None
     # Wlasciwosci broni - do wyliczenia DPS. Puste dla wszystkiego innego.
     physical_damage: tuple[float, float] | None = None
     elemental_damage: list[tuple[str, float, float]] = field(default_factory=list)
@@ -398,10 +400,21 @@ def parse_item(raw: str) -> ParsedItem:
         _parse_section(
             section, item,
             force_kind="implicit" if idx == implicit_at else None,
-            allow_mods=item.item_level_section < 0 or idx >= item.item_level_section,
+            # Gem: caly opis umiejetnosci (tagi, obrazenia, koszt, zasady
+            # dzialania) to NIE sa mody - trade ich nie indeksuje. Brane za
+            # mody zasmiecaly liste dziesiatkiem wierszy "brak w trade".
+            # Gemu szuka sie po nazwie, poziomie i jakosci.
+            allow_mods=(item.rarity != "Gem"
+                        and (item.item_level_section < 0
+                             or idx >= item.item_level_section)),
         )
         for mod in item.mods[first_mod:]:
             mod.section = idx
+
+    # "Quality: +6%" na gemie PoE2 to SUMA; jesli te punkty daja modyfikatory
+    # przedmiotu, sam gem ma ich mniej (czesto zero). Handluje sie gemem.
+    if item.global_quality and item.quality is not None:
+        item.quality = max(0, item.quality - item.global_quality)
     return item
 
 
@@ -497,6 +510,13 @@ def _affix_from_annotation(line: str) -> tuple[str, int | None, str]:
 ITEM_LEVEL_RE = re.compile(r"^Item Level:\s*\d+", re.IGNORECASE)
 MARKUP_RE = re.compile(r"\[(?:[^\]|\n]*\|)?([^\]\n]+)\]")
 UNSCALABLE_SUFFIX = " — Unscalable Value"
+# PoE2 rozbija poziom i jakosc gemu na skladniki: "Level: 23" to SUMA, a
+# handluje sie samym gemem, wiec liczy sie tylko czesc "from Gem". Bez tego
+# gem z "+4 Levels from Global Modifiers" szukal poziomu 23, ktorego w handlu
+# nie ma - i kazda taka wycena konczyla sie zerem ofert.
+GEM_LEVELS_RE = re.compile(r"^\+?(\d+)\s+Levels?\s+from\s+Gem$", re.IGNORECASE)
+GEM_QUALITY_RE = re.compile(r"^\+?(\d+)%\s+Quality\s+from\s+Gem$", re.IGNORECASE)
+GLOBAL_QUALITY_RE = re.compile(r"^\+?(\d+)%\s+Quality\s+from\s+\w+\s+Modifiers", re.IGNORECASE)
 _DIGIT_RE = re.compile(r"\d")
 
 
@@ -615,6 +635,21 @@ def _parse_section(
                 match.group(1), match.group(2), item, in_requirements
             ):
                 continue
+
+        # Rozbicie poziomu/jakosci gemu (PoE2) - to wlasciwosci, nie mody.
+        gem_match = GEM_LEVELS_RE.match(line)
+        if gem_match:
+            item.gem_level = int(gem_match.group(1))
+            continue
+        gem_match = GEM_QUALITY_RE.match(line)
+        if gem_match:
+            item.quality = int(gem_match.group(1))
+            item.global_quality = None
+            continue
+        gem_match = GLOBAL_QUALITY_RE.match(line)
+        if gem_match:
+            item.global_quality = int(gem_match.group(1))
+            continue
 
         # Przed linia "Item Level:" gra nie wypisuje zadnych modow - to sa
         # wlasciwosci bazy, w tym opis dzialania flaszki ("Onslaught", "+1500

@@ -139,8 +139,40 @@ def check_game_engine(client: TradeClient) -> bool:
     return ok
 
 
+GEM_SAMPLE = """Item Class: Skill Gems
+Rarity: Gem
+Flameblast
+--------
+Spell, AoE, Fire, Channelling, Nova, Staged
+Level: 23
+19 Levels from Gem
++4 Levels from Global Modifiers (augmented)
+Quality: +6% (augmented)
++6% Quality from Global Modifiers (augmented)
+Cost: 76.9 Mana per second
+--------
+Requirements:
+Level: 70
+--------
+Deals 370 to 556 Fire Damage
+10 maximum Stages
+"""
+
+
+def check_gem() -> bool:
+    """Gem PoE2: handluje sie SAMYM gemem, wiec poziom i jakosc licza sie
+    tylko te "from Gem" - poziom z modyfikatorow przedmiotu dawal filtr na
+    poziom, ktorego w handlu nie ma (zero ofert). Opis umiejetnosci to nie mody.
+    """
+    item = parse_item(GEM_SAMPLE)
+    ok = item.gem_level == 19 and item.quality == 0 and not item.mods
+    print("== gem PoE2 ==")
+    print(f"  poziom {item.gem_level} (w grze 23), jakosc {item.quality} (w grze 6), modow {len(item.mods)}  [{'OK' if ok else 'BLAD'}]\n")
+    return ok
+
+
 def main() -> int:
-    if not check_plain_implicit():
+    if not check_plain_implicit() or not check_gem():
         return 1
 
     print("== ligi ==")

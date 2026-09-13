@@ -7,6 +7,17 @@
 (function () {
   'use strict';
 
+  // Teksty w jezyku strony (<script type="application/json" id="i18n">),
+  // angielski jako zapas - skrypt dziala tez na stronie bez tlumaczen.
+  var I18N = (function () {
+    try { return JSON.parse(document.getElementById('i18n').textContent); } catch (e) { return {}; }
+  })();
+  function txt(key, fallback, vars) {
+    return String(I18N[key] || fallback).replace(/\{(\w+)\}/g, function (m, k) {
+      return vars && Object.prototype.hasOwnProperty.call(vars, k) ? vars[k] : m;
+    });
+  }
+
   var root = document.querySelector('.econ');
   if (!root) return;
   var game = root.dataset.game === 'poe1' ? 'poe1' : 'poe2';
@@ -32,6 +43,7 @@
     Invitation: 'Invitations',
   };
   var UNIT = { divine: 'div', exalted: 'ex', chaos: 'c' };
+  var LOCALE = document.documentElement.lang || 'en';
 
   var params = new URLSearchParams(location.search);
   var state = { league: params.get('league') || '', type: params.get('type') || 'Currency',
@@ -44,7 +56,7 @@
     if (n == null || isNaN(n)) return '–';
     var abs = Math.abs(n);
     var digits = abs >= 100 ? 0 : abs >= 10 ? 1 : abs >= 1 ? 2 : abs >= 0.1 ? 3 : 4;
-    return n.toLocaleString('en-US', { maximumFractionDigits: digits });
+    return n.toLocaleString(LOCALE, { maximumFractionDigits: digits });
   }
 
   function esc(s) {
@@ -101,7 +113,7 @@
 
   function dayLabel(iso) {
     var d = new Date(iso + 'T00:00:00Z');
-    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+    return d.toLocaleDateString(LOCALE, { month: 'short', day: 'numeric', timeZone: 'UTC' });
   }
 
   function drawChart(box, points, unit) {
@@ -127,8 +139,9 @@
     }).join('');
     var last = points[n - 1];
     box.innerHTML =
-      '<div class="chart-wrap"><svg class="hist" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" aria-label="Price history, ' +
-      n + ' days, from ' + fmt(points[0].v) + ' to ' + fmt(last.v) + ' ' + UNIT[unit] + '">' + grid + xl +
+      '<div class="chart-wrap"><svg class="hist" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" aria-label="' +
+      esc(txt('ec_chart_aria', 'Price history, {n} days, from {from} to {to} {unit}',
+        { n: n, from: fmt(points[0].v), to: fmt(last.v), unit: UNIT[unit] })) + '">' + grid + xl +
       '<path class="area" d="' + area + '"/><path class="line" d="' + line + '"/>' +
       '<line class="cross" x1="0" x2="0" y1="' + T + '" y2="' + (H - B) + '" visibility="hidden"/>' +
       '<circle class="dot-end" cx="' + x(n - 1).toFixed(1) + '" cy="' + y(last.v).toFixed(1) + '" r="4"/>' +
@@ -193,7 +206,8 @@
     var detail = document.createElement('tr');
     detail.className = 'detail';
     detail.dataset.for = item._key;
-    detail.innerHTML = '<td colspan="7"><div class="detail-box"><p class="note">Loading price history…</p></div></td>';
+    detail.innerHTML = '<td colspan="7"><div class="detail-box"><p class="note">' +
+      txt('ec_history_loading', 'Loading price history…') + '</p></div></td>';
     tr.after(detail);
     var box = detail.querySelector('.detail-box');
     var data = item._data || state.data;
@@ -203,7 +217,7 @@
       var unit = h.series ? pickUnit(h.series, item, data) : null;
       var points = unit ? h.series[unit] : [];
       if (!points || points.length < 2) {
-        box.innerHTML = '<p class="note">Not enough price history for this item yet.</p>';
+        box.innerHTML = '<p class="note">' + txt('ec_history_short', 'Not enough price history for this item yet.') + '</p>';
         return;
       }
       var vals = points.map(function (p) { return p.v; });
@@ -211,17 +225,18 @@
       var sinceStart = first > 0 ? (last / first - 1) * 100 : null;
       box.innerHTML = '<div class="detail-head"><h3>' + esc(item.name) + '</h3>' +
         '<dl class="detail-stats">' +
-        '<div><dt>Now</dt><dd>' + fmt(last) + ' ' + UNIT[unit] + '</dd></div>' +
-        '<div><dt>League low</dt><dd>' + fmt(Math.min.apply(null, vals)) + ' ' + UNIT[unit] + '</dd></div>' +
-        '<div><dt>League high</dt><dd>' + fmt(Math.max.apply(null, vals)) + ' ' + UNIT[unit] + '</dd></div>' +
-        '<div><dt>Since ' + dayLabel(points[0].t) + '</dt><dd>' + change(sinceStart) + '</dd></div>' +
+        '<div><dt>' + txt('ec_now', 'Now') + '</dt><dd>' + fmt(last) + ' ' + UNIT[unit] + '</dd></div>' +
+        '<div><dt>' + txt('ec_low', 'League low') + '</dt><dd>' + fmt(Math.min.apply(null, vals)) + ' ' + UNIT[unit] + '</dd></div>' +
+        '<div><dt>' + txt('ec_high', 'League high') + '</dt><dd>' + fmt(Math.max.apply(null, vals)) + ' ' + UNIT[unit] + '</dd></div>' +
+        '<div><dt>' + txt('ec_since', 'Since {date}', { date: dayLabel(points[0].t) }) + '</dt><dd>' + change(sinceStart) + '</dd></div>' +
         '</dl></div><div class="chart-slot"></div>' +
-        '<details class="data-table"><summary>Show data table</summary><table><thead><tr><th scope="col">Day</th><th scope="col" class="col-n">Price (' + UNIT[unit] + ')</th></tr></thead><tbody>' +
+        '<details class="data-table"><summary>' + txt('ec_show_table', 'Show data table') + '</summary><table><thead><tr><th scope="col">' +
+        txt('ec_day', 'Day') + '</th><th scope="col" class="col-n">' + txt('ec_price_unit', 'Price ({unit})', { unit: UNIT[unit] }) + '</th></tr></thead><tbody>' +
         points.slice().reverse().map(function (p) { return '<tr><td>' + dayLabel(p.t) + '</td><td class="col-n">' + fmt(p.v) + '</td></tr>'; }).join('') +
         '</tbody></table></details>';
       drawChart(box.querySelector('.chart-slot'), points, unit);
     }).catch(function () {
-      box.innerHTML = '<p class="note">Price history is unavailable right now.</p>';
+      box.innerHTML = '<p class="note">' + txt('ec_history_error', 'Price history is unavailable right now.') + '</p>';
     });
   }
 
@@ -304,7 +319,7 @@
         '<th scope="row"><span class="item">' +
           (it.icon ? '<img src="' + esc(it.icon) + '" alt="" width="28" height="28" loading="lazy">' : '') +
           '<span>' + esc(it.name) + cat + (it.sub ? '<small>' + esc(it.sub) + '</small>' : '') +
-          (it.lowConfidence ? '<small class="lowtag">low confidence</small>' : '') + '</span></span></th>' +
+          (it.lowConfidence ? '<small class="lowtag">' + esc(txt('ec_low_tag', 'low confidence')) + '</small>' : '') + '</span></span></th>' +
         '<td class="col-n"><b>' + p.main + '</b>' + (p.sub ? '<small>' + p.sub + '</small>' : '') + '</td>' +
         '<td class="col-n">' + change(it.change24h) + '</td>' +
         '<td class="col-n">' + change(it.change7d) + '</td>' +
@@ -318,19 +333,25 @@
     });
     typesBox.classList.toggle('dimmed', global);
     var anyStash = global ? state.stashTypes.length > 0 : data.kind === 'stash';
-    if (volHead) volHead.textContent = global ? 'Volume / Listed' : (data.kind === 'stash' ? 'Listed' : 'Volume');
+    if (volHead) {
+      volHead.textContent = global ? txt('ec_col_vol_listed', 'Volume / Listed')
+        : (data.kind === 'stash' ? txt('ec_col_listed', 'Listed') : txt('ec_col_volume', 'Volume'));
+    }
     if (lowWrap) lowWrap.hidden = !anyStash;
     if (global) {
       var bucketNow = state.all[state.league] || {};
       var loaded = state.types.filter(function (t) { return bucketNow[t]; }).length;
-      statusEl.textContent = (total ? total + ' results' : 'No results') + ' for “' + search.value.trim() +
-        '” across all categories' + (total > items.length ? ' (showing top ' + items.length + ')' : '') +
-        (loaded < state.types.length ? ' · searching ' + loaded + '/' + state.types.length + ' categories…' : '') +
-        ' · click a row for price history';
+      statusEl.textContent = (total ? txt('ec_results', '{n} results', { n: total }) : txt('ec_no_results', 'No results')) +
+        ' ' + txt('ec_for_query', 'for “{q}” across all categories', { q: search.value.trim() }) +
+        (total > items.length ? ' ' + txt('ec_top', '(showing top {n})', { n: items.length }) : '') +
+        (loaded < state.types.length ? ' · ' + txt('ec_searching', 'searching {loaded}/{total} categories…',
+          { loaded: loaded, total: state.types.length }) : '') +
+        ' · ' + txt('ec_click_row', 'click a row for price history');
     } else {
       var when = new Date(data.fetchedAt);
-      statusEl.textContent = items.length + ' items · ' + data.league + ' · updated ' +
-        when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' · click a row for price history';
+      statusEl.textContent = txt('ec_items', '{n} items', { n: items.length }) + ' · ' + data.league + ' · ' +
+        txt('ec_updated', 'updated {time}', { time: when.toLocaleTimeString(LOCALE, { hour: '2-digit', minute: '2-digit' }) }) +
+        ' · ' + txt('ec_click_row', 'click a row for price history');
     }
     var rateData = data || (items[0] && items[0]._data) || {};
     var r = rateData.rates || {};
@@ -364,7 +385,7 @@
   }
 
   function load() {
-    statusEl.textContent = 'Loading prices…';
+    statusEl.textContent = txt('ec_loading', 'Loading prices…');
     rowsBox.innerHTML = '';
     if (!hashItem) state.open = null;
     hashItem = null;
@@ -379,7 +400,7 @@
       })
       .catch(function () {
         state.data = null;
-        statusEl.textContent = 'Prices are unavailable right now. Try again in a few minutes.';
+        statusEl.textContent = txt('ec_prices_error', 'Prices are unavailable right now. Try again in a few minutes.');
       });
   }
 
@@ -424,7 +445,7 @@
     selectType(b.dataset.type);
   });
   leagueSel.addEventListener('change', function () { state.league = leagueSel.value; load(); });
-  search.placeholder = 'Search all items by name…';
+  search.placeholder = txt('ec_search', 'Search all items by name…');
   var searchTimer;
   search.addEventListener('input', function () {
     clearTimeout(searchTimer);
@@ -460,6 +481,6 @@
       load();
     })
     .catch(function () {
-      statusEl.textContent = 'League list is unavailable right now. Try again in a few minutes.';
+      statusEl.textContent = txt('ec_leagues_error', 'League list is unavailable right now. Try again in a few minutes.');
     });
 })();

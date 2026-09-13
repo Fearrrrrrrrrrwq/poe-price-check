@@ -22,7 +22,8 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
 from content import C, DEFAULT, LANGS, LOCALES
 from privacy_content import PRIVACY
-from tools.pages import economy_page, map_regex_page, regex_page
+from tools import tool_i18n
+from tools.pages import TOOL_PATHS, economy_page, map_regex_page, regex_page, tool_url
 from tools.instill_page import instill_page
 # Wersja i sklejanie archiwum siedza w package.py, zeby plik ze strony
 # i plik z wydania na GitHubie byly identyczne.
@@ -259,10 +260,10 @@ def page(lang: str) -> str:
       <a href="#how">{esc(t['nav_how'])}</a>
       <a href="#features">{esc(t['nav_features'])}</a>
       <a href="#faq">{esc(t['nav_faq'])}</a>
-      <a href="/tools/poe-map-regex/">{esc(t['nav_mapregex'])}</a>
-      <a href="/tools/poe2-regex/">{esc(t['nav_regex'])}</a>
-      <a href="/tools/poe2-instill/">{esc(t['nav_instill'])}</a>
-      <a href="/economy/">{esc(t['nav_economy'])}</a>
+      <a href="{tool_url(lang, '/tools/poe-map-regex/')}">{esc(t['nav_mapregex'])}</a>
+      <a href="{tool_url(lang, '/tools/poe2-regex/')}">{esc(t['nav_regex'])}</a>
+      <a href="{tool_url(lang, '/tools/poe2-instill/')}">{esc(t['nav_instill'])}</a>
+      <a href="{tool_url(lang, '/economy/')}">{esc(t['nav_economy'])}</a>
       <a class="cta" href="#download">{esc(t['nav_download'])}</a>
     </nav>
   </div>
@@ -754,15 +755,22 @@ def sitemap() -> str:
             f"  <priority>{'1.0' if code == DEFAULT else '0.9'}</priority>\n"
             f"{alts}"
             f"</url>")
-    for path in ("/tools/poe-map-regex/", "/tools/poe2-regex/", "/tools/poe2-instill/", "/economy/", "/economy/poe1/"):
+    for path in TOOL_PATHS:
         freq = "daily" if path.startswith("/economy") else "weekly"
-        entries.append(
-            f"<url>\n"
-            f"  <loc>{SITE_URL}{path}</loc>\n"
-            f"  <lastmod>{changed}</lastmod>\n"
-            f"  <changefreq>{freq}</changefreq>\n"
-            f"  <priority>0.8</priority>\n"
-            f"</url>")
+        alts = "".join(
+            f'  <xhtml:link rel="alternate" hreflang="{other}" '
+            f'href="{SITE_URL}{tool_url(other, path)}"/>\n' for other in LANGS)
+        alts += (f'  <xhtml:link rel="alternate" hreflang="x-default" '
+                 f'href="{SITE_URL}{path}"/>\n')
+        for code in LANGS:
+            entries.append(
+                f"<url>\n"
+                f"  <loc>{SITE_URL}{tool_url(code, path)}</loc>\n"
+                f"  <lastmod>{changed}</lastmod>\n"
+                f"  <changefreq>{freq}</changefreq>\n"
+                f"  <priority>{'0.8' if code == DEFAULT else '0.7'}</priority>\n"
+                f"{alts}"
+                f"</url>")
     return ('<?xml version="1.0" encoding="UTF-8"?>\n'
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
             'xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
@@ -920,22 +928,22 @@ def build() -> None:
         (target / "privacy" / "index.html").write_text(
             privacy_page(code), encoding="utf-8")
 
-    # Narzedzia (po angielsku - patrz tools/pages.py).
+    # Narzedzia w kazdym jezyku: angielski pod dotychczasowym adresem, reszta
+    # z prefiksem jezyka (patrz tools/pages.py).
+    tool_i18n.check()
     helpers = {"esc": esc, "asset": asset, "site_url": SITE_URL}
-    (DIST / "tools" / "poe2-regex").mkdir(parents=True)
-    (DIST / "tools" / "poe2-regex" / "index.html").write_text(
-        regex_page(**helpers), encoding="utf-8")
-    (DIST / "tools" / "poe-map-regex").mkdir(parents=True)
-    (DIST / "tools" / "poe-map-regex" / "index.html").write_text(
-        map_regex_page(**helpers), encoding="utf-8")
-    (DIST / "tools" / "poe2-instill").mkdir(parents=True)
-    (DIST / "tools" / "poe2-instill" / "index.html").write_text(
-        instill_page(**helpers), encoding="utf-8")
-    (DIST / "economy" / "poe1").mkdir(parents=True)
-    (DIST / "economy" / "index.html").write_text(
-        economy_page("poe2", **helpers), encoding="utf-8")
-    (DIST / "economy" / "poe1" / "index.html").write_text(
-        economy_page("poe1", **helpers), encoding="utf-8")
+    builders = {
+        "/tools/poe2-regex/": lambda code: regex_page(code, **helpers),
+        "/tools/poe-map-regex/": lambda code: map_regex_page(code, **helpers),
+        "/tools/poe2-instill/": lambda code: instill_page(code, **helpers),
+        "/economy/": lambda code: economy_page("poe2", code, **helpers),
+        "/economy/poe1/": lambda code: economy_page("poe1", code, **helpers),
+    }
+    for code in LANGS:
+        for path in TOOL_PATHS:
+            target = DIST / tool_url(code, path).strip("/")
+            target.mkdir(parents=True, exist_ok=True)
+            (target / "index.html").write_text(builders[path](code), encoding="utf-8")
 
     (DIST / "index.html").write_text(root_redirect(), encoding="utf-8")
     (DIST / "admin").mkdir()

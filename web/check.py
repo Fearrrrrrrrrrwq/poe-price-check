@@ -247,5 +247,43 @@ check("linki do wszystkich jezykow bez skryptu",
       all(f'href="/{code}/"' in root for code in LANGS))
 check("canonical wskazuje na jezyk domyslny", f'/{DEFAULT}/"' in root)
 
+print("\n=== narzedzia w kazdym jezyku ===")
+# Angielski pod dotychczasowym adresem, reszta z prefiksem - te same zasady co
+# tools.pages.tool_url. Wersje jezykowe musza wskazywac na siebie nawzajem,
+# inaczej Google potraktuje je jako duplikaty angielskiej.
+TOOLS = ("/tools/poe-map-regex/", "/tools/poe2-regex/", "/tools/poe2-instill/",
+         "/economy/", "/economy/poe1/")
+
+
+def tool_path(code: str, path: str) -> str:
+    return path if code == DEFAULT else f"/{code}{path}"
+
+
+tool_problems = []
+for path in TOOLS:
+    for code in LANGS:
+        rel = tool_path(code, path).strip("/") + "/index.html"
+        if not (DIST / rel).exists():
+            tool_problems.append(f"brak {rel}")
+            continue
+        page = read(rel)
+        if f'<html lang="{code}"' not in page:
+            tool_problems.append(f"{rel}: lang")
+        if f'rel="canonical" href="https://' not in page or f'{tool_path(code, path)}">' not in page:
+            tool_problems.append(f"{rel}: canonical")
+        missing = [o for o in LANGS if f'hreflang="{o}" href="https://' not in page
+                   or f'{tool_path(o, path)}">' not in page]
+        if missing or 'hreflang="x-default"' not in page:
+            tool_problems.append(f"{rel}: hreflang {missing}")
+        if 'id="i18n"' not in page:
+            tool_problems.append(f"{rel}: brak tekstow dla skryptu")
+        if f"{tool_path(code, path)}</loc>" not in sitemap:
+            tool_problems.append(f"sitemap: {tool_path(code, path)}")
+check(f"{len(TOOLS)} narzedzi x {len(LANGS)} jezykow: lang, canonical, hreflang, sitemap",
+      not tool_problems, "; ".join(tool_problems[:5]))
+titles_tools = {read(tool_path(c, "/tools/poe-map-regex/").strip("/") + "/index.html")
+                .split("<title>")[1].split("</title>")[0] for c in LANGS}
+check("narzedzia maja przetlumaczone tytuly", len(titles_tools) == len(LANGS))
+
 print(f"\n{sum(ok)}/{len(ok)} OK")
 sys.exit(0 if all(ok) else 1)

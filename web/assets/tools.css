@@ -96,7 +96,7 @@
 .econ-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin-bottom: 4px; }
 .econ-bar .game-switch { margin-bottom: 0; }
 .field-inline { display: inline-flex; align-items: center; gap: 8px; color: var(--muted); font-size: 14px; }
-#econ-search { min-width: 220px; }
+#econ-search { min-width: 220px; width: 17em; max-width: 100%; }
 .rates { margin: 0 0 0 auto; color: var(--title); font-size: 14px; font-variant-numeric: tabular-nums; }
 .econ .chips { margin: 14px 0 12px; }
 .econ-table-wrap { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: var(--panel); }

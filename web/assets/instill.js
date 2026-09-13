@@ -7,6 +7,17 @@
 (function () {
   'use strict';
 
+  // Teksty w jezyku strony (<script type="application/json" id="i18n">),
+  // angielski jako zapas - skrypt dziala tez na stronie bez tlumaczen.
+  var I18N = (function () {
+    try { return JSON.parse(document.getElementById('i18n').textContent); } catch (e) { return {}; }
+  })();
+  function txt(key, fallback, vars) {
+    return String(I18N[key] || fallback).replace(/\{(\w+)\}/g, function (m, k) {
+      return vars && Object.prototype.hasOwnProperty.call(vars, k) ? vars[k] : m;
+    });
+  }
+
   var root = document.querySelector('.instill');
   if (!root) return;
   var names = JSON.parse(root.dataset.emotions || '[]');
@@ -23,13 +34,13 @@
   function combo() {
     var picked = selects.map(function (s) { return s.value; });
     if (picked.some(function (v) { return v === ''; })) {
-      result.innerHTML = '<p class="note">Pick an emotion for each slot.</p>';
+      result.innerHTML = '<p class="note">' + txt('in_pick', 'Pick an emotion for each slot.') + '</p>';
       return;
     }
     var li = byRecipe[picked.join(',')];
     if (!li) {
-      result.innerHTML = '<p class="note">No notable uses these three emotions in this order. ' +
-        'Try another order — each order is a different recipe.</p>';
+      result.innerHTML = '<p class="note">' + txt('in_none', 'No notable uses these three emotions in this order. ' +
+        'Try another order — each order is a different recipe.') + '</p>';
       return;
     }
     var clone = li.cloneNode(true);
@@ -49,8 +60,8 @@
       li.hidden = !ok;
       if (ok) shown++;
     });
-    count.textContent = shown === rows.length ? rows.length + ' notables'
-      : shown + ' of ' + rows.length + ' notables';
+    count.textContent = shown === rows.length ? txt('in_count', '{n} notables', { n: rows.length })
+      : txt('in_count_of', '{shown} of {n} notables', { shown: shown, n: rows.length });
   }
 
   selects.forEach(function (s) { s.addEventListener('change', combo); });

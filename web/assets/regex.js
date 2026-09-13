@@ -15,6 +15,17 @@
 (function () {
   'use strict';
 
+  // Teksty w jezyku strony (<script type="application/json" id="i18n">),
+  // angielski jako zapas - skrypt dziala tez na stronie bez tlumaczen.
+  var I18N = (function () {
+    try { return JSON.parse(document.getElementById('i18n').textContent); } catch (e) { return {}; }
+  })();
+  function txt(key, fallback, vars) {
+    return String(I18N[key] || fallback).replace(/\{(\w+)\}/g, function (m, k) {
+      return vars && Object.prototype.hasOwnProperty.call(vars, k) ? vars[k] : m;
+    });
+  }
+
   var LIMIT = 250;
   var tabs = Array.prototype.slice.call(document.querySelectorAll('.tool-tabs [role="tab"]'));
   var out = document.getElementById('regex-out');
@@ -131,7 +142,7 @@
       var picked = panel(active).querySelector('.picked');
       if (picked) {
         picked.textContent = (s.want.length || s.avoid.length)
-          ? s.want.length + ' wanted · ' + s.avoid.length + ' avoided' : '';
+          ? txt('picked', '{want} wanted · {avoid} avoided', { want: s.want.length, avoid: s.avoid.length }) : '';
       }
     }
     var text = parts.join(' ');
@@ -358,7 +369,7 @@
 
   function copyText(btn, text, label, fallback) {
     var done = function () {
-      btn.textContent = 'Copied';
+      btn.textContent = txt('copied', 'Copied');
       setTimeout(function () { btn.textContent = label; }, 1500);
     };
     if (navigator.clipboard && navigator.clipboard.writeText) {
@@ -368,7 +379,7 @@
     }
   }
   copyBtn.addEventListener('click', function () {
-    copyText(copyBtn, out.value, 'Copy', function () {
+    copyText(copyBtn, out.value, txt('copy', 'Copy'), function () {
       out.select();
       try { document.execCommand('copy'); } catch (err) { /* uzytkownik skopiuje sam */ }
     });
@@ -376,7 +387,9 @@
   if (shareBtn) {
     shareBtn.addEventListener('click', function () {
       // Bez schowka adres i tak jest juz w pasku przegladarki (syncHash).
-      copyText(shareBtn, shareUrl(), 'Copy link', function () { shareBtn.textContent = 'Link is in the address bar'; });
+      copyText(shareBtn, shareUrl(), txt('copy_link', 'Copy link'), function () {
+        shareBtn.textContent = txt('link_in_bar', 'Link is in the address bar');
+      });
     });
   }
 

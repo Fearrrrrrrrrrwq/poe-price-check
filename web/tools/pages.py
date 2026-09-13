@@ -233,9 +233,9 @@ ECONOMY = {
     "poe1": {
         "path": "/economy/poe1/", "other": "/economy/", "name": "Path of Exile",
         "short": "PoE1",
-        "title": "PoE Economy — Currency, Scarab & Divination Card Prices",
-        "description": ("Live Path of Exile prices: Divine Orb rate, scarabs, essences, fossils, "
-                        "divination cards — with 24h, 7 day and 30 day change."),
+        "title": "PoE Economy — Currency, Unique & Scarab Prices",
+        "description": ("Live Path of Exile prices: Divine Orb rate, unique items, scarabs, essences, "
+                        "divination cards — with 24h, 7 day and 30 day change and league price history."),
     },
 }
 
@@ -247,6 +247,13 @@ ECONOMY_FAQ = (
      "The price change over the last day, week and month. 24h and 7d come from "
      "poe.ninja's price history; 30d comes from daily snapshots this site keeps, so it "
      "fills in during the first month of a league."),
+    ("Can I see how a price changed over the league?",
+     "Yes — click any row to open its price history for the whole league, with the league low, "
+     "high and the change since the league started."),
+    ("What does \"low confidence\" mean for unique items?",
+     "The price is based on fewer than 10 listings, so it can be far off. Those items are hidden "
+     "by default; untick \"Hide low confidence\" to see them. Unique prices are only available "
+     "for Path of Exile 1 — Path of Exile 2 has no public stash data."),
     ("How do I price a rare item?",
      "Currency-style items are here. For rares and uniques use the free PoE Price Check "
      "app — it reads the item under your cursor and searches the official trade site."),
@@ -265,8 +272,8 @@ def economy_page(game: str, *, esc, asset, site_url) -> str:
   <div class="wrap wide">
     <p class="eyebrow">{esc(cfg["name"])} · live prices</p>
     <h1>{esc(cfg["short"])} Economy</h1>
-    <p class="lead">Currency and consumable prices for the current league, with
-    price changes over the last day, week and month.</p>
+    <p class="lead">{"Currency, unique item" if game == "poe1" else "Currency and consumable"} prices for the current league,
+    with price changes over the last day, week and month — click a row for its price history.</p>
   </div>
 </section>
 
@@ -278,6 +285,7 @@ def economy_page(game: str, *, esc, asset, site_url) -> str:
         <select id="econ-league" aria-label="League"><option>Loading…</option></select>
       </label>
       <input type="search" id="econ-search" placeholder="Search items…" aria-label="Search items">
+      <label class="field-inline" id="econ-lowconf-wrap" hidden><input type="checkbox" id="econ-lowconf" checked> Hide low confidence</label>
       <p class="rates" id="econ-rates" aria-live="polite"></p>
     </div>
     <div class="chips" id="econ-types" role="tablist" aria-label="Category"></div>

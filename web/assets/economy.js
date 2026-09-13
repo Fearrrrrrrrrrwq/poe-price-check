@@ -1,7 +1,8 @@
 /* Strona /economy/ - tabela cen z /api/economy (zrodlo: poe.ninja).
  *
  * Stan (liga, kategoria) trzymamy w adresie (?league=&type=), zeby link do
- * konkretnej tabeli dalo sie wkleic na Discorda.
+ * konkretnej tabeli dalo sie wkleic na Discorda. Klikniecie wiersza otwiera
+ * pod nim wykres ceny z calej ligi.
  */
 (function () {
   'use strict';
@@ -15,24 +16,36 @@
   var statusEl = document.getElementById('econ-status');
   var ratesEl = document.getElementById('econ-rates');
   var search = document.getElementById('econ-search');
+  var lowToggle = document.getElementById('econ-lowconf');
+  var lowWrap = document.getElementById('econ-lowconf-wrap');
+  var volHead = document.querySelector('.econ-table th[data-sort="volume"]');
 
   var LABELS = {
     SoulCores: 'Soul Cores', UncutGems: 'Uncut Gems', LineageSupportGems: 'Lineage Supports',
     DeliriumOrb: 'Delirium Orbs', DivinationCard: 'Divination Cards', AllflameEmber: 'Allflame Embers',
     Fragment: 'Fragments', Scarab: 'Scarabs', Essence: 'Essences', Fossil: 'Fossils',
     Resonator: 'Resonators', Oil: 'Oils', Omen: 'Omens', Tattoo: 'Tattoos', Artifact: 'Artifacts',
-    Runegraft: 'Runegrafts',
+    Runegraft: 'Runegrafts', UniqueWeapon: 'Unique Weapons', UniqueArmour: 'Unique Armours',
+    UniqueAccessory: 'Unique Accessories', UniqueJewel: 'Unique Jewels', UniqueFlask: 'Unique Flasks',
+    UniqueMap: 'Unique Maps', UniqueRelic: 'Unique Relics', UniqueTincture: 'Unique Tinctures',
   };
+  var UNIT = { divine: 'div', exalted: 'ex', chaos: 'c' };
 
   var params = new URLSearchParams(location.search);
   var state = { league: params.get('league') || '', type: params.get('type') || 'Currency',
-    sort: 'value', dir: -1, data: null };
+    sort: 'value', dir: -1, data: null, open: null };
 
   function fmt(n) {
     if (n == null || isNaN(n)) return '–';
     var abs = Math.abs(n);
     var digits = abs >= 100 ? 0 : abs >= 10 ? 1 : abs >= 1 ? 2 : abs >= 0.1 ? 3 : 4;
     return n.toLocaleString('en-US', { maximumFractionDigits: digits });
+  }
+
+  function esc(s) {
+    return String(s).replace(/[&<>"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+    });
   }
 
   // Wartosc w najczytelniejszej walucie: PoE2 liczy w Divine, ale za 0,02 div
@@ -70,9 +83,140 @@
       '<circle cx="' + end[0] + '" cy="' + end[1] + '" r="2.2"/></svg>';
   }
 
-  function esc(s) {
-    return String(s).replace(/[&<>"]/g, function (c) {
-      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c];
+  // --- wykres historii ceny (jedna seria: wartosc przedmiotu w czasie) -----
+  function niceTicks(min, max, count) {
+    if (min === max) { min = min * 0.9; max = max * 1.1 || 1; }
+    var span = max - min, step = Math.pow(10, Math.floor(Math.log10(span / count)));
+    var err = span / count / step;
+    step *= err >= 7.5 ? 10 : err >= 3.5 ? 5 : err >= 1.5 ? 2 : 1;
+    var lo = Math.floor(min / step) * step, hi = Math.ceil(max / step) * step, ticks = [];
+    for (var v = lo; v <= hi + step / 2; v += step) ticks.push(Math.round(v / step) * step);
+    return ticks;
+  }
+
+  function dayLabel(iso) {
+    var d = new Date(iso + 'T00:00:00Z');
+    return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', timeZone: 'UTC' });
+  }
+
+  function drawChart(box, points, unit) {
+    // Rysujemy w rzeczywistej szerokosci kontenera - skalowany viewBox
+    // powiekszal tez tekst osi razem z wykresem.
+    var W = Math.max(320, Math.round(box.clientWidth || 720)), H = 240, L = 58, R = 18, T = 16, B = 28;
+    var vals = points.map(function (p) { return p.v; });
+    var ticks = niceTicks(Math.min.apply(null, vals), Math.max.apply(null, vals), 4);
+    var y0 = ticks[0], y1 = ticks[ticks.length - 1];
+    var n = points.length;
+    var x = function (i) { return L + (n === 1 ? (W - L - R) / 2 : i * (W - L - R) / (n - 1)); };
+    var y = function (v) { return T + (1 - (v - y0) / (y1 - y0 || 1)) * (H - T - B); };
+    var line = points.map(function (p, i) { return (i ? 'L' : 'M') + x(i).toFixed(1) + ' ' + y(p.v).toFixed(1); }).join(' ');
+    var area = line + ' L' + x(n - 1).toFixed(1) + ' ' + (H - B) + ' L' + x(0).toFixed(1) + ' ' + (H - B) + ' Z';
+    var grid = ticks.map(function (t) {
+      return '<line class="gl" x1="' + L + '" x2="' + (W - R) + '" y1="' + y(t).toFixed(1) + '" y2="' + y(t).toFixed(1) + '"/>' +
+        '<text class="axis" x="' + (L - 8) + '" y="' + (y(t) + 4).toFixed(1) + '" text-anchor="end">' + fmt(t) + '</text>';
+    }).join('');
+    var xIdx = n > 2 ? [0, Math.floor((n - 1) / 2), n - 1] : n === 2 ? [0, 1] : [0];
+    var xl = xIdx.map(function (i, k) {
+      var anchor = k === 0 ? 'start' : k === xIdx.length - 1 ? 'end' : 'middle';
+      return '<text class="axis" x="' + x(i).toFixed(1) + '" y="' + (H - 8) + '" text-anchor="' + anchor + '">' + dayLabel(points[i].t) + '</text>';
+    }).join('');
+    var last = points[n - 1];
+    box.innerHTML =
+      '<div class="chart-wrap"><svg class="hist" viewBox="0 0 ' + W + ' ' + H + '" width="' + W + '" height="' + H + '" role="img" aria-label="Price history, ' +
+      n + ' days, from ' + fmt(points[0].v) + ' to ' + fmt(last.v) + ' ' + UNIT[unit] + '">' + grid + xl +
+      '<path class="area" d="' + area + '"/><path class="line" d="' + line + '"/>' +
+      '<line class="cross" x1="0" x2="0" y1="' + T + '" y2="' + (H - B) + '" visibility="hidden"/>' +
+      '<circle class="dot-end" cx="' + x(n - 1).toFixed(1) + '" cy="' + y(last.v).toFixed(1) + '" r="4"/>' +
+      '<circle class="dot-hover" r="4" visibility="hidden"/>' +
+      '<rect class="hit" x="' + L + '" y="' + T + '" width="' + (W - L - R) + '" height="' + (H - T - B) + '"/></svg>' +
+      '<div class="tip" hidden></div></div>';
+    var svg = box.querySelector('svg'), tip = box.querySelector('.tip');
+    var cross = svg.querySelector('.cross'), dot = svg.querySelector('.dot-hover');
+    function show(i) {
+      var p = points[i], px = x(i), py = y(p.v);
+      cross.setAttribute('x1', px); cross.setAttribute('x2', px); cross.setAttribute('visibility', 'visible');
+      dot.setAttribute('cx', px); dot.setAttribute('cy', py); dot.setAttribute('visibility', 'visible');
+      tip.hidden = false;
+      tip.innerHTML = '<b>' + fmt(p.v) + ' ' + UNIT[unit] + '</b><span>' + dayLabel(p.t) + '</span>';
+      var rect = svg.getBoundingClientRect(), scale = rect.width / W;
+      tip.style.left = Math.min(Math.max(px * scale, 60), rect.width - 60) + 'px';
+      tip.style.top = (py * scale - 10) + 'px';
+    }
+    function hide() { cross.setAttribute('visibility', 'hidden'); dot.setAttribute('visibility', 'hidden'); tip.hidden = true; }
+    var hit = svg.querySelector('.hit');
+    hit.addEventListener('mousemove', function (e) {
+      var rect = svg.getBoundingClientRect();
+      var sx = (e.clientX - rect.left) * W / rect.width;
+      var i = Math.round((sx - L) / ((W - L - R) / Math.max(n - 1, 1)));
+      show(Math.max(0, Math.min(n - 1, i)));
+    });
+    hit.addEventListener('mouseleave', hide);
+    if (!box._resize) {
+      var pending;
+      box._resize = function () {
+        clearTimeout(pending);
+        pending = setTimeout(function () { if (box.isConnected) drawChart(box, points, unit); }, 150);
+      };
+      window.addEventListener('resize', box._resize);
+    }
+  }
+
+  function pickUnit(series, item, data) {
+    var keys = Object.keys(series).filter(function (k) { return series[k].length; });
+    if (!keys.length) return null;
+    if (data.kind === 'stash') return 'chaos';
+    if (game === 'poe2') {
+      if (item.value < 1 && series.exalted) return 'exalted';
+      return series.divine ? 'divine' : keys[0];
+    }
+    var perDiv = data.rates && data.rates.divine ? 1 / data.rates.divine : Infinity;
+    if (item.value >= perDiv && series.divine) return 'divine';
+    return series.chaos ? 'chaos' : keys[0];
+  }
+
+  function openDetail(tr, item) {
+    var existing = rowsBox.querySelector('tr.detail');
+    if (existing) {
+      var wasFor = existing.dataset.for;
+      existing.remove();
+      rowsBox.querySelectorAll('tr[aria-expanded="true"]').forEach(function (r) { r.setAttribute('aria-expanded', 'false'); });
+      if (wasFor === item.id) { state.open = null; setHash(null); return; }
+    }
+    state.open = item.id;
+    setHash(item.id);
+    tr.setAttribute('aria-expanded', 'true');
+    var detail = document.createElement('tr');
+    detail.className = 'detail';
+    detail.dataset.for = item.id;
+    detail.innerHTML = '<td colspan="7"><div class="detail-box"><p class="note">Loading price history…</p></div></td>';
+    tr.after(detail);
+    var box = detail.querySelector('.detail-box');
+    var data = state.data;
+    var url = '/api/economy?game=' + game + '&league=' + encodeURIComponent(data.league) +
+      '&type=' + encodeURIComponent(data.type) + '&history=' + encodeURIComponent(item.detailsId);
+    fetch(url).then(function (r) { return r.json(); }).then(function (h) {
+      var unit = h.series ? pickUnit(h.series, item, data) : null;
+      var points = unit ? h.series[unit] : [];
+      if (!points || points.length < 2) {
+        box.innerHTML = '<p class="note">Not enough price history for this item yet.</p>';
+        return;
+      }
+      var vals = points.map(function (p) { return p.v; });
+      var first = points[0].v, last = points[points.length - 1].v;
+      var sinceStart = first > 0 ? (last / first - 1) * 100 : null;
+      box.innerHTML = '<div class="detail-head"><h3>' + esc(item.name) + '</h3>' +
+        '<dl class="detail-stats">' +
+        '<div><dt>Now</dt><dd>' + fmt(last) + ' ' + UNIT[unit] + '</dd></div>' +
+        '<div><dt>League low</dt><dd>' + fmt(Math.min.apply(null, vals)) + ' ' + UNIT[unit] + '</dd></div>' +
+        '<div><dt>League high</dt><dd>' + fmt(Math.max.apply(null, vals)) + ' ' + UNIT[unit] + '</dd></div>' +
+        '<div><dt>Since ' + dayLabel(points[0].t) + '</dt><dd>' + change(sinceStart) + '</dd></div>' +
+        '</dl></div><div class="chart-slot"></div>' +
+        '<details class="data-table"><summary>Show data table</summary><table><thead><tr><th scope="col">Day</th><th scope="col" class="col-n">Price (' + UNIT[unit] + ')</th></tr></thead><tbody>' +
+        points.slice().reverse().map(function (p) { return '<tr><td>' + dayLabel(p.t) + '</td><td class="col-n">' + fmt(p.v) + '</td></tr>'; }).join('') +
+        '</tbody></table></details>';
+      drawChart(box.querySelector('.chart-slot'), points, unit);
+    }).catch(function () {
+      box.innerHTML = '<p class="note">Price history is unavailable right now.</p>';
     });
   }
 
@@ -80,7 +224,12 @@
     var data = state.data;
     if (!data) return;
     var q = search.value.trim().toLowerCase();
-    var items = data.items.filter(function (it) { return !q || it.name.toLowerCase().indexOf(q) !== -1; });
+    var hideLow = data.kind === 'stash' && lowToggle && lowToggle.checked;
+    var items = data.items.filter(function (it) {
+      if (it.id === state.open) return true;
+      if (hideLow && it.lowConfidence) return false;
+      return !q || it.name.toLowerCase().indexOf(q) !== -1 || (it.sub || '').toLowerCase().indexOf(q) !== -1;
+    });
     var key = state.sort, dir = state.dir;
     items.sort(function (a, b) {
       if (key === 'name') return a.name.localeCompare(b.name) * dir;
@@ -89,12 +238,16 @@
       if (bv == null) return -1;
       return (av - bv) * dir;
     });
+    var byId = {};
     rowsBox.innerHTML = items.map(function (it) {
+      byId[it.id] = it;
       var p = price(it.value, data);
-      return '<tr>' +
+      return '<tr class="row' + (it.lowConfidence ? ' low' : '') + '" data-id="' + esc(it.id) +
+        '" tabindex="0" aria-expanded="false">' +
         '<th scope="row"><span class="item">' +
           (it.icon ? '<img src="' + esc(it.icon) + '" alt="" width="28" height="28" loading="lazy">' : '') +
-          esc(it.name) + '</span></th>' +
+          '<span>' + esc(it.name) + (it.sub ? '<small>' + esc(it.sub) + '</small>' : '') +
+          (it.lowConfidence ? '<small class="lowtag">low confidence</small>' : '') + '</span></span></th>' +
         '<td class="col-n"><b>' + p.main + '</b>' + (p.sub ? '<small>' + p.sub + '</small>' : '') + '</td>' +
         '<td class="col-n">' + change(it.change24h) + '</td>' +
         '<td class="col-n">' + change(it.change7d) + '</td>' +
@@ -102,29 +255,48 @@
         '<td class="col-n muted">' + fmt(it.volume) + '</td>' +
         '<td class="spark-col">' + spark(it.spark) + '</td></tr>';
     }).join('');
+    state.byId = byId;
     document.querySelectorAll('.econ-table th[data-sort]').forEach(function (th) {
       th.setAttribute('aria-sort', th.dataset.sort === key ? (dir > 0 ? 'ascending' : 'descending') : 'none');
     });
+    if (volHead) volHead.textContent = data.kind === 'stash' ? 'Listed' : 'Volume';
+    if (lowWrap) lowWrap.hidden = data.kind !== 'stash';
     var when = new Date(data.fetchedAt);
     statusEl.textContent = items.length + ' items · ' + data.league + ' · updated ' +
-      when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' · click a row for price history';
     var r = data.rates || {};
     ratesEl.textContent = data.primary === 'divine'
       ? (r.exalted ? '1 Divine = ' + fmt(r.exalted) + ' Exalted' + (r.chaos ? ' = ' + fmt(r.chaos) + ' Chaos' : '') : '')
       : (r.divine ? '1 Divine = ' + fmt(1 / r.divine) + ' Chaos' : '');
+    if (state.open && byId[state.open]) {
+      var tr = rowsBox.querySelector('tr.row[data-id="' + CSS.escape(state.open) + '"]');
+      state.open = null;
+      if (tr) openDetail(tr, byId[tr.dataset.id]);
+    }
   }
+
+  // #item=<id> w adresie: link prosto do historii ceny konkretnego przedmiotu.
+  function setHash(id) {
+    var base = location.pathname + location.search;
+    history.replaceState(null, '', id ? base + '#item=' + encodeURIComponent(id) : base);
+  }
+  var hashItem = (location.hash.match(/^#item=(.+)$/) || [])[1];
+  if (hashItem) state.open = decodeURIComponent(hashItem);
 
   function syncUrl() {
     var p = new URLSearchParams();
     if (state.league) p.set('league', state.league);
     if (state.type !== 'Currency') p.set('type', state.type);
     var qs = p.toString();
-    history.replaceState(null, '', location.pathname + (qs ? '?' + qs : ''));
+    history.replaceState(null, '', location.pathname + (qs ? '?' + qs : '') +
+      (state.open ? '#item=' + encodeURIComponent(state.open) : ''));
   }
 
   function load() {
     statusEl.textContent = 'Loading prices…';
     rowsBox.innerHTML = '';
+    if (!hashItem) state.open = null;
+    hashItem = null;
     syncUrl();
     var url = '/api/economy?game=' + game + '&league=' + encodeURIComponent(state.league) +
       '&type=' + encodeURIComponent(state.type);
@@ -147,6 +319,17 @@
     }).join('');
   }
 
+  rowsBox.addEventListener('click', function (e) {
+    var tr = e.target.closest('tr.row');
+    if (tr && state.byId && state.byId[tr.dataset.id]) openDetail(tr, state.byId[tr.dataset.id]);
+  });
+  rowsBox.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' && e.key !== ' ') return;
+    var tr = e.target.closest('tr.row');
+    if (!tr) return;
+    e.preventDefault();
+    openDetail(tr, state.byId[tr.dataset.id]);
+  });
   typesBox.addEventListener('click', function (e) {
     var b = e.target.closest('button[data-type]');
     if (!b || b.dataset.type === state.type) return;
@@ -158,6 +341,7 @@
   });
   leagueSel.addEventListener('change', function () { state.league = leagueSel.value; load(); });
   search.addEventListener('input', render);
+  if (lowToggle) lowToggle.addEventListener('change', render);
   document.querySelectorAll('.econ-table th[data-sort]').forEach(function (th) {
     th.tabIndex = 0;
     var go = function () {

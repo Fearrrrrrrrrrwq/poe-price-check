@@ -127,3 +127,40 @@
 .spark.down circle { fill: var(--down); }
 .spark.flat polyline { stroke: var(--muted); }
 .spark.flat circle { fill: var(--muted); }
+
+/* economy: unikaty, wiersz szczegolow i wykres historii */
+.econ-table tbody tr.row { cursor: pointer; }
+.econ-table tbody tr.row:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.econ-table tbody tr[aria-expanded="true"] { background: var(--raise); }
+.econ-table .item small { display: block; color: var(--muted); font-size: 12px; font-weight: 400; }
+.econ-table .item .lowtag { color: var(--down); }
+.econ-table tr.low th, .econ-table tr.low td { opacity: .72; }
+.econ-table tr.detail td { padding: 0; background: var(--bg); white-space: normal; }
+.econ-table tr.detail:hover { background: var(--bg); }
+.detail-box { padding: 18px 20px 16px; }
+.detail-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; }
+.detail-head h3 { margin: 0; font-size: 16px; color: var(--title); }
+.detail-stats { display: flex; flex-wrap: wrap; gap: 6px 26px; margin: 0; }
+.detail-stats div { display: flex; flex-direction: column; }
+.detail-stats dt { color: var(--muted); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+.detail-stats dd { margin: 0; color: var(--fg); font-size: 15px; font-variant-numeric: tabular-nums; }
+.chart-wrap { position: relative; margin-top: 12px; }
+.hist { display: block; max-width: 100%; height: auto; }
+.hist .gl { stroke: var(--border); stroke-width: 1; }
+.hist .axis { fill: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.hist .line { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.hist .area { fill: var(--accent); opacity: .10; }
+.hist .dot-end, .hist .dot-hover { fill: var(--accent); stroke: var(--bg); stroke-width: 2; }
+.hist .cross { stroke: var(--muted); stroke-width: 1; }
+.hist .hit { fill: transparent; cursor: crosshair; }
+.tip { position: absolute; transform: translate(-50%, -100%); pointer-events: none; white-space: nowrap;
+       background: var(--panel); border: 1px solid var(--border); border-radius: 6px; padding: 5px 9px;
+       font-size: 12px; box-shadow: 0 6px 18px -8px rgba(0, 0, 0, .7); }
+.tip b { color: var(--title); margin-right: 8px; font-variant-numeric: tabular-nums; }
+.tip span { color: var(--muted); }
+.tool-page details.data-table { margin-top: 10px; border: 0; padding: 0; background: none; }
+.tool-page .data-table summary { font-size: 13px; font-weight: 500; color: var(--muted); }
+.tool-page .data-table summary::before { content: none; }
+.data-table table { margin-top: 8px; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+.data-table th, .data-table td { padding: 3px 14px 3px 0; border: 0; text-align: left; }
+.data-table .col-n { text-align: right; }

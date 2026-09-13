@@ -2,18 +2,24 @@
  * Ceny rynkowe dla strony /economy/.
  *
  *   GET /api/economy?game=poe2&league=Forbidden%20Rites&type=Currency
- *   GET /api/economy?game=poe2&leagues=1            -> lista lig
+ *   GET /api/economy?game=poe1&league=Allflame&type=UniqueArmour
+ *   GET /api/economy?game=poe2&league=...&type=Currency&history=exalted-orb
+ *   GET /api/economy?game=poe1&league=...&type=UniqueArmour&history=703
+ *   GET /api/economy?game=poe2&leagues=1            -> lista lig + kategorie
  *
  * Zrodlo cen: poe.ninja (strona pokazuje atrybucje). poe.ninja sam trzyma
  * odpowiedzi 30 minut, wiec my trzymamy je tyle samo w pamieci podrecznej
- * Cloudflare - kazda liga/kategoria idzie do poe.ninja najwyzej raz na pol
- * godziny, niezaleznie od ruchu na stronie.
+ * Cloudflare - kazde zapytanie idzie do poe.ninja najwyzej raz na pol godziny,
+ * niezaleznie od ruchu na stronie.
  *
- * Zmiany 24h i 7d liczymy z "sparkline" poe.ninja (7 dziennych punktow, %
- * zmiany wzgledem wartosci sprzed tygodnia). 30 dni poe.ninja nie podaje, wiec
- * raz dziennie odkladamy migawke cen do D1 i zmiana 30d zapelnia sie sama
- * w ciagu miesiaca. Brak tabeli albo bazy nie psuje odpowiedzi - wtedy po
- * prostu nie ma kolumny 30d.
+ * Dwa rodzaje danych poe.ninja:
+ *  - "exchange": waluty i przedmioty z gieldy (PoE1 i PoE2),
+ *  - "stash": unikaty z publicznych stashy - TYLKO PoE1, bo GGG nie udostepnia
+ *    publicznych stashy PoE2.
+ *
+ * Zmiany 24h i 7d liczymy z "sparkline" poe.ninja. 30 dni poe.ninja w przegladzie
+ * nie podaje, wiec raz dziennie odkladamy migawke cen do D1. Historia calej ligi
+ * dla pojedynczego przedmiotu przychodzi prosto z poe.ninja (?history=).
  */
 
 const NINJA = 'https://poe.ninja';
@@ -22,13 +28,22 @@ const CACHE_SECONDS = 1800;
 const LEAGUE_CACHE_SECONDS = 6 * 3600;
 
 // Kategorie sprawdzone na zywym API poe.ninja (niepuste odpowiedzi).
-export const TYPES = {
+const EXCHANGE = {
   poe2: ['Currency', 'Fragments', 'Runes', 'Essences', 'SoulCores', 'Idols',
     'UncutGems', 'LineageSupportGems', 'Expedition', 'Delirium', 'Breach',
     'Ritual', 'Abyss'],
   poe1: ['Currency', 'Fragment', 'Scarab', 'Essence', 'Fossil', 'Resonator',
     'Oil', 'DeliriumOrb', 'Omen', 'Tattoo', 'Artifact', 'DivinationCard',
     'Runegraft', 'AllflameEmber'],
+};
+const STASH = {
+  poe2: [],
+  poe1: ['UniqueWeapon', 'UniqueArmour', 'UniqueAccessory', 'UniqueJewel',
+    'UniqueFlask', 'UniqueMap', 'UniqueRelic', 'UniqueTincture'],
+};
+export const TYPES = {
+  poe2: [...EXCHANGE.poe2, ...STASH.poe2],
+  poe1: [...EXCHANGE.poe1, ...STASH.poe1],
 };
 
 function json(body, status = 200, maxAge = 300) {
@@ -124,6 +139,87 @@ async function snapshot30d(env, game, league, type, items) {
   }
 }
 
+async function exchangeOverview(game, league, type, ctx) {
+  const data = await cachedFetchJson(
+    `${NINJA}/${game}/api/economy/exchange/current/overview?league=${encodeURIComponent(league)}&type=${type}`,
+    CACHE_SECONDS, ctx);
+  const core = data.core || {};
+  const meta = new Map((data.items || []).map((it) => [it.id, it]));
+  // PoE2 liczy w Divine, PoE1 w Chaos. rates: ile danej waluty za 1 bazowa.
+  const primary = core.primary || (game === 'poe2' ? 'divine' : 'chaos');
+  const items = (data.lines || []).map((line) => {
+    const m = meta.get(line.id) || {};
+    return {
+      id: line.id,
+      detailsId: m.detailsId || line.id,
+      name: m.name || line.id,
+      icon: m.image ? `https://web.poecdn.com${m.image}` : '',
+      value: line.primaryValue ?? 0,
+      volume: line.volumePrimaryValue ?? 0,
+      change7d: line.sparkline ? round(line.sparkline.totalChange ?? 0, 2) : null,
+      change24h: line.sparkline ? change24h(line.sparkline.data) : null,
+      spark: line.sparkline && Array.isArray(line.sparkline.data) ? line.sparkline.data : [],
+    };
+  });
+  return { primary, rates: core.rates || {}, items };
+}
+
+async function stashOverview(game, league, type, ctx) {
+  const data = await cachedFetchJson(
+    `${NINJA}/${game}/api/economy/stash/current/item/overview?league=${encodeURIComponent(league)}&type=${type}`,
+    CACHE_SECONDS, ctx);
+  const lines = data.lines || [];
+  // Kurs Divine wyliczony z samych linii: divineValue / chaosValue.
+  const ref = lines.find((l) => l.chaosValue > 0 && l.divineValue > 0);
+  const rates = ref ? { divine: ref.divineValue / ref.chaosValue } : {};
+  const items = lines.map((line) => {
+    const extra = [line.baseType, line.variant, line.links ? `${line.links}L` : '']
+      .filter(Boolean).join(' · ');
+    const spark = line.sparkLine || line.sparkline || {};
+    return {
+      id: String(line.id),
+      detailsId: String(line.id),
+      name: line.name,
+      sub: extra,
+      icon: line.icon || '',
+      value: line.chaosValue ?? 0,
+      volume: line.listingCount ?? line.count ?? 0,
+      lowConfidence: (line.count ?? 0) < 10,
+      change7d: Array.isArray(spark.data) && spark.data.length ? round(spark.totalChange ?? 0, 2) : null,
+      change24h: change24h(spark.data),
+      spark: Array.isArray(spark.data) ? spark.data : [],
+    };
+  });
+  return { primary: 'chaos', rates, items };
+}
+
+async function history(game, league, type, id, ctx) {
+  if (STASH[game].includes(type)) {
+    if (!/^\d{1,9}$/.test(id)) throw new Error('bad id');
+    const rows = await cachedFetchJson(
+      `${NINJA}/${game}/api/economy/stash/current/item/history?league=${encodeURIComponent(league)}&type=${type}&id=${id}`,
+      CACHE_SECONDS, ctx);
+    const today = Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth(), new Date().getUTCDate());
+    const points = (Array.isArray(rows) ? rows : [])
+      .filter((r) => r.value > 0)
+      .map((r) => ({ t: new Date(today - r.daysAgo * 86400000).toISOString().slice(0, 10), v: round(r.value, 4) }))
+      .sort((a, b) => (a.t < b.t ? -1 : 1));
+    return { series: { chaos: points } };
+  }
+  if (!/^[a-z0-9-]{1,80}$/.test(id)) throw new Error('bad id');
+  const data = await cachedFetchJson(
+    `${NINJA}/${game}/api/economy/exchange/current/details?league=${encodeURIComponent(league)}&type=${type}&id=${id}`,
+    CACHE_SECONDS, ctx);
+  const series = {};
+  for (const pair of data.pairs || []) {
+    series[pair.id] = (pair.history || [])
+      .filter((h) => h.rate > 0)
+      .map((h) => ({ t: String(h.timestamp).slice(0, 10), v: round(h.rate, 6) }))
+      .sort((a, b) => (a.t < b.t ? -1 : 1));
+  }
+  return { series };
+}
+
 export async function onRequestGet({ request, env, waitUntil }) {
   const ctx = { waitUntil };
   const url = new URL(request.url);
@@ -131,7 +227,8 @@ export async function onRequestGet({ request, env, waitUntil }) {
 
   if (url.searchParams.get('leagues')) {
     try {
-      return json({ game, leagues: await leagues(game, ctx), types: TYPES[game] }, 200, 3600);
+      return json({ game, leagues: await leagues(game, ctx), types: TYPES[game],
+        stashTypes: STASH[game] }, 200, 3600);
     } catch (err) {
       return json({ error: 'leagues_unavailable' }, 502);
     }
@@ -143,37 +240,26 @@ export async function onRequestGet({ request, env, waitUntil }) {
     return json({ error: 'bad_request' }, 400);
   }
 
-  let data;
+  const historyId = url.searchParams.get('history');
+  if (historyId) {
+    try {
+      return json({ game, league, type, id: historyId, ...(await history(game, league, type, historyId, ctx)) },
+        200, 900);
+    } catch (err) {
+      return json({ error: 'history_unavailable' }, 502);
+    }
+  }
+
+  let overview;
   try {
-    data = await cachedFetchJson(
-      `${NINJA}/${game}/api/economy/exchange/current/overview?league=${encodeURIComponent(league)}&type=${type}`,
-      CACHE_SECONDS, ctx);
+    overview = STASH[game].includes(type)
+      ? await stashOverview(game, league, type, ctx)
+      : await exchangeOverview(game, league, type, ctx);
   } catch (err) {
     return json({ error: 'upstream_unavailable' }, 502);
   }
 
-  const core = data.core || {};
-  const meta = new Map((data.items || []).map((it) => [it.id, it]));
-  // Kurs waluty bazowej: PoE2 liczy w Divine, PoE1 w Chaos. rates mowi, ile
-  // danej waluty daje 1 jednostka bazowej.
-  const primary = core.primary || (game === 'poe2' ? 'divine' : 'chaos');
-  const rates = core.rates || {};
-
-  const items = (data.lines || []).map((line) => {
-    const m = meta.get(line.id) || {};
-    return {
-      id: line.id,
-      name: m.name || line.id,
-      icon: m.image ? `https://web.poecdn.com${m.image}` : '',
-      category: m.category || type,
-      value: line.primaryValue ?? 0,
-      volume: line.volumePrimaryValue ?? 0,
-      change7d: line.sparkline ? round(line.sparkline.totalChange ?? 0, 2) : null,
-      change24h: line.sparkline ? change24h(line.sparkline.data) : null,
-      spark: line.sparkline && Array.isArray(line.sparkline.data) ? line.sparkline.data : [],
-    };
-  }).filter((it) => it.value > 0);
-
+  const items = overview.items.filter((it) => it.value > 0);
   const old = await snapshot30d(env, game, league, type, items);
   for (const it of items) {
     const prev = old[it.id];
@@ -181,7 +267,10 @@ export async function onRequestGet({ request, env, waitUntil }) {
   }
 
   return json({
-    game, league, type, primary, rates,
+    game, league, type,
+    kind: STASH[game].includes(type) ? 'stash' : 'exchange',
+    primary: overview.primary,
+    rates: overview.rates,
     source: 'poe.ninja',
     fetchedAt: new Date().toISOString(),
     items,

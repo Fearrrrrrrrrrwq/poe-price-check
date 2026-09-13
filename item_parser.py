@@ -102,6 +102,9 @@ STANDALONE_FLAGS = {
     "Synthesised Item": "synthesised",
     "Fractured Item": "fractured_item",
     "Veiled Item": "veiled",
+    # PoE2: "Sanctified" blokuje dalsze modyfikacje - trade nie normalizuje
+    # wtedy obrony do 20% jakosci (patrz trade_api.q20_factor).
+    "Sanctified": "sanctified",
     # Implanty eldrycze (Wykuwacz/Wchłaniacz) - tekst linii niepotwierdzony
     # na zywym przedmiocie (nie mamy jak przetestowac), ale identyfikatory
     # API (searing_item/tangled_item) sa pewne, a bledny tekst po lewej

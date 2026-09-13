@@ -114,6 +114,37 @@ GAME_KIND_ORDER = {
 }
 
 
+# Enchanty wylaczajace wplyw jakosci - wtedy trade nie normalizuje do Q20.
+QUALITY_BLOCKERS = {
+    "defence": "quality does not increase defences",
+    "physical": "quality does not increase physical damage",
+}
+
+
+def q20_factor(item: ParsedItem, game: str, what: str) -> float:
+    """Mnoznik, ktory przelicza obrone / obrazenia fizyczne na wartosc przy 20%
+    jakosci - bo TAK porownuje je trade.
+
+    Strona trade liczy pancerz, unik, ES, Ward i obrazenia fizyczne przy
+    jakosci max(20, jakosc przedmiotu) - wiec kupiec widzi, ile przedmiot
+    bedzie mial po dorzuceniu tanich osełek. Filtr z wartoscia przy OBECNEJ
+    jakosci przepuszczal slabsze przedmioty i zanizal wycene kazdego itemu
+    ponizej 20%. Wzor jak calc-q20 w Awakened PoE Trade / Exiled Exchange 2:
+    jakosc to osobny mnoznik, wiec mody flat i "increased" sie skracaja i
+    zostaje wartosc * (100 + Q) / (100 + jakosc).
+
+    PoE2 normalizuje tylko przedmioty, ktore da sie jeszcze modyfikowac (nie
+    Corrupted/Mirrored/Sanctified); PoE1 zawsze.
+    """
+    blocker = QUALITY_BLOCKERS[what]
+    if any(blocker in mod.text.lower() for mod in item.mods):
+        return 1.0
+    if game == "poe2" and (item.corrupted or item.flags & {"mirrored", "sanctified"}):
+        return 1.0
+    quality = item.quality or 0
+    return (100 + max(20, quality)) / (100 + quality)
+
+
 def _prefers_local(item: ParsedItem, pattern: str) -> bool:
     """Czy dla tego przedmiotu i tego moda wlasciwy jest wariant '(Local)'."""
     item_class = item.item_class or ""
@@ -1205,16 +1236,23 @@ class TradeClient:
         # DPS decyduje o cenie broni bardziej niz prawie kazdy pojedynczy mod,
         # wiec calkowity DPS idzie wlaczony domyslnie - pDPS/eDPS zostaja do
         # doprecyzowania, gdyby ktos chcial zawezic po samej fizyce/zywiolach.
+        # Wartosci przy 20% jakosci - tak porownuje trade (patrz q20_factor).
+        # eDPS jakosc nie rusza, wiec projekcja dotyczy tylko czesci fizycznej.
+        phys_factor = q20_factor(item, self.game, "physical")
+        def_factor = q20_factor(item, self.game, "defence")
+        phys_tag = " (Q20)" if phys_factor != 1 else ""
+        def_tag = " (Q20)" if def_factor != 1 else ""
+        pdps20 = item.physical_dps * phys_factor if item.physical_dps is not None else None
         if item.total_dps is not None:
-            value = round(item.total_dps)
+            value = round((pdps20 or 0) + (item.elemental_dps or 0))
             options.append(PropertyOption(
-                key="dps", label=t("prop.dps"),
+                key="dps", label=t("prop.dps") + phys_tag,
                 value=value, minimum=0, maximum=max(value * 2, 10), enabled=True,
             ))
-        if item.physical_dps is not None:
-            value = round(item.physical_dps)
+        if pdps20 is not None:
+            value = round(pdps20)
             options.append(PropertyOption(
-                key="pdps", label=t("prop.pdps"),
+                key="pdps", label=t("prop.pdps") + phys_tag,
                 value=value, minimum=0, maximum=max(value * 2, 10), enabled=False,
             ))
         if item.elemental_dps is not None:
@@ -1226,25 +1264,28 @@ class TradeClient:
         # Obrona pancerza/tarczy decyduje o cenie tak samo jak DPS dla broni -
         # ten sam wzorzec, wlaczone domyslnie.
         if item.armour is not None:
+            value = round(item.armour * def_factor)
             options.append(PropertyOption(
-                key="ar", label=t("prop.ar"),
-                value=item.armour, minimum=0, maximum=max(item.armour * 2, 10), enabled=True,
+                key="ar", label=t("prop.ar") + def_tag,
+                value=value, minimum=0, maximum=max(value * 2, 10), enabled=True,
             ))
         if item.evasion is not None:
+            value = round(item.evasion * def_factor)
             options.append(PropertyOption(
-                key="ev", label=t("prop.ev"),
-                value=item.evasion, minimum=0, maximum=max(item.evasion * 2, 10), enabled=True,
+                key="ev", label=t("prop.ev") + def_tag,
+                value=value, minimum=0, maximum=max(value * 2, 10), enabled=True,
             ))
         if item.energy_shield is not None:
+            value = round(item.energy_shield * def_factor)
             options.append(PropertyOption(
-                key="es", label=t("prop.es"),
-                value=item.energy_shield, minimum=0,
-                maximum=max(item.energy_shield * 2, 10), enabled=True,
+                key="es", label=t("prop.es") + def_tag,
+                value=value, minimum=0, maximum=max(value * 2, 10), enabled=True,
             ))
         if item.ward is not None:
+            value = round(item.ward * def_factor)
             options.append(PropertyOption(
-                key="ward", label=t("prop.ward"),
-                value=item.ward, minimum=0, maximum=max(item.ward * 2, 10), enabled=True,
+                key="ward", label=t("prop.ward") + def_tag,
+                value=value, minimum=0, maximum=max(value * 2, 10), enabled=True,
             ))
         if item.block_chance is not None:
             options.append(PropertyOption(

@@ -2,6 +2,8 @@
  *
  * Strona sama opisuje, co ma: panele z lista modow (.mods) i/lub progami
  * (.thr), opcjonalne zakladki; klucz localStorage w data-store pola wyniku.
+ * Link do zestawu: #tab=<panel>&t=<id.min~id>&w=<frag~frag>&a=<frag>&s=<links.r.g.b>&m=all
+ * (tylko aktywny panel; patrz shareParams/loadHash).
  *
  * Lista modow i progi sa wyrenderowane w HTML (widoczne dla wyszukiwarek);
  * skrypt tylko trzyma stan zaznaczen i sklada z niego tekst wyszukiwania.

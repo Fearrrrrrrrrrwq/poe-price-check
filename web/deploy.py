@@ -239,6 +239,52 @@ def deploy() -> None:
     run("pages", "deploy", f"--project-name={PROJECT}", f"--branch={BRANCH}")
 
 
+def verify_assets(site_url: str) -> None:
+    """Czeka, az Cloudflare serwuje nowe zasoby, i sprawdza adresy ze znacznikiem.
+
+    Zasoby maja Cache-Control immutable na rok. Tuz po wysylce krawedz potrafi
+    jeszcze oddac plik z poprzedniego wdrozenia - jesli pierwsze zapytanie o
+    NOWY adres (?v=nowy) trafi wtedy w stara wersje, cache trzyma ja pod nowym
+    adresem na stale (tak zepsul sie link do zestawu w regex.js). Dlatego
+    najpierw pytamy adresem z dodatkowym parametrem, ktory nigdy nie trafi do
+    cache uzytkownikow, i dopiero gdy tresc sie zgadza - adresem prawdziwym.
+    """
+    import hashlib
+    import time
+    import urllib.request
+
+    wanted: dict[str, str] = {}
+    for page in (HERE / "dist").rglob("*.html"):
+        for name, digest in re.findall(r'/assets/([\w.-]+)\?v=([0-9a-f]{8})', page.read_text(encoding="utf-8")):
+            wanted[name] = digest
+
+    def fetch(url: str) -> str:
+        req = urllib.request.Request(url, headers={"User-Agent": "poe-price-check-deploy"})
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            return hashlib.sha256(resp.read()).hexdigest()[:8]
+
+    stale = []
+    for name, digest in sorted(wanted.items()):
+        base = f"{site_url}/assets/{name}?v={digest}"
+        for attempt in range(12):
+            try:
+                if fetch(f"{base}&deploycheck={secrets.token_hex(4)}") == digest:
+                    break
+            except OSError:
+                pass
+            time.sleep(5)
+        try:
+            if fetch(base) != digest:
+                stale.append(name)
+        except OSError:
+            stale.append(name)
+    if stale:
+        print("  UWAGA: cache Cloudflare oddaje stara tresc pod nowym adresem: " + ", ".join(stale))
+        print("  Zmien tresc tych plikow (nowy znacznik ?v=) i wdroz ponownie.")
+    else:
+        print(f"  zasoby: {len(wanted)} plikow ze znacznikiem serwuje aktualna tresc")
+
+
 # --------------------------------------------------------------------- start
 
 def main() -> None:
@@ -266,6 +312,7 @@ def main() -> None:
     token = ensure_secret()
     build(site_url)
     deploy()
+    verify_assets(site_url)
 
     print("\n" + "=" * 68)
     print("Wdrozone.")

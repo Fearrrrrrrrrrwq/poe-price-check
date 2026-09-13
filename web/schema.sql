@@ -89,3 +89,16 @@ CREATE TABLE IF NOT EXISTS login_attempts (
 );
 
 CREATE INDEX IF NOT EXISTS login_attempts_ip ON login_attempts (ip, at);
+
+-- Migawki cen dla strony /economy/ (zrodlo: poe.ninja). Jedna na dzien na
+-- lige/kategorie - wystarczy do zmiany 30d, ktorej poe.ninja nie podaje.
+-- Wiersze starsze niz ~40 dni kasuje sama funkcja /api/economy.
+CREATE TABLE IF NOT EXISTS economy_prices (
+  game   TEXT NOT NULL,
+  league TEXT NOT NULL,
+  type   TEXT NOT NULL,
+  day    TEXT NOT NULL,
+  item   TEXT NOT NULL,
+  value  REAL NOT NULL,
+  PRIMARY KEY (game, league, type, day, item)
+);

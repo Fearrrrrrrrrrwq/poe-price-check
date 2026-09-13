@@ -22,6 +22,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
 from content import C, DEFAULT, LANGS, LOCALES
 from privacy_content import PRIVACY
+from tools.pages import economy_page, regex_page
 # Wersja i sklejanie archiwum siedza w package.py, zeby plik ze strony
 # i plik z wydania na GitHubie byly identyczne.
 from package import APP_VERSION, ARCHIVE_NAME
@@ -257,6 +258,8 @@ def page(lang: str) -> str:
       <a href="#how">{esc(t['nav_how'])}</a>
       <a href="#features">{esc(t['nav_features'])}</a>
       <a href="#faq">{esc(t['nav_faq'])}</a>
+      <a href="/tools/poe2-regex/">{esc(t['nav_regex'])}</a>
+      <a href="/economy/">{esc(t['nav_economy'])}</a>
       <a class="cta" href="#download">{esc(t['nav_download'])}</a>
     </nav>
   </div>
@@ -748,6 +751,15 @@ def sitemap() -> str:
             f"  <priority>{'1.0' if code == DEFAULT else '0.9'}</priority>\n"
             f"{alts}"
             f"</url>")
+    for path in ("/tools/poe2-regex/", "/economy/", "/economy/poe1/"):
+        freq = "daily" if path.startswith("/economy") else "weekly"
+        entries.append(
+            f"<url>\n"
+            f"  <loc>{SITE_URL}{path}</loc>\n"
+            f"  <lastmod>{changed}</lastmod>\n"
+            f"  <changefreq>{freq}</changefreq>\n"
+            f"  <priority>0.8</priority>\n"
+            f"</url>")
     return ('<?xml version="1.0" encoding="UTF-8"?>\n'
             '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" '
             'xmlns:xhtml="http://www.w3.org/1999/xhtml">\n'
@@ -824,7 +836,7 @@ def headers() -> str:
         "https://fundingchoicesmessages.google.com "
         "https://*.adtrafficquality.google; "
         "style-src 'self' 'unsafe-inline'; "
-        "img-src 'self' data: https://*.googlesyndication.com https://*.doubleclick.net "
+        "img-src 'self' data: https://web.poecdn.com https://*.googlesyndication.com https://*.doubleclick.net "
         "https://*.google.com https://*.gstatic.com https://*.adtrafficquality.google; "
         "font-src 'self'; "
         "connect-src 'self' https://*.googlesyndication.com https://*.doubleclick.net "
@@ -904,6 +916,17 @@ def build() -> None:
         (target / "privacy").mkdir()
         (target / "privacy" / "index.html").write_text(
             privacy_page(code), encoding="utf-8")
+
+    # Narzedzia (po angielsku - patrz tools/pages.py).
+    helpers = {"esc": esc, "asset": asset, "site_url": SITE_URL}
+    (DIST / "tools" / "poe2-regex").mkdir(parents=True)
+    (DIST / "tools" / "poe2-regex" / "index.html").write_text(
+        regex_page(**helpers), encoding="utf-8")
+    (DIST / "economy" / "poe1").mkdir(parents=True)
+    (DIST / "economy" / "index.html").write_text(
+        economy_page("poe2", **helpers), encoding="utf-8")
+    (DIST / "economy" / "poe1" / "index.html").write_text(
+        economy_page("poe1", **helpers), encoding="utf-8")
 
     (DIST / "index.html").write_text(root_redirect(), encoding="utf-8")
     (DIST / "admin").mkdir()

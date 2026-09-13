@@ -1,0 +1,932 @@
+{
+ "generated": "2026-09-13",
+ "waystone": [
+  {
+   "text": "# additional Rare Monsters are spawned from Abysses",
+   "frag": "are s"
+  },
+  {
+   "text": "#% increased amount of Magic Chests",
+   "frag": "f mag"
+  },
+  {
+   "text": "#% increased amount of Rare Chests",
+   "frag": "of ra"
+  },
+  {
+   "text": "#% increased Gold found in Map",
+   "frag": "sed g"
+  },
+  {
+   "text": "#% increased Magic Monsters",
+   "frag": "gic m"
+  },
+  {
+   "text": "#% increased Magic Pack Size",
+   "frag": "gic p"
+  },
+  {
+   "text": "#% increased Monster Damage",
+   "frag": "d monster d"
+  },
+  {
+   "text": "#% increased number of Monster Packs",
+   "frag": "numbe"
+  },
+  {
+   "text": "#% increased Pack Size",
+   "frag": "ed pa"
+  },
+  {
+   "text": "#% increased Quantity of Items found",
+   "frag": "of it"
+  },
+  {
+   "text": "#% increased Quantity of Waystones found",
+   "frag": "of wa"
+  },
+  {
+   "text": "#% increased Rare Monsters",
+   "frag": "sed r"
+  },
+  {
+   "text": "#% maximum Player Resistances",
+   "frag": "mum p"
+  },
+  {
+   "text": "#% Monster Elemental Resistances",
+   "frag": "er el"
+  },
+  {
+   "text": "#% more effect of Curses on Monsters",
+   "frag": "of cu"
+  },
+  {
+   "text": "#% more Monster Life",
+   "frag": "ter l"
+  },
+  {
+   "text": "Abyss Cracks have #% chance to spawn all Monsters as at least Magic",
+   "frag": "crack"
+  },
+  {
+   "text": "Abyss Pits have #% chance to spawn all Monsters as at least Magic",
+   "frag": "its h"
+  },
+  {
+   "text": "Abyss Pits in Map are #% less likely to have no Rewards",
+   "frag": "map a"
+  },
+  {
+   "text": "Abyssal Monsters grant #% increased Experience",
+   "frag": "grant"
+  },
+  {
+   "text": "Abyssal Monsters have increased Difficulty and Reward for each closed Pit",
+   "frag": "diffi"
+  },
+  {
+   "text": "Abysses lead to an Abyssal Boss",
+   "frag": "sal b"
+  },
+  {
+   "text": "Abysses lead to an Abyssal Depths",
+   "frag": "depth"
+  },
+  {
+   "text": "Abysses spawn #% increased Monsters",
+   "frag": "ses s"
+  },
+  {
+   "text": "Area contains # additional Incubator Queens",
+   "frag": "incub"
+  },
+  {
+   "text": "Area contains # additional Magic Chests",
+   "frag": "al ma"
+  },
+  {
+   "text": "Area contains # additional packs of Beasts",
+   "frag": "of be"
+  },
+  {
+   "text": "Area contains # additional packs of Bramble Monsters",
+   "frag": "of br"
+  },
+  {
+   "text": "Area contains # additional packs of Ezomyte Monsters",
+   "frag": "of ez"
+  },
+  {
+   "text": "Area contains # additional packs of Faridun Monsters",
+   "frag": "of fa"
+  },
+  {
+   "text": "Area contains # additional packs of Iron Guards",
+   "frag": "of ir"
+  },
+  {
+   "text": "Area contains # additional packs of Plagued Monsters",
+   "frag": "of pl"
+  },
+  {
+   "text": "Area contains # additional packs of Transcended Monsters",
+   "frag": "of tr"
+  },
+  {
+   "text": "Area contains # additional packs of Undead",
+   "frag": "of un"
+  },
+  {
+   "text": "Area contains # additional packs of Vaal Monsters",
+   "frag": "of va"
+  },
+  {
+   "text": "Area has patches of Chilled Ground",
+   "frag": "of ch"
+  },
+  {
+   "text": "Area has patches of Ignited Ground",
+   "frag": "of ig"
+  },
+  {
+   "text": "Area has patches of Mana Siphoning Ground",
+   "frag": "sipho"
+  },
+  {
+   "text": "Area has patches of Shocked Ground",
+   "frag": "of sh"
+  },
+  {
+   "text": "Map contains # additional Abysses",
+   "frag": "nal a"
+  },
+  {
+   "text": "Map contains # additional Essences",
+   "frag": "essen"
+  },
+  {
+   "text": "Map contains # additional Rare Chests",
+   "frag": "l rare c"
+  },
+  {
+   "text": "Map contains # additional Shrines",
+   "frag": "shrin"
+  },
+  {
+   "text": "Map contains # additional Strongboxes",
+   "frag": "stron"
+  },
+  {
+   "text": "Map is overrun by the Abyssal",
+   "frag": "map i"
+  },
+  {
+   "text": "Monster Damage Penetrates #% Elemental Resistances",
+   "frag": "penet"
+  },
+  {
+   "text": "Monster have #% increased Elemental Ailment Application",
+   "frag": "appli"
+  },
+  {
+   "text": "Monsters are Armoured",
+   "frag": "are a"
+  },
+  {
+   "text": "Monsters are Evasive",
+   "frag": "are e"
+  },
+  {
+   "text": "Monsters Break Armour equal to #% of Physical Damage dealt",
+   "frag": "break"
+  },
+  {
+   "text": "Monsters deal #% of Damage as Extra Chaos",
+   "frag": "chaos"
+  },
+  {
+   "text": "Monsters deal #% of Damage as Extra Cold",
+   "frag": "ra co"
+  },
+  {
+   "text": "Monsters deal #% of Damage as Extra Fire",
+   "frag": "tra f"
+  },
+  {
+   "text": "Monsters deal #% of Damage as Extra Lightning",
+   "frag": "light"
+  },
+  {
+   "text": "Monsters fire # additional Projectiles",
+   "frag": "proje"
+  },
+  {
+   "text": "Monsters gain #% of maximum Life as Extra maximum Energy Shield",
+   "frag": "f max"
+  },
+  {
+   "text": "Monsters have #% chance to inflict Bleeding on Hit",
+   "frag": "to in"
+  },
+  {
+   "text": "Monsters have #% chance to Poison on Hit",
+   "frag": "to po"
+  },
+  {
+   "text": "Monsters have #% chance to steal Power, Frenzy and Endurance charges on Hit",
+   "frag": "to st"
+  },
+  {
+   "text": "Monsters have #% Critical Damage Bonus",
+   "frag": "bonus"
+  },
+  {
+   "text": "Monsters have #% increased Accuracy Rating",
+   "frag": "accur"
+  },
+  {
+   "text": "Monsters have #% increased Ailment Threshold",
+   "frag": "ed ai"
+  },
+  {
+   "text": "Monsters have #% increased Area of Effect",
+   "frag": "of ef"
+  },
+  {
+   "text": "Monsters have #% increased Attack, Cast and Movement Speed",
+   "frag": "attac"
+  },
+  {
+   "text": "Monsters have #% increased Critical Hit Chance",
+   "frag": "hit c"
+  },
+  {
+   "text": "Monsters have #% increased Stun Buildup",
+   "frag": "build"
+  },
+  {
+   "text": "Monsters have #% increased Stun Threshold",
+   "frag": "tun t"
+  },
+  {
+   "text": "Monsters inflict # Grasping Vines on Hit",
+   "frag": "grasp"
+  },
+  {
+   "text": "Monsters take #% reduced Extra Damage from Critical Hits",
+   "frag": "reduc"
+  },
+  {
+   "text": "Natural Rare Monsters in Area Eat the Souls of slain Monsters in their Presence",
+   "frag": "eat t"
+  },
+  {
+   "text": "Natural Rare Monsters in Area have # extra Abyssal Modifiers",
+   "frag": "a hav"
+  },
+  {
+   "text": "Players and their Minions deal no damage for 3 out of every 10 seconds",
+   "frag": "and t"
+  },
+  {
+   "text": "Players are Marked for Death for # seconds after killing a Rare or Unique monster",
+   "frag": "marke"
+  },
+  {
+   "text": "Players are periodically Cursed with Elemental Weakness",
+   "frag": "weakn"
+  },
+  {
+   "text": "Players are periodically Cursed with Enfeeble",
+   "frag": "enfee"
+  },
+  {
+   "text": "Players are periodically Cursed with Temporal Chains",
+   "frag": "tempo"
+  },
+  {
+   "text": "Players gain #% increased Flask Charges",
+   "frag": "flask"
+  },
+  {
+   "text": "Players have #% more Cooldown Recovery Rate",
+   "frag": "coold"
+  },
+  {
+   "text": "Players have #% more Movement and Skill Speed for each time they've used a Skill Recently",
+   "frag": "and s"
+  },
+  {
+   "text": "Players have #% more Recovery Rate of Life and Energy Shield",
+   "frag": "of li"
+  },
+  {
+   "text": "Players steal the Eaten Souls of Slain Rare Monsters in Area",
+   "frag": "the e"
+  },
+  {
+   "text": "Rare Monsters have # additional Modifiers",
+   "frag": "nal mo"
+  }
+ ],
+ "waystoneProps": [
+  {
+   "id": "tier",
+   "label": "Waystone Tier",
+   "re": "tier {n}\\)",
+   "def": 15
+  },
+  {
+   "id": "iir",
+   "label": "Item Rarity",
+   "re": "em rarity: \\+{n}%",
+   "def": 30
+  },
+  {
+   "id": "pack",
+   "label": "Pack Size",
+   "re": "ck size: \\+{n}%",
+   "def": 20
+  },
+  {
+   "id": "mrar",
+   "label": "Monster Rarity",
+   "re": "er rarity: \\+{n}%",
+   "def": 30
+  },
+  {
+   "id": "drop",
+   "label": "Waystone Drop Chance",
+   "re": "op chance: \\+{n}%",
+   "def": 100
+  }
+ ],
+ "tablet": [
+  {
+   "text": "# additional Rare Monsters are spawned from Abysses in Map",
+   "frag": "are s"
+  },
+  {
+   "text": "# extra pack of Monsters around Vaal Beacons in Map",
+   "frag": "ack o"
+  },
+  {
+   "text": "#% chance for an extra packs of Monsters around Vaal Beacons in Map",
+   "frag": "an ex"
+  },
+  {
+   "text": "#% chance to gain an additional Crystal from Vaal Beacons in Map",
+   "frag": "to ga"
+  },
+  {
+   "text": "#% increased chance for Abyssal monsters in Map to have Abyssal Modifiers",
+   "frag": "or ab"
+  },
+  {
+   "text": "#% increased chance for Desecrated Currency from Abysses in Map",
+   "frag": "for d"
+  },
+  {
+   "text": "#% increased chance Vaal Beacon Chests are Rare in Map",
+   "frag": "are r"
+  },
+  {
+   "text": "#% increased chance Vaal Beacons summon additional Monsters in Map",
+   "frag": "ons s"
+  },
+  {
+   "text": "#% increased Effect of Expedition Remnants in Map",
+   "frag": "ect o"
+  },
+  {
+   "text": "#% increased Effectiveness of Rare Breach Monsters in Map",
+   "frag": "fecti"
+  },
+  {
+   "text": "#% increased Expedition Explosive Area of Effect in Map",
+   "frag": "of ef"
+  },
+  {
+   "text": "#% increased Expedition Explosive Placement Range in Map",
+   "frag": "range"
+  },
+  {
+   "text": "#% increased Expedition Monster Rarity in Map",
+   "frag": "ity i"
+  },
+  {
+   "text": "#% increased Experience gain in Map",
+   "frag": "nce g"
+  },
+  {
+   "text": "#% increased Gold found in Map (Gold Piles)",
+   "frag": "piles"
+  },
+  {
+   "text": "#% increased number of Rare Expedition Monsters in Map",
+   "frag": "are e"
+  },
+  {
+   "text": "#% increased Pack Size for Monsters around Vaal Beacons in Map",
+   "frag": "for m"
+  },
+  {
+   "text": "#% increased Pack Size in Map",
+   "frag": "ize i"
+  },
+  {
+   "text": "#% increased Quantity of Breach Splinters dropped by Breach Monsters in Map",
+   "frag": "of br"
+  },
+  {
+   "text": "#% increased quantity of Expedition Artifacts dropped by Monsters in Map",
+   "frag": "artif"
+  },
+  {
+   "text": "#% increased Quantity of Expedition Logbooks dropped by Runic Monsters in Map",
+   "frag": "logbo"
+  },
+  {
+   "text": "#% increased Quantity of Hiveblood found in Map",
+   "frag": "ivebl"
+  },
+  {
+   "text": "#% increased Quantity of Items dropped by Map Bosses",
+   "frag": "tity of items d"
+  },
+  {
+   "text": "#% increased Quantity of Items found in Map",
+   "frag": "tity of items f"
+  },
+  {
+   "text": "#% increased Quantity of Waystones dropped by Map Bosses",
+   "frag": "nes d"
+  },
+  {
+   "text": "#% increased Quantity of Waystones found in Map",
+   "frag": "nes f"
+  },
+  {
+   "text": "#% increased Quantity of Wombgifts found in Map",
+   "frag": "of wo"
+  },
+  {
+   "text": "#% increased Rarity of Items dropped by Map Bosses",
+   "frag": "rity of items d"
+  },
+  {
+   "text": "#% increased Rarity of Items found in Map",
+   "frag": "rity of items f"
+  },
+  {
+   "text": "#% increased Stack size of Simulacrum Splinters found in Map",
+   "frag": "stack"
+  },
+  {
+   "text": "Abyss Pits in Map are twice as likely to have Rewards",
+   "frag": "are t"
+  },
+  {
+   "text": "Abyssal Monsters in Map have increased Difficulty and Reward for each closed Pit",
+   "frag": "diffi"
+  },
+  {
+   "text": "Abysses in Map have #% increased chance to lead to an Abyssal Depths",
+   "frag": "to le"
+  },
+  {
+   "text": "Abysses in Map spawn #% increased Monsters",
+   "frag": "ses in map s"
+  },
+  {
+   "text": "Areas with Map Powerful Map Bosses contain an additional Shrine",
+   "frag": "ith m"
+  },
+  {
+   "text": "Areas with Powerful Map Bosses contain an additional Azmeri Spirit",
+   "frag": "n an additional a"
+  },
+  {
+   "text": "Areas with Powerful Map Bosses contain an additional Essence",
+   "frag": "n an additional e"
+  },
+  {
+   "text": "Areas with Powerful Map Bosses contain an additional Strongbox",
+   "frag": "n an additional st"
+  },
+  {
+   "text": "Breach Hives in Map have an additional wave of Hiveborn Monsters",
+   "frag": "hives"
+  },
+  {
+   "text": "Breaches in Map contain # additional Clasped Hand",
+   "frag": "clasp"
+  },
+  {
+   "text": "Breaches in Map open and close #% faster",
+   "frag": "map o"
+  },
+  {
+   "text": "Breaches in Map spawn an additional Rare Monster",
+   "frag": "awn a",
+   "also": 1
+  },
+  {
+   "text": "Can only be applied to Precursor Tower Maps Completing the Tower makes all nearby Maps accessible",
+   "frag": "can o"
+  },
+  {
+   "text": "Can Reroll Favours at Ritual Altars in your Maps twice as many times",
+   "frag": "can r"
+  },
+  {
+   "text": "Deferring Favours at Ritual Altars in Map costs #% increased Tribute",
+   "frag": "ferri"
+  },
+  {
+   "text": "Delirious Monsters Killed in Map provide #% increased Reward Progress",
+   "frag": "kille"
+  },
+  {
+   "text": "Delirium Encounters in Map are #% more likely to spawn Unique Bosses",
+   "frag": "encou"
+  },
+  {
+   "text": "Delirium Fog in Map applies #% increased Deliriousness to Players",
+   "frag": "to pl"
+  },
+  {
+   "text": "Delirium Fog in Map dissipates #% faster",
+   "frag": "map d"
+  },
+  {
+   "text": "Delirium Fog in Map lasts # additional seconds before dissipating",
+   "frag": "map l"
+  },
+  {
+   "text": "Delirium Fog in Map spawns #% increased Fracturing Mirrors",
+   "frag": "fract"
+  },
+  {
+   "text": "Delirium Fog in Map spawns #% increased Mirror Shards",
+   "frag": "shard"
+  },
+  {
+   "text": "Delirium Fog in your Maps never dissipates",
+   "frag": "never"
+  },
+  {
+   "text": "Delirium Monsters in Map have #% increased Pack Size",
+   "frag": "um mo"
+  },
+  {
+   "text": "Expedition Monsters in your Maps spawn with half of their Life missing",
+   "frag": "their"
+  },
+  {
+   "text": "Expeditions contain 1 Additional Boss encased in ice in Map",
+   "frag": "encas"
+  },
+  {
+   "text": "Expeditions contain 1 Additional Verisium Sentry in Map",
+   "frag": "sentr"
+  },
+  {
+   "text": "Expeditions contain 1 buried Strongbox in Map",
+   "frag": "burie"
+  },
+  {
+   "text": "Expeditions contain 1 Vaal Relic in Map",
+   "frag": "relic"
+  },
+  {
+   "text": "Expeditions have +#% Surpassing chance to Duplicate Runic Monsters in Map",
+   "frag": "to du"
+  },
+  {
+   "text": "Expeditions in Map have # Remnant",
+   "frag": "ions i"
+  },
+  {
+   "text": "Favours Deferred at Ritual Altars in Map reappear #% sooner",
+   "frag": "map r"
+  },
+  {
+   "text": "Favours Rerolled at Ritual Altars in Map have #% chance to cost no Tribute",
+   "frag": "no tr"
+  },
+  {
+   "text": "Map also counts as a Desert Map",
+   "frag": "a des"
+  },
+  {
+   "text": "Map also counts as a Forest Map",
+   "frag": "a for"
+  },
+  {
+   "text": "Map also counts as a Grass Map",
+   "frag": "a gra"
+  },
+  {
+   "text": "Map also counts as a Mountain Map",
+   "frag": "a mou"
+  },
+  {
+   "text": "Map also counts as a Swamp Map",
+   "frag": "a swa"
+  },
+  {
+   "text": "Map also counts as a Water Map",
+   "frag": "a wat"
+  },
+  {
+   "text": "Map Boss has +#% chance to drop a Waystone of the current tier or higher",
+   "frag": "a way"
+  },
+  {
+   "text": "Map Bosses are Hunted by Azmeri Spirits",
+   "frag": "are h"
+  },
+  {
+   "text": "Map Bosses grant #% increased Experience",
+   "frag": "ses g"
+  },
+  {
+   "text": "Map Bosses have # additional Modifier",
+   "frag": "ses h"
+  },
+  {
+   "text": "Map contains #% increased number of Runic Monster Markers",
+   "frag": "of ru"
+  },
+  {
+   "text": "Map contains an additional Abyss",
+   "frag": "n additional ab"
+  },
+  {
+   "text": "Map contains an additional Azmeri Spirit",
+   "frag": "s an additional az"
+  },
+  {
+   "text": "Map contains an additional Essence",
+   "frag": "s an additional e"
+  },
+  {
+   "text": "Map contains an additional Rare Chest",
+   "frag": "re ch"
+  },
+  {
+   "text": "Map contains an additional Shrine",
+   "frag": "s an additional sh"
+  },
+  {
+   "text": "Map contains an additional Strongbox",
+   "frag": "s an additional st"
+  },
+  {
+   "text": "Map contains an additional Summoning Circle",
+   "frag": "al su"
+  },
+  {
+   "text": "Map has # additional random Modifier",
+   "frag": "rando"
+  },
+  {
+   "text": "Map has #% chance to contain an additional Breach",
+   "frag": "o contain an"
+  },
+  {
+   "text": "Map has #% chance to contain four additional Abysses",
+   "frag": "ain f"
+  },
+  {
+   "text": "Map has #% chance to contain three additional Breaches",
+   "frag": "three"
+  },
+  {
+   "text": "Map has #% increased chance to contain a Summoning Circle",
+   "frag": "a sum"
+  },
+  {
+   "text": "Map has #% increased chance to contain Azmeri Spirits",
+   "frag": "in az"
+  },
+  {
+   "text": "Map has #% increased chance to contain Essences",
+   "frag": "ain e"
+  },
+  {
+   "text": "Map has #% increased chance to contain Rogue Exiles",
+   "frag": "ain r"
+  },
+  {
+   "text": "Map has #% increased chance to contain Shrines",
+   "frag": "in sh"
+  },
+  {
+   "text": "Map has #% increased chance to contain Strongboxes",
+   "frag": "in st"
+  },
+  {
+   "text": "Map has #% increased Monster Rarity",
+   "frag": "d monster r"
+  },
+  {
+   "text": "Map has #% increased number of Rare Monsters",
+   "frag": "f rare m"
+  },
+  {
+   "text": "Map is inhabited by # additional Rogue Exile",
+   "frag": "map i"
+  },
+  {
+   "text": "Monsters Sacrificed at Ritual Altars in Map grant #% increased Tribute",
+   "frag": "sacri"
+  },
+  {
+   "text": "Rare Monsters in Map have a #% Surpassing chance to have an additional Modifier",
+   "frag": "e to h"
+  },
+  {
+   "text": "Rerolling Favours at Ritual Altars in Map costs #% increased Tribute",
+   "frag": "ling favours at"
+  },
+  {
+   "text": "Revived Monsters from Ritual Altars in Map have #% increased chance to be Magic",
+   "frag": "be ma"
+  },
+  {
+   "text": "Revived Monsters from Ritual Altars in Map have #% increased chance to be Rare",
+   "frag": "be ra"
+  },
+  {
+   "text": "Ritual Altars in Map allow rerolling Favours an additional time",
+   "frag": "allow"
+  },
+  {
+   "text": "Ritual Favours in Map have #% increased chance to be Omens",
+   "frag": "be om"
+  },
+  {
+   "text": "Runic Monsters in your Maps are Duplicated",
+   "frag": "are d"
+  },
+  {
+   "text": "Slaying Rare Monsters in Map pauses the Delirium Mirror Timer for 1 second",
+   "frag": "slayi"
+  },
+  {
+   "text": "The first unearthed Runic Monster will be a Rare Monster in Map",
+   "frag": "the f"
+  },
+  {
+   "text": "Unstable Breaches in Map have #% increased chance to contain Vruun, Marshal of Xesht",
+   "frag": "vruun"
+  },
+  {
+   "text": "Unstable Breaches in Map spawn an additional Rare Monster when Stabilised",
+   "frag": "stabi"
+  },
+  {
+   "text": "Unstable Breaches in Map take an additional second to collapse after timer is filled",
+   "frag": "colla"
+  },
+  {
+   "text": "Verisium Remnants have +#% chance to add an additional Runic Modifier in Map",
+   "frag": "to ad"
+  },
+  {
+   "text": "Wombgifts have #% chance to drop one Level higher in Map",
+   "frag": "one l"
+  }
+ ],
+ "vendor": [
+  {
+   "id": "ms",
+   "label": "Movement Speed",
+   "re": "{n}% increased movement speed",
+   "def": 25
+  },
+  {
+   "id": "life",
+   "label": "Maximum Life",
+   "re": "\\+{n} to maximum life",
+   "def": 80
+  },
+  {
+   "id": "mana",
+   "label": "Maximum Mana",
+   "re": "\\+{n} to maximum mana",
+   "def": 80
+  },
+  {
+   "id": "spirit",
+   "label": "Spirit",
+   "re": "\\+{n} to spirit",
+   "def": 30
+  },
+  {
+   "id": "lvl",
+   "label": "+ Level of all ... Skills (any)",
+   "re": "\\+{n} to level of all",
+   "def": 2
+  },
+  {
+   "id": "lvlspell",
+   "label": "+ Level of all Spell Skills",
+   "re": "\\+{n} to level of all spell",
+   "def": 2
+  },
+  {
+   "id": "lvlminion",
+   "label": "+ Level of all Minion Skills",
+   "re": "\\+{n} to level of all minion",
+   "def": 2
+  },
+  {
+   "id": "lvlmelee",
+   "label": "+ Level of all Melee Skills",
+   "re": "\\+{n} to level of all melee",
+   "def": 2
+  },
+  {
+   "id": "lvlproj",
+   "label": "+ Level of all Projectile Skills",
+   "re": "\\+{n} to level of all projectile",
+   "def": 2
+  },
+  {
+   "id": "resfire",
+   "label": "Fire Resistance",
+   "re": "\\+{n}% to fire res",
+   "def": 30
+  },
+  {
+   "id": "rescold",
+   "label": "Cold Resistance",
+   "re": "\\+{n}% to cold res",
+   "def": 30
+  },
+  {
+   "id": "reslight",
+   "label": "Lightning Resistance",
+   "re": "\\+{n}% to lightning res",
+   "def": 30
+  },
+  {
+   "id": "reschaos",
+   "label": "Chaos Resistance",
+   "re": "\\+{n}% to chaos res",
+   "def": 15
+  },
+  {
+   "id": "resall",
+   "label": "All Elemental Resistances",
+   "re": "\\+{n}% to all elemental",
+   "def": 10
+  },
+  {
+   "id": "physinc",
+   "label": "% increased Physical Damage",
+   "re": "{n}% increased physical damage",
+   "def": 100
+  },
+  {
+   "id": "aspd",
+   "label": "% increased Attack Speed",
+   "re": "{n}% increased attack speed",
+   "def": 15
+  },
+  {
+   "id": "cspd",
+   "label": "% increased Cast Speed",
+   "re": "{n}% increased cast speed",
+   "def": 15
+  },
+  {
+   "id": "crit",
+   "label": "% increased Critical Hit Chance",
+   "re": "{n}% increased critical hit chance",
+   "def": 25
+  },
+  {
+   "id": "spelldmg",
+   "label": "% increased Spell Damage",
+   "re": "{n}% increased spell damage",
+   "def": 50
+  },
+  {
+   "id": "rarity",
+   "label": "% increased Rarity of Items found",
+   "re": "{n}% increased rarity of items",
+   "def": 15
+  },
+  {
+   "id": "attr",
+   "label": "+ Strength / Dexterity / Intelligence",
+   "re": "\\+{n} to (strength|dexterity|intelligence|all attributes)",
+   "def": 20
+  }
+ ]
+}

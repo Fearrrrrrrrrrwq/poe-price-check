@@ -39,7 +39,10 @@ const EXCHANGE = {
 const STASH = {
   poe2: [],
   poe1: ['UniqueWeapon', 'UniqueArmour', 'UniqueAccessory', 'UniqueJewel',
-    'UniqueFlask', 'UniqueMap', 'UniqueRelic', 'UniqueTincture'],
+    'UniqueFlask', 'UniqueMap', 'UniqueRelic', 'UniqueTincture',
+    // Lzejsze kategorie stash - warto je miec dla wyszukiwania po nazwie.
+    // SkillGem (3,7 MB) i BaseType (7,4 MB) celowo pominiete: za ciezkie.
+    'ClusterJewel', 'Beast', 'Map', 'BlightedMap', 'Invitation'],
 };
 export const TYPES = {
   poe2: [...EXCHANGE.poe2, ...STASH.poe2],
@@ -173,7 +176,10 @@ async function stashOverview(game, league, type, ctx) {
   const ref = lines.find((l) => l.chaosValue > 0 && l.divineValue > 0);
   const rates = ref ? { divine: ref.divineValue / ref.chaosValue } : {};
   const items = lines.map((line) => {
-    const extra = [line.baseType, line.variant, line.links ? `${line.links}L` : '']
+    // poe.ninja zapisuje czesc pol po swojemu: wariant mapy ", Gen-24",
+    // rodziny bestii "Goliaths|Unnaturals". Sprzatamy do jednego formatu.
+    const clean = (v) => String(v || '').replace(/^[,\s]+/, '').split('|').join(' · ').trim();
+    const extra = [clean(line.baseType), clean(line.variant), line.links ? `${line.links}L` : '']
       .filter(Boolean).join(' · ');
     const spark = line.sparkLine || line.sparkline || {};
     return {

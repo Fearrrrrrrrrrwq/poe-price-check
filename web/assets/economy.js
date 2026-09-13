@@ -28,12 +28,17 @@
     Runegraft: 'Runegrafts', UniqueWeapon: 'Unique Weapons', UniqueArmour: 'Unique Armours',
     UniqueAccessory: 'Unique Accessories', UniqueJewel: 'Unique Jewels', UniqueFlask: 'Unique Flasks',
     UniqueMap: 'Unique Maps', UniqueRelic: 'Unique Relics', UniqueTincture: 'Unique Tinctures',
+    ClusterJewel: 'Cluster Jewels', Beast: 'Beasts', Map: 'Maps', BlightedMap: 'Blighted Maps',
+    Invitation: 'Invitations',
   };
   var UNIT = { divine: 'div', exalted: 'ex', chaos: 'c' };
 
   var params = new URLSearchParams(location.search);
   var state = { league: params.get('league') || '', type: params.get('type') || 'Currency',
-    sort: 'value', dir: -1, data: null, open: null };
+    sort: 'value', dir: -1, data: null, open: null, types: [], stashTypes: [], all: {}, loadingAll: false };
+  // Wyszukiwanie od tylu znakow przeszukuje WSZYSTKIE kategorie - nie kazdy
+  // wie, czy "Mageblood" to akcesorium, a "Fracturing Orb" waluta.
+  var GLOBAL_MIN = 2;
 
   function fmt(n) {
     if (n == null || isNaN(n)) return '–';
@@ -180,18 +185,18 @@
       var wasFor = existing.dataset.for;
       existing.remove();
       rowsBox.querySelectorAll('tr[aria-expanded="true"]').forEach(function (r) { r.setAttribute('aria-expanded', 'false'); });
-      if (wasFor === item.id) { state.open = null; setHash(null); return; }
+      if (wasFor === item._key) { state.open = null; setHash(null); return; }
     }
-    state.open = item.id;
-    setHash(item.id);
+    state.open = item._key;
+    setHash(item._key.indexOf('|') === -1 ? item._key : null);
     tr.setAttribute('aria-expanded', 'true');
     var detail = document.createElement('tr');
     detail.className = 'detail';
-    detail.dataset.for = item.id;
+    detail.dataset.for = item._key;
     detail.innerHTML = '<td colspan="7"><div class="detail-box"><p class="note">Loading price history…</p></div></td>';
     tr.after(detail);
     var box = detail.querySelector('.detail-box');
-    var data = state.data;
+    var data = item._data || state.data;
     var url = '/api/economy?game=' + game + '&league=' + encodeURIComponent(data.league) +
       '&type=' + encodeURIComponent(data.type) + '&history=' + encodeURIComponent(item.detailsId);
     fetch(url).then(function (r) { return r.json(); }).then(function (h) {
@@ -220,13 +225,59 @@
     });
   }
 
-  function render() {
-    var data = state.data;
-    if (!data) return;
+  function globalQuery() {
     var q = search.value.trim().toLowerCase();
-    var hideLow = data.kind === 'stash' && lowToggle && lowToggle.checked;
-    var items = data.items.filter(function (it) {
-      if (it.id === state.open) return true;
+    return q.length >= GLOBAL_MIN ? q : '';
+  }
+
+  // Wszystkie kategorie aktualnej ligi - pobierane raz, przy pierwszym wyszukiwaniu.
+  function loadAll() {
+    var league = state.league;
+    var bucket = state.all[league] || (state.all[league] = {});
+    var missing = state.types.filter(function (t) { return !bucket[t]; });
+    if (!missing.length || state.loadingAll) return;
+    state.loadingAll = true;
+    var left = missing.length;
+    missing.forEach(function (t) {
+      var cached = state.data && state.data.type === t && state.data.league === league ? state.data : null;
+      var done = function () {
+        left -= 1;
+        if (!left) state.loadingAll = false;
+        if (globalQuery() && state.league === league) render();
+      };
+      if (cached) { bucket[t] = cached; done(); return; }
+      fetch('/api/economy?game=' + game + '&league=' + encodeURIComponent(league) + '&type=' + encodeURIComponent(t))
+        .then(function (r) { return r.ok ? r.json() : null; })
+        .then(function (j) { bucket[t] = j || { type: t, items: [], failed: true }; })
+        .catch(function () { bucket[t] = { type: t, items: [], failed: true }; })
+        .then(done);
+    });
+  }
+
+  function render() {
+    var q = globalQuery();
+    var global = !!q;
+    var data = state.data;
+    if (!global && !data) return;
+    var hideLow = lowToggle && lowToggle.checked;
+    var pool = [];
+    if (global) {
+      loadAll();
+      var bucket = state.all[state.league] || {};
+      state.types.forEach(function (t) {
+        var d = bucket[t];
+        if (!d || !d.items) return;
+        d.items.forEach(function (it) {
+          it._data = d;
+          it._key = t + '|' + it.id;
+          pool.push(it);
+        });
+      });
+    } else {
+      data.items.forEach(function (it) { it._data = data; it._key = it.id; pool.push(it); });
+    }
+    var items = pool.filter(function (it) {
+      if (it._key === state.open) return true;
       if (hideLow && it.lowConfidence) return false;
       return !q || it.name.toLowerCase().indexOf(q) !== -1 || (it.sub || '').toLowerCase().indexOf(q) !== -1;
     });
@@ -238,15 +289,21 @@
       if (bv == null) return -1;
       return (av - bv) * dir;
     });
+    // W wyszukiwaniu pokazujemy najwyzej 200 wynikow - krotkie zapytanie ("or")
+    // pasuje do setek przedmiotow, a tabela na tysiac wierszy tylko by zamulila.
+    var total = items.length;
+    if (global && items.length > 200) items = items.slice(0, 200);
     var byId = {};
     rowsBox.innerHTML = items.map(function (it) {
-      byId[it.id] = it;
-      var p = price(it.value, data);
-      return '<tr class="row' + (it.lowConfidence ? ' low' : '') + '" data-id="' + esc(it.id) +
+      byId[it._key] = it;
+      var p = price(it.value, it._data);
+      var cat = global ? '<button type="button" class="cat" data-type="' + esc(it._data.type) + '">' +
+        esc(LABELS[it._data.type] || it._data.type) + '</button>' : '';
+      return '<tr class="row' + (it.lowConfidence ? ' low' : '') + '" data-id="' + esc(it._key) +
         '" tabindex="0" aria-expanded="false">' +
         '<th scope="row"><span class="item">' +
           (it.icon ? '<img src="' + esc(it.icon) + '" alt="" width="28" height="28" loading="lazy">' : '') +
-          '<span>' + esc(it.name) + (it.sub ? '<small>' + esc(it.sub) + '</small>' : '') +
+          '<span>' + esc(it.name) + cat + (it.sub ? '<small>' + esc(it.sub) + '</small>' : '') +
           (it.lowConfidence ? '<small class="lowtag">low confidence</small>' : '') + '</span></span></th>' +
         '<td class="col-n"><b>' + p.main + '</b>' + (p.sub ? '<small>' + p.sub + '</small>' : '') + '</td>' +
         '<td class="col-n">' + change(it.change24h) + '</td>' +
@@ -259,13 +316,25 @@
     document.querySelectorAll('.econ-table th[data-sort]').forEach(function (th) {
       th.setAttribute('aria-sort', th.dataset.sort === key ? (dir > 0 ? 'ascending' : 'descending') : 'none');
     });
-    if (volHead) volHead.textContent = data.kind === 'stash' ? 'Listed' : 'Volume';
-    if (lowWrap) lowWrap.hidden = data.kind !== 'stash';
-    var when = new Date(data.fetchedAt);
-    statusEl.textContent = items.length + ' items · ' + data.league + ' · updated ' +
-      when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' · click a row for price history';
-    var r = data.rates || {};
-    ratesEl.textContent = data.primary === 'divine'
+    typesBox.classList.toggle('dimmed', global);
+    var anyStash = global ? state.stashTypes.length > 0 : data.kind === 'stash';
+    if (volHead) volHead.textContent = global ? 'Volume / Listed' : (data.kind === 'stash' ? 'Listed' : 'Volume');
+    if (lowWrap) lowWrap.hidden = !anyStash;
+    if (global) {
+      var bucketNow = state.all[state.league] || {};
+      var loaded = state.types.filter(function (t) { return bucketNow[t]; }).length;
+      statusEl.textContent = (total ? total + ' results' : 'No results') + ' for “' + search.value.trim() +
+        '” across all categories' + (total > items.length ? ' (showing top ' + items.length + ')' : '') +
+        (loaded < state.types.length ? ' · searching ' + loaded + '/' + state.types.length + ' categories…' : '') +
+        ' · click a row for price history';
+    } else {
+      var when = new Date(data.fetchedAt);
+      statusEl.textContent = items.length + ' items · ' + data.league + ' · updated ' +
+        when.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ' · click a row for price history';
+    }
+    var rateData = data || (items[0] && items[0]._data) || {};
+    var r = rateData.rates || {};
+    ratesEl.textContent = rateData.primary === 'divine'
       ? (r.exalted ? '1 Divine = ' + fmt(r.exalted) + ' Exalted' + (r.chaos ? ' = ' + fmt(r.chaos) + ' Chaos' : '') : '')
       : (r.divine ? '1 Divine = ' + fmt(1 / r.divine) + ' Chaos' : '');
     if (state.open && byId[state.open]) {
@@ -281,12 +350,14 @@
     history.replaceState(null, '', id ? base + '#item=' + encodeURIComponent(id) : base);
   }
   var hashItem = (location.hash.match(/^#item=(.+)$/) || [])[1];
+  if (params.get('q')) search.value = params.get('q');
   if (hashItem) state.open = decodeURIComponent(hashItem);
 
   function syncUrl() {
     var p = new URLSearchParams();
     if (state.league) p.set('league', state.league);
     if (state.type !== 'Currency') p.set('type', state.type);
+    if (search.value.trim()) p.set('q', search.value.trim());
     var qs = p.toString();
     history.replaceState(null, '', location.pathname + (qs ? '?' + qs : '') +
       (state.open ? '#item=' + encodeURIComponent(state.open) : ''));
@@ -320,6 +391,14 @@
   }
 
   rowsBox.addEventListener('click', function (e) {
+    var catBtn = e.target.closest('button.cat');
+    if (catBtn) {
+      // Etykieta kategorii w wynikach: przejdz do tej kategorii.
+      e.stopPropagation();
+      search.value = '';
+      selectType(catBtn.dataset.type);
+      return;
+    }
     var tr = e.target.closest('tr.row');
     if (tr && state.byId && state.byId[tr.dataset.id]) openDetail(tr, state.byId[tr.dataset.id]);
   });
@@ -330,17 +409,27 @@
     e.preventDefault();
     openDetail(tr, state.byId[tr.dataset.id]);
   });
-  typesBox.addEventListener('click', function (e) {
-    var b = e.target.closest('button[data-type]');
-    if (!b || b.dataset.type === state.type) return;
-    state.type = b.dataset.type;
+  function selectType(type) {
+    state.type = type;
     Array.prototype.forEach.call(typesBox.children, function (c) {
       c.setAttribute('aria-selected', c.dataset.type === state.type ? 'true' : 'false');
     });
     load();
+  }
+  typesBox.addEventListener('click', function (e) {
+    var b = e.target.closest('button[data-type]');
+    if (!b) return;
+    if (b.dataset.type === state.type && !globalQuery()) return;
+    search.value = '';
+    selectType(b.dataset.type);
   });
   leagueSel.addEventListener('change', function () { state.league = leagueSel.value; load(); });
-  search.addEventListener('input', render);
+  search.placeholder = 'Search all items by name…';
+  var searchTimer;
+  search.addEventListener('input', function () {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(function () { state.open = null; syncUrl(); render(); }, 200);
+  });
   if (lowToggle) lowToggle.addEventListener('change', render);
   document.querySelectorAll('.econ-table th[data-sort]').forEach(function (th) {
     th.tabIndex = 0;
@@ -365,7 +454,9 @@
         return '<option' + (l === state.league ? ' selected' : '') + '>' + esc(l) + '</option>';
       }).join('');
       if ((j.types || []).indexOf(state.type) === -1) state.type = 'Currency';
-      renderTypes(j.types || ['Currency']);
+      state.types = j.types || ['Currency'];
+      state.stashTypes = j.stashTypes || [];
+      renderTypes(state.types);
       load();
     })
     .catch(function () {

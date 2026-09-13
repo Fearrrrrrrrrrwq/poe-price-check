@@ -248,6 +248,9 @@ ECONOMY_FAQ = (
      "The price change over the last day, week and month. 24h and 7d come from "
      "poe.ninja's price history; 30d comes from daily snapshots this site keeps, so it "
      "fills in during the first month of a league."),
+    ("Do I need to know which category an item is in?",
+     "No. Type at least two letters of any item name in the search box and the results "
+     "come from every category at once, each marked with its category."),
     ("Can I see how a price changed over the league?",
      "Yes — click any row to open its price history for the whole league, with the league low, "
      "high and the change since the league started."),
@@ -285,7 +288,7 @@ def economy_page(game: str, *, esc, asset, site_url) -> str:
       <label class="field-inline">League
         <select id="econ-league" aria-label="League"><option>Loading…</option></select>
       </label>
-      <input type="search" id="econ-search" placeholder="Search items…" aria-label="Search items">
+      <input type="search" id="econ-search" placeholder="Search all items by name…" aria-label="Search all items by name">
       <label class="field-inline" id="econ-lowconf-wrap" hidden><input type="checkbox" id="econ-lowconf" checked> Hide low confidence</label>
       <p class="rates" id="econ-rates" aria-live="polite"></p>
     </div>

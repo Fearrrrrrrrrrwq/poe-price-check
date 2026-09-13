@@ -200,3 +200,10 @@ button.emo[aria-pressed="true"] { background: var(--raise); box-shadow: inset 0 
 .nt-stats { margin: 8px 0 0; padding-left: 18px; color: var(--fg); font-size: 13.5px; }
 .nt-stats li { margin: 1px 0; }
 @media (max-width: 520px) { .notables { grid-template-columns: 1fr; } .slots { grid-template-columns: 1fr; } }
+
+/* economy: wyszukiwanie we wszystkich kategoriach */
+.econ .chips.dimmed button[aria-selected="true"] { background: none; box-shadow: none; color: var(--muted); }
+.econ-table .item .cat { appearance: none; border: 1px solid var(--border); background: var(--bg); color: var(--muted);
+  border-radius: 999px; font: inherit; font-size: 11px; font-weight: 600; padding: 0 8px; margin-left: 8px;
+  vertical-align: 2px; cursor: pointer; }
+.econ-table .item .cat:hover { color: var(--title); border-color: var(--accent); }

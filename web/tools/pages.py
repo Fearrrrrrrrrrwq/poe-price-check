@@ -18,6 +18,7 @@ REGEX_DATA = HERE.parent / "assets" / "regex-data.json"
 NAV = (
     ("/en/", "Price Checker"),
     ("/tools/poe2-regex/", "PoE2 Regex"),
+    ("/tools/poe2-instill/", "PoE2 Instill"),
     ("/economy/", "Economy"),
 )
 

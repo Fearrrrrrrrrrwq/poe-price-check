@@ -1,4 +1,7 @@
-/* PoE2 Regex Builder - logika strony /tools/poe2-regex/.
+/* Regex Builder - logika stron /tools/poe2-regex/ i /tools/poe-map-regex/.
+ *
+ * Strona sama opisuje, co ma: panele z lista modow (.mods) i/lub progami
+ * (.thr), opcjonalne zakladki; klucz localStorage w data-store pola wyniku.
  *
  * Lista modow i progi sa wyrenderowane w HTML (widoczne dla wyszukiwarek);
  * skrypt tylko trzyma stan zaznaczen i sklada z niego tekst wyszukiwania.
@@ -11,15 +14,18 @@
   'use strict';
 
   var LIMIT = 250;
-  var STORE = 'poe2-regex-v1';
   var tabs = Array.prototype.slice.call(document.querySelectorAll('.tool-tabs [role="tab"]'));
   var out = document.getElementById('regex-out');
   var counter = document.querySelector('.counter');
   var copyBtn = document.getElementById('regex-copy');
   var clearBtn = document.getElementById('regex-clear');
-  if (!out || !tabs.length) return;
+  if (!out) return;
+  var STORE = out.dataset.store || 'poe2-regex-v1';
 
-  var active = 'waystone';
+  var panels = Array.prototype.slice.call(document.querySelectorAll('.tool-panel'));
+  var modKinds = panels.filter(function (el) { return el.querySelector('.mods'); })
+    .map(function (el) { return el.id.slice(6); });
+  var active = panels.length ? panels[0].id.slice(6) : '';
 
   // "co najmniej n" jako regex na liczbe calkowita (bez zer wiodacych).
   // 45 -> (4[5-9]|[5-9]\d|\d\d\d). Mniejsza liczba nigdy nie pasuje: ma mniej
@@ -73,12 +79,12 @@
 
   function build() {
     var parts = [];
-    if (active === 'vendor') {
-      var v = thresholds('vendor');
+    if (modKinds.indexOf(active) === -1) {
+      var v = thresholds(active);
       if (v.length) parts = mode() === 'all' ? v.map(quote) : [quote(v.join('|'))];
     } else {
       var s = modStates(active);
-      if (active === 'waystone') parts = parts.concat(thresholds('waystone').map(quote));
+      parts = parts.concat(thresholds(active).map(quote));
       if (s.want.length) {
         parts = parts.concat(mode() === 'all' ? s.want.map(quote) : [quote(s.want.join('|'))]);
       }
@@ -101,7 +107,7 @@
   function save() {
     try {
       var state = { active: active, mode: mode(), mods: {}, thr: {} };
-      ['waystone', 'tablet'].forEach(function (k) {
+      modKinds.forEach(function (k) {
         state.mods[k] = {};
         Array.prototype.forEach.call(panel(k).querySelectorAll('.mods li[data-state]'), function (li) {
           state.mods[k][li.dataset.frag] = li.dataset.state;
@@ -112,6 +118,8 @@
         state.thr[key] = [row.querySelector('[data-role="on"]').checked,
           row.querySelector('[data-role="n"]').value];
       });
+      var t17 = document.getElementById('hide-t17');
+      if (t17) state.hideT17 = t17.checked;
       localStorage.setItem(STORE, JSON.stringify(state));
     } catch (e) { /* prywatne okno / zablokowany storage - bez zapamietywania */ }
   }
@@ -120,7 +128,7 @@
     var state;
     try { state = JSON.parse(localStorage.getItem(STORE) || 'null'); } catch (e) { state = null; }
     if (!state) return;
-    ['waystone', 'tablet'].forEach(function (k) {
+    modKinds.forEach(function (k) {
       var saved = (state.mods || {})[k] || {};
       Array.prototype.forEach.call(panel(k).querySelectorAll('.mods li'), function (li) {
         if (saved[li.dataset.frag]) setState(li, saved[li.dataset.frag]);
@@ -136,7 +144,22 @@
     });
     var m = document.querySelector('input[name="mode"][value="' + state.mode + '"]');
     if (m) m.checked = true;
+    var t17 = document.getElementById('hide-t17');
+    if (t17 && state.hideT17) { t17.checked = true; filterList(t17.closest('.tool-panel')); }
     if (state.active && panel(state.active)) select(state.active);
+  }
+
+  function filterList(p) {
+    var input = p.querySelector('.filter');
+    var q = input ? input.value.trim().toLowerCase() : '';
+    var t17 = p.querySelector('#hide-t17');
+    var hideT17 = t17 && t17.checked;
+    Array.prototype.forEach.call(p.querySelectorAll('.mods li'), function (li) {
+      // Zaznaczone mody zostaja widoczne - ukryty "Avoid" dalej jest w regexie.
+      var off = (q && li.textContent.toLowerCase().indexOf(q) === -1) ||
+        (hideT17 && li.hasAttribute('data-t17') && !li.dataset.state);
+      li.hidden = !!off;
+    });
   }
 
   function setState(li, state) {
@@ -166,6 +189,20 @@
     });
   });
 
+  // Gotowe zestawy ("Avoid: curses") - dopisuja Avoid do modow z listy;
+  // drugie klikniecie zdejmuje, jesli caly zestaw juz jest zaznaczony.
+  document.addEventListener('click', function (e) {
+    var preset = e.target.closest('.presets button[data-frags]');
+    if (!preset) return;
+    var frags = JSON.parse(preset.dataset.frags);
+    var rows = Array.prototype.filter.call(panel(active).querySelectorAll('.mods li'), function (li) {
+      return frags.indexOf(li.dataset.frag) !== -1;
+    });
+    var all = rows.every(function (li) { return li.dataset.state === preset.dataset.set; });
+    rows.forEach(function (li) { setState(li, all ? null : preset.dataset.set); });
+    build();
+  });
+
   document.addEventListener('click', function (e) {
     var btn = e.target.closest('.mods .seg button');
     if (!btn) return;
@@ -175,12 +212,9 @@
   });
 
   document.addEventListener('input', function (e) {
-    if (e.target.classList.contains('filter')) {
-      var q = e.target.value.trim().toLowerCase();
-      var list = e.target.closest('.tool-panel').querySelectorAll('.mods li');
-      Array.prototype.forEach.call(list, function (li) {
-        li.hidden = q && li.textContent.toLowerCase().indexOf(q) === -1;
-      });
+    if (e.target.classList.contains('filter') || e.target.id === 'hide-t17') {
+      filterList(e.target.closest('.tool-panel'));
+      save();
       return;
     }
     if (e.target.closest('.thr') || e.target.name === 'mode') {

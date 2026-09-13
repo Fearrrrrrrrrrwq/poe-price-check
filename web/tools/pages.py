@@ -14,9 +14,11 @@ import pathlib
 
 HERE = pathlib.Path(__file__).resolve().parent
 REGEX_DATA = HERE.parent / "assets" / "regex-data.json"
+MAP_REGEX_DATA = HERE.parent / "assets" / "map-regex-data.json"
 
 NAV = (
     ("/en/", "Price Checker"),
+    ("/tools/poe-map-regex/", "PoE1 Map Regex"),
     ("/tools/poe2-regex/", "PoE2 Regex"),
     ("/tools/poe2-instill/", "PoE2 Instill"),
     ("/economy/", "Economy"),
@@ -107,9 +109,11 @@ def _mod_list(pool: list[dict], esc, kind: str) -> str:
     for mod in pool:
         also = (f' <span class="also" title="Also matches {mod["also"]} longer modifier(s) '
                 f'containing this text">+{mod["also"]}</span>') if mod.get("also") else ""
+        t17 = mod.get("t17")
+        badge = ' <span class="tag-t17" title="Only rolls on Tier 17 maps">T17</span>' if t17 else ""
         rows.append(
-            f'<li data-frag="{esc(mod["frag"])}">'
-            f'<span class="mod-text">{esc(mod["text"])}{also}</span>'
+            f'<li data-frag="{esc(mod["frag"])}"{" data-t17" if t17 else ""}>'
+            f'<span class="mod-text">{esc(mod["text"])}{badge}{also}</span>'
             f'<span class="seg" role="group" aria-label="{esc(mod["text"])}">'
             f'<button type="button" data-set="want">Want</button>'
             f'<button type="button" data-set="avoid">Avoid</button></span></li>')
@@ -219,6 +223,132 @@ def regex_page(*, esc, asset, site_url) -> str:
                                "search strings for Waystones, Precursor Tablets and vendor items "
                                "within the 250 character limit."),
                   body=body, script="regex.js", json_ld=_faq_ld(REGEX_FAQ))
+
+
+# ------------------------------------------------------------ PoE1 map regex
+
+MAP_REGEX_FAQ = (
+    ("How do I use a map regex in Path of Exile?",
+     "Open your stash or the map device, click the search box and paste the generated "
+     "text. Maps that match are highlighted. Avoided modifiers use a leading ! so maps "
+     "carrying any of them stay dark."),
+    ("Which modifiers should I avoid?",
+     "It depends on the build. Common picks are \"Players cannot Regenerate\", the "
+     "leech mods for leech-reliant builds, \"Players are Cursed with ...\", reduced "
+     "maximum resistances and the Physical/Elemental Thorns mods for melee. The quick "
+     "presets above the list tick those in one click."),
+    ("Why do some fragments look strange, like \"ve .*% increased ar\"?",
+     "Each modifier gets the shortest piece of text that no other map modifier, map name "
+     "or map property contains. When both halves around a number also appear in other "
+     "modifiers, the fragment spans the number with .* — the in-game search supports it."),
+    ("Does it cover Tier 17 maps?",
+     "Yes. Modifiers that only roll on Tier 17 maps are marked T17 and can be hidden "
+     "from the list. Thresholds also cover the More Maps / More Scarabs / More Currency "
+     "lines and the map conversion chances."),
+    ("Is the list checked against real maps?",
+     "Every fragment was tested on rare Tier 14–17 maps listed on the official trade site: "
+     "each modifier line matched its own fragment and no fragment matched another line."),
+)
+
+# Szybkie zestawy "Avoid" - dopasowanie po tekscie moda, zeby przetrwaly
+# regeneracje danych (fragmenty sie zmieniaja, teksty nie).
+MAP_PRESETS = (
+    ("No regen", ("cannot regenerate", "less recovery rate of life")),
+    ("No leech", ("cannot be leeched", "recovery per second from leech")),
+    ("Curses", ("are cursed with", "less effect of curses")),
+    ("Max res", ("maximum resistances",)),
+    ("Thorns", ("thorns reflecting",)),
+    ("Block", ("cannot block", "reduced chance to block")),
+    ("Flasks", ("effect of flasks", "meteor when they use a flask")),
+)
+
+
+def map_regex_page(*, esc, asset, site_url) -> str:
+    data = json.loads(MAP_REGEX_DATA.read_text(encoding="utf-8"))
+    pool = data["maps"]
+    faq = "".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>"
+                  for q, a in MAP_REGEX_FAQ)
+    presets = []
+    for label, keys in MAP_PRESETS:
+        frags = [m["frag"] for m in pool if any(k in m["text"].lower() for k in keys)]
+        if frags:
+            presets.append(f'<button type="button" data-set="avoid" data-frags="{esc(json.dumps(frags))}" '
+                           f'title="{len(frags)} modifier(s)">{esc(label)}</button>')
+    t17_count = sum(1 for m in pool if m.get("t17"))
+    body = f"""
+<section class="tool-hero">
+  <div class="wrap wide">
+    <p class="eyebrow">Path of Exile 1 · free tool</p>
+    <h1>PoE Map Regex</h1>
+    <p class="lead">Build a stash search string for rare maps: minimum quantity, rarity and
+    pack size, the modifiers you want, and the ones your build cannot run. Copy, paste into
+    the stash or map device search.</p>
+  </div>
+</section>
+
+<section class="tool">
+  <div class="wrap wide tool-grid">
+    <div class="tool-main">
+      <div class="tool-panel" id="panel-maps">
+        <h3 class="sub">Minimum values</h3>
+        {_threshold_rows(data["props"], esc, "maps")}
+        <h3 class="sub">Modifiers</h3>
+        <p class="note">{len(pool)} map modifier lines. <b>Want</b> highlights maps that have them,
+        <b>Avoid</b> hides maps with any of them.</p>
+        <div class="presets" role="group" aria-label="Quick avoid presets"><span>Quick avoid:</span>{"".join(presets)}</div>
+        <div class="list-tools"><input type="search" class="filter"
+          placeholder="Filter modifiers…" aria-label="Filter modifiers">
+          <label class="field-inline"><input type="checkbox" id="hide-t17"> Hide T17-only ({t17_count})</label>
+          <span class="picked" aria-live="polite"></span></div>
+        {_mod_list(pool, esc, "maps")}
+      </div>
+    </div>
+
+    <aside class="tool-out" aria-label="Generated regex">
+      <div class="out-card">
+        <div class="out-head">
+          <h2>Your regex</h2>
+          <span class="counter" aria-live="polite"><b>0</b> / 250</span>
+        </div>
+        <textarea id="regex-out" data-store="poe1-map-regex-v1" readonly spellcheck="false" rows="5"
+          placeholder="Pick thresholds or modifiers to build a search string"></textarea>
+        <div class="out-actions">
+          <button type="button" class="btn primary" id="regex-copy" disabled>Copy</button>
+          <button type="button" class="btn" id="regex-clear">Clear</button>
+        </div>
+        <fieldset class="mode">
+          <legend>Wanted modifiers must match</legend>
+          <label><input type="radio" name="mode" value="any" checked> any of them</label>
+          <label><input type="radio" name="mode" value="all"> all of them</label>
+        </fieldset>
+        <p class="note small">Minimum values and avoided modifiers always apply together.
+        Only works with the English game client.</p>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section class="band">
+  <div class="wrap narrow">
+    <h2>How the map search works</h2>
+    <ol class="how">
+      <li><b>Quoted text is a pattern.</b> <code>"regen"</code> highlights every map whose text contains it.</li>
+      <li><b><code>|</code> means “or”.</b> <code>"enfee|vulne"</code> matches either curse.</li>
+      <li><b>A leading <code>!</code> negates.</b> <code>"!regen|be le"</code> hides maps with no regen or no leech.</li>
+      <li><b>Space-separated patterns must all match.</b> <code>"quantity: .(9\\d|\\d\\d\\d)%" "!regen"</code> — 90%+ quantity without no regen.</li>
+    </ol>
+    <h2 id="faq">FAQ</h2>
+    <div class="faq">{faq}</div>
+    <p class="note">Modifier data generated {esc(data["generated"])}.</p>
+  </div>
+</section>
+"""
+    return _shell(esc=esc, asset=asset, site_url=site_url, path="/tools/poe-map-regex/",
+                  title="PoE Map Regex — Rare Map Stash Search Builder (incl. T17)",
+                  description=("Free Path of Exile map regex builder: highlight rare maps by quantity, "
+                               "rarity and pack size, avoid no regen, leech, curse and max res mods, "
+                               "Tier 17 included — within the 250 character limit."),
+                  body=body, script="regex.js", json_ld=_faq_ld(MAP_REGEX_FAQ))
 
 
 # --------------------------------------------------------------------- economy

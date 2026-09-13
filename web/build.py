@@ -22,7 +22,7 @@ sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
 from content import C, DEFAULT, LANGS, LOCALES
 from privacy_content import PRIVACY
-from tools.pages import economy_page, regex_page
+from tools.pages import economy_page, map_regex_page, regex_page
 from tools.instill_page import instill_page
 # Wersja i sklejanie archiwum siedza w package.py, zeby plik ze strony
 # i plik z wydania na GitHubie byly identyczne.
@@ -259,6 +259,7 @@ def page(lang: str) -> str:
       <a href="#how">{esc(t['nav_how'])}</a>
       <a href="#features">{esc(t['nav_features'])}</a>
       <a href="#faq">{esc(t['nav_faq'])}</a>
+      <a href="/tools/poe-map-regex/">{esc(t['nav_mapregex'])}</a>
       <a href="/tools/poe2-regex/">{esc(t['nav_regex'])}</a>
       <a href="/tools/poe2-instill/">{esc(t['nav_instill'])}</a>
       <a href="/economy/">{esc(t['nav_economy'])}</a>
@@ -753,7 +754,7 @@ def sitemap() -> str:
             f"  <priority>{'1.0' if code == DEFAULT else '0.9'}</priority>\n"
             f"{alts}"
             f"</url>")
-    for path in ("/tools/poe2-regex/", "/tools/poe2-instill/", "/economy/", "/economy/poe1/"):
+    for path in ("/tools/poe-map-regex/", "/tools/poe2-regex/", "/tools/poe2-instill/", "/economy/", "/economy/poe1/"):
         freq = "daily" if path.startswith("/economy") else "weekly"
         entries.append(
             f"<url>\n"
@@ -924,6 +925,9 @@ def build() -> None:
     (DIST / "tools" / "poe2-regex").mkdir(parents=True)
     (DIST / "tools" / "poe2-regex" / "index.html").write_text(
         regex_page(**helpers), encoding="utf-8")
+    (DIST / "tools" / "poe-map-regex").mkdir(parents=True)
+    (DIST / "tools" / "poe-map-regex" / "index.html").write_text(
+        map_regex_page(**helpers), encoding="utf-8")
     (DIST / "tools" / "poe2-instill").mkdir(parents=True)
     (DIST / "tools" / "poe2-instill" / "index.html").write_text(
         instill_page(**helpers), encoding="utf-8")

@@ -55,7 +55,7 @@ def _norm(text: str) -> str:
 
 
 def shortest_fragment(text: str, others: list[str], noise: list[str],
-                      min_len: int = 5) -> str:
+                      min_len: int = 5, allowed: re.Pattern = ALLOWED) -> str:
     """Najkrotszy fragment `text` bez cyfr/'#'/'%', ktorego nie ma w innych.
 
     Minimum 5 znakow i przy rownej dlugosci pierwszenstwo dla fragmentu
@@ -69,7 +69,7 @@ def shortest_fragment(text: str, others: list[str], noise: list[str],
         best = None
         for start in range(0, len(t) - length + 1):
             frag = t[start:start + length]
-            if not ALLOWED.match(frag):
+            if not allowed.match(frag):
                 continue
             if any(frag in other for other in corpus):
                 continue

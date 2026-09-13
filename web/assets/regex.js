@@ -19,6 +19,7 @@
   var counter = document.querySelector('.counter');
   var copyBtn = document.getElementById('regex-copy');
   var clearBtn = document.getElementById('regex-clear');
+  var shareBtn = document.getElementById('regex-share');
   if (!out) return;
   var STORE = out.dataset.store || 'poe2-regex-v1';
 
@@ -65,9 +66,43 @@
       var on = row.querySelector('[data-role="on"]');
       var n = row.querySelector('[data-role="n"]');
       row.classList.toggle('on', on.checked);
-      if (on.checked) terms.push(row.dataset.re.replace('{n}', atLeast(n.value)));
+      if (on.checked) terms.push(n ? row.dataset.re.replace('{n}', atLeast(n.value)) : row.dataset.re);
     });
     return terms;
+  }
+
+  // Gniazda w tekscie przedmiotu: "Sockets: R-G-B B". Polaczenie n gniazd to
+  // n liter polaczonych myslnikami; kolory = wszystkie kolejnosci liter w jednej
+  // grupie (pozostale miejsca: dowolne gniazdo).
+  function permutations(letters) {
+    if (letters.length <= 1) return [letters.slice()];
+    var seen = {}, outList = [];
+    letters.forEach(function (l, i) {
+      if (seen[l]) return;
+      seen[l] = true;
+      var rest = letters.slice(0, i).concat(letters.slice(i + 1));
+      permutations(rest).forEach(function (perm) { outList.push([l].concat(perm)); });
+    });
+    return outList;
+  }
+  function socketsTerm(kind) {
+    var box = panel(kind).querySelector('.sockets');
+    if (!box) return '';
+    var links = Number(box.querySelector('[data-role="links"]').value) || 0;
+    var letters = [];
+    ['r', 'g', 'b'].forEach(function (c) {
+      var k = Math.max(0, Math.min(6, Number(box.querySelector('[data-role="' + c + '"]').value) || 0));
+      for (var i = 0; i < k; i++) letters.push(c);
+    });
+    var size = Math.max(links, letters.length);
+    box.classList.toggle('on', size > 1 || letters.length > 0);
+    if (size < 2 && !letters.length) return '';
+    if (size < 2) return 'sockets:.*' + letters[0];
+    // "." jako dowolne gniazdo tylko przy 3+ polaczeniach: ".-." trafialby
+    // w zwykle slowa z myslnikiem ("Two-Handed").
+    while (letters.length < size) letters.push(size === 2 ? '[rgbwa]' : '.');
+    var perms = permutations(letters).map(function (perm) { return perm.join('-'); });
+    return perms.join('|');
   }
 
   function mode() {
@@ -82,6 +117,8 @@
     if (modKinds.indexOf(active) === -1) {
       var v = thresholds(active);
       if (v.length) parts = mode() === 'all' ? v.map(quote) : [quote(v.join('|'))];
+      var sock = socketsTerm(active);
+      if (sock) parts.push(quote(sock));
     } else {
       var s = modStates(active);
       parts = parts.concat(thresholds(active).map(quote));
@@ -100,7 +137,9 @@
     counter.querySelector('b').textContent = text.length;
     counter.classList.toggle('over', text.length > LIMIT);
     copyBtn.disabled = !text;
+    if (shareBtn) shareBtn.disabled = !text;
     save();
+    syncHash();
   }
 
   // --- stan w localStorage (wygoda: po odswiezeniu zaznaczenia zostaja) ---
@@ -115,8 +154,12 @@
       });
       Array.prototype.forEach.call(document.querySelectorAll('.thr'), function (row) {
         var key = row.closest('.thresholds').dataset.kind + ':' + row.dataset.re;
-        state.thr[key] = [row.querySelector('[data-role="on"]').checked,
-          row.querySelector('[data-role="n"]').value];
+        var n = row.querySelector('[data-role="n"]');
+        state.thr[key] = [row.querySelector('[data-role="on"]').checked, n ? n.value : ''];
+      });
+      state.sockets = {};
+      Array.prototype.forEach.call(document.querySelectorAll('.sockets'), function (box) {
+        state.sockets[box.closest('.tool-panel').id] = socketValues(box);
       });
       var t17 = document.getElementById('hide-t17');
       if (t17) state.hideT17 = t17.checked;
@@ -139,14 +182,94 @@
       var v = (state.thr || {})[key];
       if (v) {
         row.querySelector('[data-role="on"]').checked = !!v[0];
-        row.querySelector('[data-role="n"]').value = v[1];
+        var n = row.querySelector('[data-role="n"]');
+        if (n && v[1] !== '') n.value = v[1];
       }
+    });
+    Array.prototype.forEach.call(document.querySelectorAll('.sockets'), function (box) {
+      var v = (state.sockets || {})[box.closest('.tool-panel').id];
+      if (v) setSocketValues(box, v);
     });
     var m = document.querySelector('input[name="mode"][value="' + state.mode + '"]');
     if (m) m.checked = true;
     var t17 = document.getElementById('hide-t17');
     if (t17 && state.hideT17) { t17.checked = true; filterList(t17.closest('.tool-panel')); }
     if (state.active && panel(state.active)) select(state.active);
+  }
+
+  function socketValues(box) {
+    return ['links', 'r', 'g', 'b'].map(function (role) {
+      return box.querySelector('[data-role="' + role + '"]').value || '0';
+    }).join('.');
+  }
+  function setSocketValues(box, text) {
+    String(text).split('.').forEach(function (v, i) {
+      var el = box.querySelector('[data-role="' + ['links', 'r', 'g', 'b'][i] + '"]');
+      if (el) el.value = v;
+    });
+  }
+
+  // Link opisuje tylko aktywny panel - to, co widac i co trafia do regexu.
+  // Fragmenty modow zamiast indeksow: nie przesuwaja sie po dodaniu nowego moda.
+  var SEP = '~';
+  function shareParams() {
+    var p = panel(active), params = new URLSearchParams();
+    if (tabs.length) params.set('tab', active);
+    var thr = [];
+    Array.prototype.forEach.call(p.querySelectorAll('.thr[data-id]'), function (row) {
+      if (!row.querySelector('[data-role="on"]').checked) return;
+      var n = row.querySelector('[data-role="n"]');
+      thr.push(row.dataset.id + (n ? '.' + n.value : ''));
+    });
+    if (thr.length) params.set('t', thr.join(SEP));
+    var s = p.querySelector('.mods') ? modStates(active) : { want: [], avoid: [] };
+    if (s.want.length) params.set('w', s.want.join(SEP));
+    if (s.avoid.length) params.set('a', s.avoid.join(SEP));
+    var box = p.querySelector('.sockets');
+    if (box && socketValues(box) !== '0.0.0.0') params.set('s', socketValues(box));
+    if (mode() === 'all') params.set('m', 'all');
+    return params;
+  }
+  function shareUrl() {
+    var params = shareParams();
+    // "~" bez kodowania - link czytelniejszy na Discordzie.
+    var q = params.toString().replace(/%7E/gi, '~');
+    return location.origin + location.pathname + (q ? '#' + q : '');
+  }
+  function syncHash() {
+    try { history.replaceState(null, '', shareUrl()); } catch (e) { /* file:// itp. */ }
+  }
+  function loadHash() {
+    if (location.hash.length < 2) return false;
+    var params = new URLSearchParams(location.hash.slice(1));
+    if (!['tab', 't', 'w', 'a', 's'].some(function (k) { return params.has(k); })) return false;
+    if (params.get('tab') && panel(params.get('tab'))) select(params.get('tab'));
+    var p = panel(active);
+    // Link zastepuje zapamietany stan tego panelu, nie dokleja sie do niego.
+    Array.prototype.forEach.call(p.querySelectorAll('.mods li[data-state]'), function (li) { setState(li, null); });
+    Array.prototype.forEach.call(p.querySelectorAll('.thr [data-role="on"]'), function (c) { c.checked = false; });
+    (params.get('t') || '').split(SEP).forEach(function (item) {
+      if (!item) return;
+      var dot = item.indexOf('.');
+      var id = dot === -1 ? item : item.slice(0, dot);
+      var row = p.querySelector('.thr[data-id="' + CSS.escape(id) + '"]');
+      if (!row) return;
+      row.querySelector('[data-role="on"]').checked = true;
+      var n = row.querySelector('[data-role="n"]');
+      if (n && dot !== -1) n.value = item.slice(dot + 1);
+    });
+    [['w', 'want'], ['a', 'avoid']].forEach(function (pair) {
+      (params.get(pair[0]) || '').split(SEP).forEach(function (frag) {
+        if (!frag) return;
+        var li = p.querySelector('.mods li[data-frag="' + CSS.escape(frag) + '"]');
+        if (li) setState(li, pair[1]);
+      });
+    });
+    var box = p.querySelector('.sockets');
+    if (box) setSocketValues(box, params.get('s') || '0.0.0.0');
+    var m = document.querySelector('input[name="mode"][value="' + (params.get('m') === 'all' ? 'all' : 'any') + '"]');
+    if (m) m.checked = true;
+    return true;
   }
 
   function filterList(p) {
@@ -217,6 +340,7 @@
       save();
       return;
     }
+    if (e.target.closest('.sockets')) { build(); return; }
     if (e.target.closest('.thr') || e.target.name === 'mode') {
       // Wpisanie liczby od razu wlacza prog - nikt nie wpisuje minimum po to,
       // zeby go nie uzyc.
@@ -227,30 +351,44 @@
     }
   });
   document.addEventListener('change', function (e) {
-    if (e.target.closest('.thr') || e.target.name === 'mode') build();
+    if (e.target.closest('.thr') || e.target.closest('.sockets') || e.target.name === 'mode') build();
   });
 
-  copyBtn.addEventListener('click', function () {
+  function copyText(btn, text, label, fallback) {
     var done = function () {
-      copyBtn.textContent = 'Copied';
-      setTimeout(function () { copyBtn.textContent = 'Copy'; }, 1500);
+      btn.textContent = 'Copied';
+      setTimeout(function () { btn.textContent = label; }, 1500);
     };
     if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(out.value).then(done, function () { out.select(); });
+      navigator.clipboard.writeText(text).then(done, fallback);
     } else {
-      out.select();
-      try { document.execCommand('copy'); done(); } catch (err) { /* uzytkownik skopiuje sam */ }
+      fallback();
     }
+  }
+  copyBtn.addEventListener('click', function () {
+    copyText(copyBtn, out.value, 'Copy', function () {
+      out.select();
+      try { document.execCommand('copy'); } catch (err) { /* uzytkownik skopiuje sam */ }
+    });
   });
+  if (shareBtn) {
+    shareBtn.addEventListener('click', function () {
+      // Bez schowka adres i tak jest juz w pasku przegladarki (syncHash).
+      copyText(shareBtn, shareUrl(), 'Copy link', function () { shareBtn.textContent = 'Link is in the address bar'; });
+    });
+  }
 
   clearBtn.addEventListener('click', function () {
     var p = panel(active);
     Array.prototype.forEach.call(p.querySelectorAll('.mods li[data-state]'), function (li) { setState(li, null); });
     Array.prototype.forEach.call(p.querySelectorAll('.thr [data-role="on"]'), function (c) { c.checked = false; });
+    var box = p.querySelector('.sockets');
+    if (box) setSocketValues(box, '0.0.0.0');
     build();
   });
 
   load();
+  loadHash();
   build();
 
   // Dla testow w konsoli / przyszlych stron.

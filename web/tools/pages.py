@@ -18,7 +18,7 @@ MAP_REGEX_DATA = HERE.parent / "assets" / "map-regex-data.json"
 
 NAV = (
     ("/en/", "Price Checker"),
-    ("/tools/poe-map-regex/", "PoE1 Map Regex"),
+    ("/tools/poe-map-regex/", "PoE1 Regex"),
     ("/tools/poe2-regex/", "PoE2 Regex"),
     ("/tools/poe2-instill/", "PoE2 Instill"),
     ("/economy/", "Economy"),
@@ -123,12 +123,15 @@ def _mod_list(pool: list[dict], esc, kind: str) -> str:
 def _threshold_rows(items: list[dict], esc, kind: str) -> str:
     rows = []
     for it in items:
+        # def None = prog "jest/nie ma" (np. "Adds # to # Fire Damage") - bez pola liczby.
+        number = ("" if it["def"] is None else
+                  f'<input type="number" min="0" max="9999" value="{int(it["def"])}" '
+                  f'data-role="n" aria-label="{esc(it["label"])} minimum">')
+        ident = f' data-id="{esc(it["id"])}"' if it.get("id") else ""
         rows.append(
-            f'<label class="thr" data-re="{esc(it["re"])}">'
+            f'<label class="thr" data-re="{esc(it["re"])}"{ident}>'
             f'<input type="checkbox" data-role="on"> '
-            f'<span>{esc(it["label"])}</span>'
-            f'<input type="number" min="0" max="9999" value="{int(it["def"])}" '
-            f'data-role="n" aria-label="{esc(it["label"])} minimum"></label>')
+            f'<span>{esc(it["label"])}</span>{number}</label>')
     return f'<div class="thresholds" data-kind="{kind}">' + "".join(rows) + "</div>"
 
 
@@ -188,6 +191,7 @@ def regex_page(*, esc, asset, site_url) -> str:
           placeholder="Pick modifiers to build a search string"></textarea>
         <div class="out-actions">
           <button type="button" class="btn primary" id="regex-copy" disabled>Copy</button>
+          <button type="button" class="btn" id="regex-share" disabled>Copy link</button>
           <button type="button" class="btn" id="regex-clear">Clear</button>
         </div>
         <fieldset class="mode">
@@ -247,7 +251,18 @@ MAP_REGEX_FAQ = (
      "lines and the map conversion chances."),
     ("Is the list checked against real maps?",
      "Every fragment was tested on rare Tier 14–17 maps listed on the official trade site: "
-     "each modifier line matched its own fragment and no fragment matched another line."),
+     "each modifier line matched its own fragment and no fragment matched another line. "
+     "Heist Contracts, Blueprints and Expedition Logbooks were checked the same way."),
+    ("How do I share my regex?",
+     "Click Copy link. The link opens the same tab with the same thresholds and modifiers picked, "
+     "so a guild mate can paste it straight into their stash search."),
+    ("How does the vendor socket search work?",
+     "Pick a linked group size and the colours you need. The builder writes every colour order "
+     "for one linked group (R-G-B, G-R-B, ...), so a 3-link with red, green and blue is found "
+     "however the sockets are ordered."),
+    ("Which Expedition Logbook bonuses can I search for?",
+     "The four factions, the area bonuses such as artifact quantity, explosive radius, "
+     "remnants and chest markers, and the logbook bosses. Modifiers work like map modifiers."),
 )
 
 # Szybkie zestawy "Avoid" - dopasowanie po tekscie moda, zeby przetrwaly
@@ -265,7 +280,7 @@ MAP_PRESETS = (
 
 def map_regex_page(*, esc, asset, site_url) -> str:
     data = json.loads(MAP_REGEX_DATA.read_text(encoding="utf-8"))
-    pool = data["maps"]
+    pool = data["maps"]["mods"]
     faq = "".join(f"<details><summary>{esc(q)}</summary><p>{esc(a)}</p></details>"
                   for q, a in MAP_REGEX_FAQ)
     presets = []
@@ -275,33 +290,106 @@ def map_regex_page(*, esc, asset, site_url) -> str:
             presets.append(f'<button type="button" data-set="avoid" data-frags="{esc(json.dumps(frags))}" '
                            f'title="{len(frags)} modifier(s)">{esc(label)}</button>')
     t17_count = sum(1 for m in pool if m.get("t17"))
+
+    def list_tools(extra=""):
+        return ('<div class="list-tools"><input type="search" class="filter" '
+                'placeholder="Filter modifiers…" aria-label="Filter modifiers">'
+                f'{extra}<span class="picked" aria-live="polite"></span></div>')
+
+    def grouped(mods, kind, titles):
+        html = ""
+        for group, title in titles:
+            part = [m for m in mods if m.get("group", "mod") == group]
+            if part:
+                html += f'<h3 class="sub">{esc(title)} <span class="count">{len(part)}</span></h3>' + _mod_list(part, esc, kind)
+        return html
+
+    def panel(kind, content, first=False):
+        hidden = "" if first else " hidden"
+        return (f'<div class="tool-panel" id="panel-{kind}" role="tabpanel" '
+                f'aria-labelledby="tab-{kind}"{hidden}>{content}</div>')
+
+    heist_props = [p for p in data["heist"]["props"] if p.get("group") != "job"]
+    heist_jobs = [p for p in data["heist"]["props"] if p.get("group") == "job"]
+    heist_mods = data["heist"]["mods"]
+    logbook_mods = data["logbook"]["mods"]
+
+    maps_panel = panel("maps", f"""
+        <h3 class="sub">Minimum values</h3>
+        {_threshold_rows(data["maps"]["props"], esc, "maps")}
+        <h3 class="sub">Modifiers</h3>
+        <p class="note">{len(pool)} map modifier lines. <b>Want</b> highlights maps that have them,
+        <b>Avoid</b> hides maps with any of them.</p>
+        <div class="presets" role="group" aria-label="Quick avoid presets"><span>Quick avoid:</span>{"".join(presets)}</div>
+        {list_tools(f'<label class="field-inline"><input type="checkbox" id="hide-t17"> Hide T17-only ({t17_count})</label>')}
+        {_mod_list(pool, esc, "maps")}""", first=True)
+
+    link_opts = "".join(f'<option value="{n}">{label}</option>' for n, label in
+                        ((0, "Any"), (2, "2-link"), (3, "3-link"), (4, "4-link"), (5, "5-link"), (6, "6-link")))
+    colour_inputs = "".join(
+        f'<label class="sock-colour {c}"><span>{name}</span>'
+        f'<input type="number" min="0" max="6" value="0" data-role="{c}" aria-label="{name} sockets"></label>'
+        for c, name in (("r", "Red"), ("g", "Green"), ("b", "Blue")))
+    vendor_panel = panel("vendor", f"""
+        <p class="note">Levelling shopping list for vendors: tick the stats you want and set a minimum.
+        With “any of them” an item needs one ticked stat, with “all of them” every one.</p>
+        <h3 class="sub">Sockets</h3>
+        <div class="sockets">
+          <label class="field-inline">Linked group <select data-role="links" aria-label="Linked sockets">{link_opts}</select></label>
+          {colour_inputs}
+          <p class="note small">Colours count inside one linked group, e.g. 3-link with 1 red, 1 green, 1 blue
+          finds any R-G-B order. Sockets always apply on top of the stats.</p>
+        </div>
+        <h3 class="sub">Stats</h3>
+        {_threshold_rows(data["vendor"]["props"], esc, "vendor")}""")
+
+    heist_panel = panel("heist", f"""
+        <p class="note">Heist Contracts and Blueprints. Minimum values, rogue job levels and modifiers
+        all apply together.</p>
+        <h3 class="sub">Minimum values</h3>
+        {_threshold_rows(heist_props, esc, "heist")}
+        <h3 class="sub">Required job level</h3>
+        <p class="note small">Highlights contracts that need the job at this level or higher — higher
+        levels mean better rewards. Blueprints list several jobs; every ticked job must be on it.</p>
+        {_threshold_rows(heist_jobs, esc, "heist")}
+        <h3 class="sub">Modifiers <span class="count">{len(heist_mods)}</span></h3>
+        {list_tools()}
+        {_mod_list(heist_mods, esc, "heist")}""")
+
+    logbook_panel = panel("logbook", f"""
+        <p class="note">Expedition Logbooks: pick the faction and area bonuses you want, avoid the
+        modifiers your build cannot run.</p>
+        <h3 class="sub">Minimum values</h3>
+        {_threshold_rows(data["logbook"]["props"], esc, "logbook")}
+        {list_tools()}
+        {grouped(logbook_mods, "logbook", (("faction", "Factions"), ("bonus", "Area bonuses & bosses"), ("mod", "Modifiers")))}""")
+
+    tab_buttons = []
+    for kind, label in (("maps", "Maps"), ("vendor", "Vendor"), ("heist", "Heist"), ("logbook", "Logbooks")):
+        first = kind == "maps"
+        tab_buttons.append(f'<button type="button" role="tab" id="tab-{kind}" aria-controls="panel-{kind}" '
+                           f'aria-selected="{"true" if first else "false"}" tabindex="{0 if first else -1}">{label}</button>')
+    tabs = "".join(tab_buttons)
+
     body = f"""
 <section class="tool-hero">
   <div class="wrap wide">
     <p class="eyebrow">Path of Exile 1 · free tool</p>
-    <h1>PoE Map Regex</h1>
-    <p class="lead">Build a stash search string for rare maps: minimum quantity, rarity and
-    pack size, the modifiers you want, and the ones your build cannot run. Copy, paste into
-    the stash or map device search.</p>
+    <h1>PoE Regex Builder</h1>
+    <p class="lead">Stash and vendor search strings for rare maps, levelling gear, Heist Contracts and
+    Expedition Logbooks. Pick what you want and what your build cannot run, then copy the text
+    or share the link.</p>
   </div>
 </section>
 
 <section class="tool">
   <div class="wrap wide tool-grid">
     <div class="tool-main">
-      <div class="tool-panel" id="panel-maps">
-        <h3 class="sub">Minimum values</h3>
-        {_threshold_rows(data["props"], esc, "maps")}
-        <h3 class="sub">Modifiers</h3>
-        <p class="note">{len(pool)} map modifier lines. <b>Want</b> highlights maps that have them,
-        <b>Avoid</b> hides maps with any of them.</p>
-        <div class="presets" role="group" aria-label="Quick avoid presets"><span>Quick avoid:</span>{"".join(presets)}</div>
-        <div class="list-tools"><input type="search" class="filter"
-          placeholder="Filter modifiers…" aria-label="Filter modifiers">
-          <label class="field-inline"><input type="checkbox" id="hide-t17"> Hide T17-only ({t17_count})</label>
-          <span class="picked" aria-live="polite"></span></div>
-        {_mod_list(pool, esc, "maps")}
-      </div>
+      <div class="tool-tabs" role="tablist" aria-label="Item type">{tabs}</div>
+      {maps_panel}
+      {vendor_panel}
+      {heist_panel}
+      {logbook_panel}
     </div>
 
     <aside class="tool-out" aria-label="Generated regex">
@@ -311,18 +399,19 @@ def map_regex_page(*, esc, asset, site_url) -> str:
           <span class="counter" aria-live="polite"><b>0</b> / 250</span>
         </div>
         <textarea id="regex-out" data-store="poe1-map-regex-v1" readonly spellcheck="false" rows="5"
-          placeholder="Pick thresholds or modifiers to build a search string"></textarea>
+          placeholder="Pick values or modifiers to build a search string"></textarea>
         <div class="out-actions">
           <button type="button" class="btn primary" id="regex-copy" disabled>Copy</button>
+          <button type="button" class="btn" id="regex-share" disabled>Copy link</button>
           <button type="button" class="btn" id="regex-clear">Clear</button>
         </div>
         <fieldset class="mode">
-          <legend>Wanted modifiers must match</legend>
+          <legend>Wanted modifiers (Vendor: stats) must match</legend>
           <label><input type="radio" name="mode" value="any" checked> any of them</label>
           <label><input type="radio" name="mode" value="all"> all of them</label>
         </fieldset>
         <p class="note small">Minimum values and avoided modifiers always apply together.
-        Only works with the English game client.</p>
+        The link opens this tab with the same picks. English game client only.</p>
       </div>
     </aside>
   </div>
@@ -330,9 +419,9 @@ def map_regex_page(*, esc, asset, site_url) -> str:
 
 <section class="band">
   <div class="wrap narrow">
-    <h2>How the map search works</h2>
+    <h2>How the search works</h2>
     <ol class="how">
-      <li><b>Quoted text is a pattern.</b> <code>"regen"</code> highlights every map whose text contains it.</li>
+      <li><b>Quoted text is a pattern.</b> <code>"regen"</code> highlights every item whose text contains it.</li>
       <li><b><code>|</code> means “or”.</b> <code>"enfee|vulne"</code> matches either curse.</li>
       <li><b>A leading <code>!</code> negates.</b> <code>"!regen|be le"</code> hides maps with no regen or no leech.</li>
       <li><b>Space-separated patterns must all match.</b> <code>"quantity: .(9\\d|\\d\\d\\d)%" "!regen"</code> — 90%+ quantity without no regen.</li>
@@ -344,10 +433,10 @@ def map_regex_page(*, esc, asset, site_url) -> str:
 </section>
 """
     return _shell(esc=esc, asset=asset, site_url=site_url, path="/tools/poe-map-regex/",
-                  title="PoE Map Regex — Rare Map Stash Search Builder (incl. T17)",
-                  description=("Free Path of Exile map regex builder: highlight rare maps by quantity, "
-                               "rarity and pack size, avoid no regen, leech, curse and max res mods, "
-                               "Tier 17 included — within the 250 character limit."),
+                  title="PoE Regex Builder — Maps, Vendor, Heist Contracts & Logbooks",
+                  description=("Free Path of Exile regex builder: rare map quantity and bad mods (T17 included), "
+                               "levelling vendor items with links and colours, Heist Contracts and "
+                               "Expedition Logbooks — with shareable links, within the 250 character limit."),
                   body=body, script="regex.js", json_ld=_faq_ld(MAP_REGEX_FAQ))
 
 

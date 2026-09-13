@@ -1,878 +1,1963 @@
 {
  "generated": "2026-09-13",
- "maps": [
-  {
-   "text": "#% chance for Rare Monsters to Fracture on death",
-   "frag": "for r",
-   "t17": true
-  },
-  {
-   "text": "#% increased Magic Monsters",
-   "frag": "d mag"
-  },
-  {
-   "text": "#% increased Monster Attack Speed",
-   "frag": "ter a"
-  },
-  {
-   "text": "#% increased Monster Cast Speed",
-   "frag": "r cas"
-  },
-  {
-   "text": "#% increased Monster Damage",
-   "frag": "d monster d"
-  },
-  {
-   "text": "#% increased Monster Movement Speed",
-   "frag": "ter m"
-  },
-  {
-   "text": "#% increased number of Rare Monsters",
-   "frag": "of ra"
-  },
-  {
-   "text": "#% less effect of Curses on Monsters",
-   "frag": "of cu"
-  },
-  {
-   "text": "#% Monster Chaos Resistance",
-   "frag": "ter ch"
-  },
-  {
-   "text": "#% Monster Elemental Resistances",
-   "frag": "ter e"
-  },
-  {
-   "text": "#% Monster Physical Damage Reduction",
-   "frag": "er ph"
-  },
-  {
-   "text": "#% more Monster Life",
-   "frag": "ore mo"
-  },
-  {
-   "text": "#% to Monster Critical Strike Multiplier",
-   "frag": "to mo"
-  },
-  {
-   "text": "All Damage from Monsters' Hits can Poison",
-   "frag": "all d",
-   "t17": true
-  },
-  {
-   "text": "All Legion monsters in Area must be released to claim Reward",
-   "frag": "all l"
-  },
-  {
-   "text": "All Magic and Normal Monsters in Area are in a Union of Souls",
-   "frag": "and n"
-  },
-  {
-   "text": "All Monster Damage can Ignite, Freeze and Shock",
-   "frag": "can i",
-   "t17": true
-  },
-  {
-   "text": "All Monster Damage from Hits always Ignites",
-   "frag": "alway"
-  },
-  {
-   "text": "All Strongboxes in Area must be opened to claim Reward",
-   "frag": "all s"
-  },
-  {
-   "text": "Area contains # additional guarded Exquisite Vaal Vessels",
-   "frag": "exqui"
-  },
-  {
-   "text": "Area contains # additional pack of four Map Bosses",
-   "frag": "ack o"
-  },
-  {
-   "text": "Area contains # additional packs of four Map Bosses",
-   "frag": "s of fo"
-  },
-  {
-   "text": "Area contains # additional packs of Frogs",
-   "frag": "of fr"
-  },
-  {
-   "text": "Area contains # additional Rare Monsters that create Frost Walls and Flee",
-   "frag": "frost"
-  },
-  {
-   "text": "Area contains # Gigantic Rogue Exiles",
-   "frag": "gigan"
-  },
-  {
-   "text": "Area contains a Bismuth Ore Deposit",
-   "frag": "a bis"
-  },
-  {
-   "text": "Area contains a Blight Encounter",
-   "frag": "a bli"
-  },
-  {
-   "text": "Area contains additional packs of Restless Dead",
-   "frag": "of re"
-  },
-  {
-   "text": "Area contains an additional Legion Encounter",
-   "frag": "an ad"
-  },
-  {
-   "text": "Area contains Drowning Orbs",
-   "frag": "drown",
-   "t17": true
-  },
-  {
-   "text": "Area contains Einhar, Exilehunter",
-   "frag": "einha"
-  },
-  {
-   "text": "Area contains Labyrinth Hazards",
-   "frag": "labyr",
-   "t17": true
-  },
-  {
-   "text": "Area contains many Detonation Totems",
-   "frag": "ny de"
-  },
-  {
-   "text": "Area contains many Totems",
-   "frag": "any t"
-  },
-  {
-   "text": "Area contains patches of moving Marked Ground, inflicting random Marks",
-   "frag": "of mo",
-   "t17": true
-  },
-  {
-   "text": "Area contains Runes of the Searing Exarch",
-   "frag": "runes",
-   "t17": true
-  },
-  {
-   "text": "Area contains The Elderslayers",
-   "frag": "the e"
-  },
-  {
-   "text": "Area contains The Feared",
-   "frag": "the f"
-  },
-  {
-   "text": "Area contains two Unique Bosses",
-   "frag": "two u"
-  },
-  {
-   "text": "Area contains Unstable Tentacle Fiends",
-   "frag": "tenta",
-   "t17": true
-  },
-  {
-   "text": "Area has # additional random Modifiers",
-   "frag": "l ran"
-  },
-  {
-   "text": "Area has increased monster variety",
-   "frag": "has i"
-  },
-  {
-   "text": "Area has patches of Burning Ground",
-   "frag": "of bu"
-  },
-  {
-   "text": "Area has patches of Chilled Ground",
-   "frag": "of ch"
-  },
-  {
-   "text": "Area has patches of Consecrated Ground",
-   "frag": "of co"
-  },
-  {
-   "text": "Area has patches of desecrated ground",
-   "frag": "of de"
-  },
-  {
-   "text": "Area has patches of Shocked Ground which increase Damage taken by #%",
-   "frag": "of sh"
-  },
-  {
-   "text": "Area is affected by a Corrupting Tempest",
-   "frag": "is af"
-  },
-  {
-   "text": "Area is infested with Fungal Growths",
-   "frag": "infes"
-  },
-  {
-   "text": "Area is Influenced by the Originator's Memories",
-   "frag": "influ"
-  },
-  {
-   "text": "Area is inhabited by Abominations",
-   "frag": "by ab"
-  },
-  {
-   "text": "Area is inhabited by Animals",
-   "frag": "by an"
-  },
-  {
-   "text": "Area is inhabited by Cultists of Kitava",
-   "frag": "by cu"
-  },
-  {
-   "text": "Area is inhabited by Demons",
-   "frag": "by de"
-  },
-  {
-   "text": "Area is inhabited by Ghosts",
-   "frag": "by gh"
-  },
-  {
-   "text": "Area is inhabited by Goatmen",
-   "frag": "by go"
-  },
-  {
-   "text": "Area is inhabited by Humanoids",
-   "frag": "by hu"
-  },
-  {
-   "text": "Area is inhabited by Lunaris fanatics",
-   "frag": "by lu"
-  },
-  {
-   "text": "Area is inhabited by Porcupines",
-   "frag": "by po"
-  },
-  {
-   "text": "Area is inhabited by ranged monsters",
-   "frag": "by ra"
-  },
-  {
-   "text": "Area is inhabited by Sea Witches and their Spawn",
-   "frag": "by se"
-  },
-  {
-   "text": "Area is inhabited by Skeletons",
-   "frag": "by sk"
-  },
-  {
-   "text": "Area is inhabited by Solaris fanatics",
-   "frag": "by so"
-  },
-  {
-   "text": "Area is inhabited by Undead",
-   "frag": "by un"
-  },
-  {
-   "text": "Areas contain Ritual Altars",
-   "frag": "areas"
-  },
-  {
-   "text": "Auras from Player Skills which affect Allies also affect Enemies",
-   "frag": "allie",
-   "t17": true
-  },
-  {
-   "text": "Beyond Bosses cannot spawn",
-   "frag": "ond b"
-  },
-  {
-   "text": "Buffs on Players expire #% faster",
-   "frag": "on pl"
-  },
-  {
-   "text": "Can be Anointed up to # times",
-   "frag": "can b"
-  },
-  {
-   "text": "Debuffs on Monsters expire #% faster",
-   "frag": "debuf",
-   "t17": true
-  },
-  {
-   "text": "Delirium Reward Type: Armour",
-   "frag": "pe: a"
-  },
-  {
-   "text": "Delirium Reward Type: Currency",
-   "frag": "pe: c"
-  },
-  {
-   "text": "Delirium Reward Type: Divination Cards",
-   "frag": "divin"
-  },
-  {
-   "text": "Delirium Reward Type: Fragments",
-   "frag": "fragm"
-  },
-  {
-   "text": "Delirium Reward Type: Jewellery",
-   "frag": "jewel"
-  },
-  {
-   "text": "Delirium Reward Type: Map Items",
-   "frag": "map i"
-  },
-  {
-   "text": "Delirium Reward Type: Unique Items",
-   "frag": "pe: u"
-  },
-  {
-   "text": "Delirium Reward Type: Weapons",
-   "frag": "weapo"
-  },
-  {
-   "text": "Durability of Ichor Pumps in Area is #",
-   "frag": "durab"
-  },
-  {
-   "text": "Legion Monsters in Area have a Volatile Core",
-   "frag": "a vol"
-  },
-  {
-   "text": "Map Boss is accompanied by a Synthesis Boss",
-   "frag": "is ac",
-   "t17": true
-  },
-  {
-   "text": "Map's Item Quantity Modifiers also affect Blight Chest count at #% value",
-   "frag": "map's"
-  },
-  {
-   "text": "Maven releases all Bosses at once",
-   "frag": "all b"
-  },
-  {
-   "text": "Maximum number of Players in Area is one",
-   "frag": "of pl"
-  },
-  {
-   "text": "modifier from #% less to #% more, until Hit again",
-   "frag": "until"
-  },
-  {
-   "text": "Monster Damage Penetrates #% Elemental Resistances",
-   "frag": "penet",
-   "t17": true
-  },
-  {
-   "text": "Monsters are Hexproof",
-   "frag": "are h"
-  },
-  {
-   "text": "Monsters Blind on Hit",
-   "frag": "blind"
-  },
-  {
-   "text": "Monsters can only be Damaged while within # metres of a Player",
-   "frag": "be da"
-  },
-  {
-   "text": "Monsters cannot be Leeched from",
-   "frag": "be le"
-  },
-  {
-   "text": "Monsters cannot be Stunned",
-   "frag": "be st"
-  },
-  {
-   "text": "Monsters cannot be Taunted",
-   "frag": "be ta"
-  },
-  {
-   "text": "Monsters deal #% extra Physical Damage as Cold",
-   "frag": "s col"
-  },
-  {
-   "text": "Monsters deal #% extra Physical Damage as Fire",
-   "frag": "as fi"
-  },
-  {
-   "text": "Monsters deal #% extra Physical Damage as Lightning",
-   "frag": "as li"
-  },
-  {
-   "text": "Monsters fire # additional Projectiles",
-   "frag": "rs fi"
-  },
-  {
-   "text": "Monsters from Beyond create Desecrated Ground",
-   "frag": "ond c"
-  },
-  {
-   "text": "Monsters gain #% of Maximum Life as Extra Maximum Energy Shield",
-   "frag": "f max"
-  },
-  {
-   "text": "Monsters gain #% of their Physical Damage as Extra Chaos Damage",
-   "frag": "tra c"
-  },
-  {
-   "text": "Monsters gain #% of their Physical Damage as Extra Damage of a random Element",
-   "frag": "age o",
-   "t17": true
-  },
-  {
-   "text": "Monsters gain a Frenzy Charge on Hit",
-   "frag": "a fre"
-  },
-  {
-   "text": "Monsters gain a Power Charge on Hit",
-   "frag": "a pow"
-  },
-  {
-   "text": "Monsters gain an Endurance Charge on Hit",
-   "frag": "e charge o"
-  },
-  {
-   "text": "Monsters gain an Endurance Charge when hit",
-   "frag": "rge w"
-  },
-  {
-   "text": "Monsters have # to Maximum Endurance Charges",
-   "frag": "m end",
-   "t17": true
-  },
-  {
-   "text": "Monsters have # to Maximum Frenzy Charges",
-   "frag": "mum f",
-   "t17": true
-  },
-  {
-   "text": "Monsters have # to Maximum Power Charges",
-   "frag": "mum p",
-   "t17": true
-  },
-  {
-   "text": "Monsters have #% chance to Avoid Elemental Ailments",
-   "frag": "ailme"
-  },
-  {
-   "text": "Monsters have #% Chance to Block Attack Damage",
-   "frag": "ock a",
-   "t17": true
-  },
-  {
-   "text": "Monsters have #% chance to Suppress Spell Damage",
-   "frag": "to su"
-  },
-  {
-   "text": "Monsters have #% increased Accuracy Rating",
-   "frag": "ed ac"
-  },
-  {
-   "text": "Monsters have #% increased Area of Effect",
-   "frag": "ve .*% increased ar"
-  },
-  {
-   "text": "Monsters have #% increased Critical Strike Chance",
-   "frag": "sed c"
-  },
-  {
-   "text": "Monsters have #% increased Poison Duration",
-   "frag": "durat",
-   "t17": true
-  },
-  {
-   "text": "Monsters have a #% chance to avoid Poison, Impale, and Bleeding",
-   "frag": "and b"
-  },
-  {
-   "text": "Monsters have a #% chance to Ignite, Freeze and Shock on Hit",
-   "frag": "to ig"
-  },
-  {
-   "text": "Monsters Hinder on Hit with Spells",
-   "frag": "hinde"
-  },
-  {
-   "text": "Monsters Ignite, Freeze and Shock on Hit",
-   "frag": "rs ig"
-  },
-  {
-   "text": "Monsters inflict # Grasping Vines on Hit",
-   "frag": "grasp",
-   "t17": true
-  },
-  {
-   "text": "Monsters inflict Petrification for # seconds on hit",
-   "frag": "petri"
-  },
-  {
-   "text": "Monsters Inflict Withered for # seconds on Hit",
-   "frag": "withe"
-  },
-  {
-   "text": "Monsters Kill things with #% or lower Life on Hit",
-   "frag": "thing"
-  },
-  {
-   "text": "Monsters Maim on Hit with Attacks",
-   "frag": "ers m"
-  },
-  {
-   "text": "Monsters Poison on Hit",
-   "frag": "ers p"
-  },
-  {
-   "text": "Monsters steal Power, Frenzy and Endurance charges on Hit",
-   "frag": "steal"
-  },
-  {
-   "text": "Monsters take #% reduced Extra Damage from Critical Strikes",
-   "frag": "rs ta"
-  },
-  {
-   "text": "Monsters' Action Speed cannot be modified to below Base Value",
-   "frag": "actio"
-  },
-  {
-   "text": "Monsters' Attacks have #% chance to Impale on Hit",
-   "frag": "to im"
-  },
-  {
-   "text": "Monsters' Movement Speed cannot be modified to below Base Value",
-   "frag": "s' mov"
-  },
-  {
-   "text": "Monsters' Projectiles can Chain when colliding with Terrain",
-   "frag": "can c"
-  },
-  {
-   "text": "Monsters' skills Chain # additional times",
-   "frag": "rs' s"
-  },
-  {
-   "text": "Must fully complete all Ritual Encounters in Area to claim Reward",
-   "frag": "compl"
-  },
-  {
-   "text": "Must successfully defend all Ichor Pumps in Area to claim Reward",
-   "frag": "succe"
-  },
-  {
-   "text": "Natural inhabitants of this area have been removed",
-   "frag": "natur"
-  },
-  {
-   "text": "Non-Unique Equipment found in Area drops as Currency instead",
-   "frag": "non-u"
-  },
-  {
-   "text": "Only opens # Portal to Area",
-   "frag": "al to"
-  },
-  {
-   "text": "Only opens # Portals to Area",
-   "frag": "rtals"
-  },
-  {
-   "text": "Players are assaulted by Bloodstained Sawblades",
-   "frag": "by bl",
-   "t17": true
-  },
-  {
-   "text": "Players are assaulted by many dangerous Apparitions",
-   "frag": "by ma"
-  },
-  {
-   "text": "Players are Cursed with Elemental Weakness",
-   "frag": "weakn"
-  },
-  {
-   "text": "Players are Cursed with Enfeeble",
-   "frag": "enfee"
-  },
-  {
-   "text": "Players are Cursed with Temporal Chains",
-   "frag": "h tem"
-  },
-  {
-   "text": "Players are Cursed with Vulnerability",
-   "frag": "vulne"
-  },
-  {
-   "text": "Players are targeted by a Meteor when they use a Flask",
-   "frag": "targe",
-   "t17": true
-  },
-  {
-   "text": "Players cannot Block",
-   "frag": "ot bl"
-  },
-  {
-   "text": "Players cannot Evade",
-   "frag": "evade"
-  },
-  {
-   "text": "Players cannot gain Flask Charges",
-   "frag": "in fl"
-  },
-  {
-   "text": "Players cannot inflict Exposure",
-   "frag": "expos"
-  },
-  {
-   "text": "Players cannot Recover Life or Energy Shield above #% during Rituals in Area",
-   "frag": "above"
-  },
-  {
-   "text": "Players cannot Regenerate Life, Mana or Energy Shield",
-   "frag": "regen"
-  },
-  {
-   "text": "Players cannot Suppress Spell Damage",
-   "frag": "ot su"
-  },
-  {
-   "text": "Players do not gain Experience",
-   "frag": "do no"
-  },
-  {
-   "text": "Players gain #% reduced Flask Charges",
-   "frag": "ced f"
-  },
-  {
-   "text": "Players gain Instability on Kill",
-   "frag": "insta"
-  },
-  {
-   "text": "Players have #% less Accuracy Rating",
-   "frag": "ss ac"
-  },
-  {
-   "text": "Players have #% less Area of Effect",
-   "frag": "ss are"
-  },
-  {
-   "text": "Players have #% less Armour",
-   "frag": "s arm"
-  },
-  {
-   "text": "Players have #% less Cooldown Recovery Rate",
-   "frag": "coold"
-  },
-  {
-   "text": "Players have #% less Defences",
-   "frag": "s def",
-   "t17": true
-  },
-  {
-   "text": "Players have #% less effect of Flasks applied to them",
-   "frag": "of fl",
-   "t17": true
-  },
-  {
-   "text": "Players have #% less Recovery Rate of Life and Energy Shield",
-   "frag": "of li"
-  },
-  {
-   "text": "Players have #% reduced Chance to Block",
-   "frag": "d chan"
-  },
-  {
-   "text": "Players have #% reduced Character Size",
-   "frag": "chara"
-  },
-  {
-   "text": "Players have #% reduced effect of Non-Curse Auras from Skills",
-   "frag": "of no"
-  },
-  {
-   "text": "Players have #% reduced Maximum total Life, Mana and Energy Shield Recovery per second from Leech",
-   "frag": "total",
-   "t17": true
-  },
-  {
-   "text": "Players have #% reduced Movement Speed",
-   "frag": "d mov"
-  },
-  {
-   "text": "Players have #% to all maximum Resistances",
-   "frag": "to al"
-  },
-  {
-   "text": "Players have #% to amount of Suppressed Spell Damage Prevented",
-   "frag": "to am"
-  },
-  {
-   "text": "Players have Shroud Walker",
-   "frag": "shrou"
-  },
-  {
-   "text": "Players in Area are #% Delirious",
-   "frag": "lirio"
-  },
-  {
-   "text": "Players' modifiers to Light Radius also apply to this range",
-   "frag": "to li"
-  },
-  {
-   "text": "Players' Travel Skills are Disabled",
-   "frag": "are d"
-  },
-  {
-   "text": "Rare and Unique Monsters in Area are Possessed by # to # Tormented Spirits and their Minions are Touched",
-   "frag": "and u"
-  },
-  {
-   "text": "Rare Monsters each have # additional Modifier",
-   "frag": "rs ea",
-   "also": 1,
-   "t17": true
-  },
-  {
-   "text": "Rare Monsters each have # additional Modifiers",
-   "frag": "l modifiers"
-  },
-  {
-   "text": "Rare Monsters have #% chance to spawn a Duplicate of Map Boss on Death",
-   "frag": "to sp"
-  },
-  {
-   "text": "Rare Monsters have Elemental Thorns reflecting # Elemental Damage",
-   "frag": "ve el"
-  },
-  {
-   "text": "Rare Monsters have Essence effects",
-   "frag": "essen"
-  },
-  {
-   "text": "Rare Monsters have Physical Thorns reflecting # Physical Damage",
-   "frag": "ave p"
-  },
-  {
-   "text": "Rare Monsters have Volatile Cores",
-   "frag": "cores",
-   "t17": true
-  },
-  {
-   "text": "Rare monsters in area are Shaper-Touched",
-   "frag": "are s",
-   "t17": true
-  },
-  {
-   "text": "Rare monsters in area Temporarily Revive on death",
-   "frag": "reviv",
-   "t17": true
-  },
-  {
-   "text": "Slaying Enemies close together can attract monsters from Beyond this realm",
-   "frag": "slayi"
-  },
-  {
-   "text": "The Maven interferes with Players",
-   "frag": "the m",
-   "t17": true
-  },
-  {
-   "text": "Unique Boss deals #% increased Damage",
-   "frag": "deals"
-  },
-  {
-   "text": "Unique Boss has #% increased Area of Effect",
-   "frag": "as .*% increased ar"
-  },
-  {
-   "text": "Unique Boss has #% increased Attack and Cast Speed",
-   "frag": "ed at"
-  },
-  {
-   "text": "Unique Boss has #% increased Life",
-   "frag": "sed l"
-  },
-  {
-   "text": "Unique Bosses are Possessed",
-   "frag": "es ar"
-  },
-  {
-   "text": "Unique Monsters have a random Shrine Buff",
-   "frag": "shrin",
-   "t17": true
-  },
-  {
-   "text": "Unstable Players eventually detonate",
-   "frag": "ble p"
-  },
-  {
-   "text": "When Hit, Players gain a random Movement Speed",
-   "frag": "it, p"
-  }
- ],
- "props": [
-  {
-   "id": "tier",
-   "label": "Map Tier",
-   "re": "tier {n}\\)",
-   "def": 16
-  },
-  {
-   "id": "iiq",
-   "label": "Item Quantity",
-   "re": "quantity: \\+{n}%",
-   "def": 80
-  },
-  {
-   "id": "iir",
-   "label": "Item Rarity",
-   "re": "rarity: \\+{n}%",
-   "def": 50
-  },
-  {
-   "id": "pack",
-   "label": "Monster Pack Size",
-   "re": "size: \\+{n}%",
-   "def": 25
-  },
-  {
-   "id": "maps",
-   "label": "More Maps",
-   "re": "maps: \\+{n}%",
-   "def": 20
-  },
-  {
-   "id": "currency",
-   "label": "More Currency",
-   "re": "currency: \\+{n}%",
-   "def": 20
-  },
-  {
-   "id": "scarabs",
-   "label": "More Scarabs",
-   "re": "scarabs: \\+{n}%",
-   "def": 20
-  },
-  {
-   "id": "scarab",
-   "label": "Converts to Scarab",
-   "re": "scarab: {n}%",
-   "def": 40
-  },
-  {
-   "id": "umap",
-   "label": "Converts to Unique Map",
-   "re": "unique map: {n}%",
-   "def": 5
-  },
-  {
-   "id": "conq",
-   "label": "Converts to Conqueror Map",
-   "re": "conqueror map: {n}%",
-   "def": 5
-  },
-  {
-   "id": "shaper",
-   "label": "Converts to Shaper Map",
-   "re": "shaper map: {n}%",
-   "def": 5
-  },
-  {
-   "id": "elder",
-   "label": "Converts to Elder Map",
-   "re": "elder map: {n}%",
-   "def": 5
-  }
- ]
+ "maps": {
+  "mods": [
+   {
+    "text": "#% chance for Rare Monsters to Fracture on death",
+    "frag": "for r",
+    "t17": true
+   },
+   {
+    "text": "#% increased Magic Monsters",
+    "frag": "d mag"
+   },
+   {
+    "text": "#% increased Monster Attack Speed",
+    "frag": "ter a"
+   },
+   {
+    "text": "#% increased Monster Cast Speed",
+    "frag": "r cas"
+   },
+   {
+    "text": "#% increased Monster Damage",
+    "frag": "d monster d"
+   },
+   {
+    "text": "#% increased Monster Movement Speed",
+    "frag": "ter m"
+   },
+   {
+    "text": "#% increased number of Rare Monsters",
+    "frag": "of ra"
+   },
+   {
+    "text": "#% less effect of Curses on Monsters",
+    "frag": "of cu"
+   },
+   {
+    "text": "#% Monster Chaos Resistance",
+    "frag": "ter ch"
+   },
+   {
+    "text": "#% Monster Elemental Resistances",
+    "frag": "ter e"
+   },
+   {
+    "text": "#% Monster Physical Damage Reduction",
+    "frag": "er ph"
+   },
+   {
+    "text": "#% more Monster Life",
+    "frag": "ore mo"
+   },
+   {
+    "text": "#% to Monster Critical Strike Multiplier",
+    "frag": "to mo"
+   },
+   {
+    "text": "All Damage from Monsters' Hits can Poison",
+    "frag": "all d",
+    "t17": true
+   },
+   {
+    "text": "All Legion monsters in Area must be released to claim Reward",
+    "frag": "all l"
+   },
+   {
+    "text": "All Magic and Normal Monsters in Area are in a Union of Souls",
+    "frag": "and n"
+   },
+   {
+    "text": "All Monster Damage can Ignite, Freeze and Shock",
+    "frag": "can i",
+    "t17": true
+   },
+   {
+    "text": "All Monster Damage from Hits always Ignites",
+    "frag": "alway"
+   },
+   {
+    "text": "All Strongboxes in Area must be opened to claim Reward",
+    "frag": "all s"
+   },
+   {
+    "text": "Area contains # additional guarded Exquisite Vaal Vessels",
+    "frag": "exqui"
+   },
+   {
+    "text": "Area contains # additional pack of four Map Bosses",
+    "frag": "ack o"
+   },
+   {
+    "text": "Area contains # additional packs of four Map Bosses",
+    "frag": "s of fo"
+   },
+   {
+    "text": "Area contains # additional packs of Frogs",
+    "frag": "of fr"
+   },
+   {
+    "text": "Area contains # additional Rare Monsters that create Frost Walls and Flee",
+    "frag": "frost"
+   },
+   {
+    "text": "Area contains # Gigantic Rogue Exiles",
+    "frag": "gigan"
+   },
+   {
+    "text": "Area contains a Bismuth Ore Deposit",
+    "frag": "a bis"
+   },
+   {
+    "text": "Area contains a Blight Encounter",
+    "frag": "a bli"
+   },
+   {
+    "text": "Area contains additional packs of Restless Dead",
+    "frag": "of re"
+   },
+   {
+    "text": "Area contains an additional Legion Encounter",
+    "frag": "an ad"
+   },
+   {
+    "text": "Area contains Drowning Orbs",
+    "frag": "drown",
+    "t17": true
+   },
+   {
+    "text": "Area contains Einhar, Exilehunter",
+    "frag": "einha"
+   },
+   {
+    "text": "Area contains Labyrinth Hazards",
+    "frag": "labyr",
+    "t17": true
+   },
+   {
+    "text": "Area contains many Detonation Totems",
+    "frag": "ny de"
+   },
+   {
+    "text": "Area contains many Totems",
+    "frag": "any t"
+   },
+   {
+    "text": "Area contains patches of moving Marked Ground, inflicting random Marks",
+    "frag": "of mo",
+    "t17": true
+   },
+   {
+    "text": "Area contains Runes of the Searing Exarch",
+    "frag": "runes",
+    "t17": true
+   },
+   {
+    "text": "Area contains The Elderslayers",
+    "frag": "the e"
+   },
+   {
+    "text": "Area contains The Feared",
+    "frag": "the f"
+   },
+   {
+    "text": "Area contains two Unique Bosses",
+    "frag": "two u"
+   },
+   {
+    "text": "Area contains Unstable Tentacle Fiends",
+    "frag": "tenta",
+    "t17": true
+   },
+   {
+    "text": "Area has # additional random Modifiers",
+    "frag": "l ran"
+   },
+   {
+    "text": "Area has increased monster variety",
+    "frag": "has i"
+   },
+   {
+    "text": "Area has patches of Burning Ground",
+    "frag": "of bu"
+   },
+   {
+    "text": "Area has patches of Chilled Ground",
+    "frag": "of ch"
+   },
+   {
+    "text": "Area has patches of Consecrated Ground",
+    "frag": "of co"
+   },
+   {
+    "text": "Area has patches of desecrated ground",
+    "frag": "of de"
+   },
+   {
+    "text": "Area has patches of Shocked Ground which increase Damage taken by #%",
+    "frag": "of sh"
+   },
+   {
+    "text": "Area is affected by a Corrupting Tempest",
+    "frag": "is af"
+   },
+   {
+    "text": "Area is infested with Fungal Growths",
+    "frag": "infes"
+   },
+   {
+    "text": "Area is Influenced by the Originator's Memories",
+    "frag": "influ"
+   },
+   {
+    "text": "Area is inhabited by Abominations",
+    "frag": "by ab"
+   },
+   {
+    "text": "Area is inhabited by Animals",
+    "frag": "by an"
+   },
+   {
+    "text": "Area is inhabited by Cultists of Kitava",
+    "frag": "by cu"
+   },
+   {
+    "text": "Area is inhabited by Demons",
+    "frag": "by de"
+   },
+   {
+    "text": "Area is inhabited by Ghosts",
+    "frag": "by gh"
+   },
+   {
+    "text": "Area is inhabited by Goatmen",
+    "frag": "by go"
+   },
+   {
+    "text": "Area is inhabited by Humanoids",
+    "frag": "by hu"
+   },
+   {
+    "text": "Area is inhabited by Lunaris fanatics",
+    "frag": "by lu"
+   },
+   {
+    "text": "Area is inhabited by Porcupines",
+    "frag": "by po"
+   },
+   {
+    "text": "Area is inhabited by ranged monsters",
+    "frag": "by ra"
+   },
+   {
+    "text": "Area is inhabited by Sea Witches and their Spawn",
+    "frag": "by se"
+   },
+   {
+    "text": "Area is inhabited by Skeletons",
+    "frag": "by sk"
+   },
+   {
+    "text": "Area is inhabited by Solaris fanatics",
+    "frag": "by so"
+   },
+   {
+    "text": "Area is inhabited by Undead",
+    "frag": "by un"
+   },
+   {
+    "text": "Areas contain Ritual Altars",
+    "frag": "areas"
+   },
+   {
+    "text": "Auras from Player Skills which affect Allies also affect Enemies",
+    "frag": "allie",
+    "t17": true
+   },
+   {
+    "text": "Beyond Bosses cannot spawn",
+    "frag": "ond b"
+   },
+   {
+    "text": "Buffs on Players expire #% faster",
+    "frag": "on pl"
+   },
+   {
+    "text": "Can be Anointed up to # times",
+    "frag": "can b"
+   },
+   {
+    "text": "Debuffs on Monsters expire #% faster",
+    "frag": "debuf",
+    "t17": true
+   },
+   {
+    "text": "Delirium Reward Type: Armour",
+    "frag": "pe: a"
+   },
+   {
+    "text": "Delirium Reward Type: Currency",
+    "frag": "pe: c"
+   },
+   {
+    "text": "Delirium Reward Type: Divination Cards",
+    "frag": "divin"
+   },
+   {
+    "text": "Delirium Reward Type: Fragments",
+    "frag": "fragm"
+   },
+   {
+    "text": "Delirium Reward Type: Jewellery",
+    "frag": "jewel"
+   },
+   {
+    "text": "Delirium Reward Type: Map Items",
+    "frag": "map i"
+   },
+   {
+    "text": "Delirium Reward Type: Unique Items",
+    "frag": "pe: u"
+   },
+   {
+    "text": "Delirium Reward Type: Weapons",
+    "frag": "weapo"
+   },
+   {
+    "text": "Durability of Ichor Pumps in Area is #",
+    "frag": "durab"
+   },
+   {
+    "text": "Legion Monsters in Area have a Volatile Core",
+    "frag": "a vol"
+   },
+   {
+    "text": "Map Boss is accompanied by a Synthesis Boss",
+    "frag": "is ac",
+    "t17": true
+   },
+   {
+    "text": "Map's Item Quantity Modifiers also affect Blight Chest count at #% value",
+    "frag": "map's"
+   },
+   {
+    "text": "Maven releases all Bosses at once",
+    "frag": "all b"
+   },
+   {
+    "text": "Maximum number of Players in Area is one",
+    "frag": "of pl"
+   },
+   {
+    "text": "modifier from #% less to #% more, until Hit again",
+    "frag": "until"
+   },
+   {
+    "text": "Monster Damage Penetrates #% Elemental Resistances",
+    "frag": "penet",
+    "t17": true
+   },
+   {
+    "text": "Monsters are Hexproof",
+    "frag": "are h"
+   },
+   {
+    "text": "Monsters Blind on Hit",
+    "frag": "blind"
+   },
+   {
+    "text": "Monsters can only be Damaged while within # metres of a Player",
+    "frag": "be da"
+   },
+   {
+    "text": "Monsters cannot be Leeched from",
+    "frag": "be le"
+   },
+   {
+    "text": "Monsters cannot be Stunned",
+    "frag": "be st"
+   },
+   {
+    "text": "Monsters cannot be Taunted",
+    "frag": "be ta"
+   },
+   {
+    "text": "Monsters deal #% extra Physical Damage as Cold",
+    "frag": "s col"
+   },
+   {
+    "text": "Monsters deal #% extra Physical Damage as Fire",
+    "frag": "as fi"
+   },
+   {
+    "text": "Monsters deal #% extra Physical Damage as Lightning",
+    "frag": "as li"
+   },
+   {
+    "text": "Monsters fire # additional Projectiles",
+    "frag": "rs fi"
+   },
+   {
+    "text": "Monsters from Beyond create Desecrated Ground",
+    "frag": "ond c"
+   },
+   {
+    "text": "Monsters gain #% of Maximum Life as Extra Maximum Energy Shield",
+    "frag": "f max"
+   },
+   {
+    "text": "Monsters gain #% of their Physical Damage as Extra Chaos Damage",
+    "frag": "tra c"
+   },
+   {
+    "text": "Monsters gain #% of their Physical Damage as Extra Damage of a random Element",
+    "frag": "age o",
+    "t17": true
+   },
+   {
+    "text": "Monsters gain a Frenzy Charge on Hit",
+    "frag": "a fre"
+   },
+   {
+    "text": "Monsters gain a Power Charge on Hit",
+    "frag": "a pow"
+   },
+   {
+    "text": "Monsters gain an Endurance Charge on Hit",
+    "frag": "e charge o"
+   },
+   {
+    "text": "Monsters gain an Endurance Charge when hit",
+    "frag": "rge w"
+   },
+   {
+    "text": "Monsters have # to Maximum Endurance Charges",
+    "frag": "m end",
+    "t17": true
+   },
+   {
+    "text": "Monsters have # to Maximum Frenzy Charges",
+    "frag": "mum f",
+    "t17": true
+   },
+   {
+    "text": "Monsters have # to Maximum Power Charges",
+    "frag": "mum p",
+    "t17": true
+   },
+   {
+    "text": "Monsters have #% chance to Avoid Elemental Ailments",
+    "frag": "ailme"
+   },
+   {
+    "text": "Monsters have #% Chance to Block Attack Damage",
+    "frag": "ock a",
+    "t17": true
+   },
+   {
+    "text": "Monsters have #% chance to Suppress Spell Damage",
+    "frag": "to su"
+   },
+   {
+    "text": "Monsters have #% increased Accuracy Rating",
+    "frag": "ed ac"
+   },
+   {
+    "text": "Monsters have #% increased Area of Effect",
+    "frag": "ve .*% increased ar"
+   },
+   {
+    "text": "Monsters have #% increased Critical Strike Chance",
+    "frag": "sed c"
+   },
+   {
+    "text": "Monsters have #% increased Poison Duration",
+    "frag": "durat",
+    "t17": true
+   },
+   {
+    "text": "Monsters have a #% chance to avoid Poison, Impale, and Bleeding",
+    "frag": "and b"
+   },
+   {
+    "text": "Monsters have a #% chance to Ignite, Freeze and Shock on Hit",
+    "frag": "to ig"
+   },
+   {
+    "text": "Monsters Hinder on Hit with Spells",
+    "frag": "hinde"
+   },
+   {
+    "text": "Monsters Ignite, Freeze and Shock on Hit",
+    "frag": "rs ig"
+   },
+   {
+    "text": "Monsters inflict # Grasping Vines on Hit",
+    "frag": "grasp",
+    "t17": true
+   },
+   {
+    "text": "Monsters inflict Petrification for # seconds on hit",
+    "frag": "petri"
+   },
+   {
+    "text": "Monsters Inflict Withered for # seconds on Hit",
+    "frag": "withe"
+   },
+   {
+    "text": "Monsters Kill things with #% or lower Life on Hit",
+    "frag": "thing"
+   },
+   {
+    "text": "Monsters Maim on Hit with Attacks",
+    "frag": "ers m"
+   },
+   {
+    "text": "Monsters Poison on Hit",
+    "frag": "ers p"
+   },
+   {
+    "text": "Monsters steal Power, Frenzy and Endurance charges on Hit",
+    "frag": "steal"
+   },
+   {
+    "text": "Monsters take #% reduced Extra Damage from Critical Strikes",
+    "frag": "rs ta"
+   },
+   {
+    "text": "Monsters' Action Speed cannot be modified to below Base Value",
+    "frag": "actio"
+   },
+   {
+    "text": "Monsters' Attacks have #% chance to Impale on Hit",
+    "frag": "to im"
+   },
+   {
+    "text": "Monsters' Movement Speed cannot be modified to below Base Value",
+    "frag": "s' mov"
+   },
+   {
+    "text": "Monsters' Projectiles can Chain when colliding with Terrain",
+    "frag": "can c"
+   },
+   {
+    "text": "Monsters' skills Chain # additional times",
+    "frag": "rs' s"
+   },
+   {
+    "text": "Must fully complete all Ritual Encounters in Area to claim Reward",
+    "frag": "compl"
+   },
+   {
+    "text": "Must successfully defend all Ichor Pumps in Area to claim Reward",
+    "frag": "succe"
+   },
+   {
+    "text": "Natural inhabitants of this area have been removed",
+    "frag": "natur"
+   },
+   {
+    "text": "Non-Unique Equipment found in Area drops as Currency instead",
+    "frag": "non-u"
+   },
+   {
+    "text": "Only opens # Portal to Area",
+    "frag": "al to"
+   },
+   {
+    "text": "Only opens # Portals to Area",
+    "frag": "rtals"
+   },
+   {
+    "text": "Players are assaulted by Bloodstained Sawblades",
+    "frag": "by bl",
+    "t17": true
+   },
+   {
+    "text": "Players are assaulted by many dangerous Apparitions",
+    "frag": "by ma"
+   },
+   {
+    "text": "Players are Cursed with Elemental Weakness",
+    "frag": "weakn"
+   },
+   {
+    "text": "Players are Cursed with Enfeeble",
+    "frag": "enfee"
+   },
+   {
+    "text": "Players are Cursed with Temporal Chains",
+    "frag": "h tem"
+   },
+   {
+    "text": "Players are Cursed with Vulnerability",
+    "frag": "vulne"
+   },
+   {
+    "text": "Players are targeted by a Meteor when they use a Flask",
+    "frag": "targe",
+    "t17": true
+   },
+   {
+    "text": "Players cannot Block",
+    "frag": "ot bl"
+   },
+   {
+    "text": "Players cannot Evade",
+    "frag": "evade"
+   },
+   {
+    "text": "Players cannot gain Flask Charges",
+    "frag": "in fl"
+   },
+   {
+    "text": "Players cannot inflict Exposure",
+    "frag": "expos"
+   },
+   {
+    "text": "Players cannot Recover Life or Energy Shield above #% during Rituals in Area",
+    "frag": "above"
+   },
+   {
+    "text": "Players cannot Regenerate Life, Mana or Energy Shield",
+    "frag": "regen"
+   },
+   {
+    "text": "Players cannot Suppress Spell Damage",
+    "frag": "ot su"
+   },
+   {
+    "text": "Players do not gain Experience",
+    "frag": "do no"
+   },
+   {
+    "text": "Players gain #% reduced Flask Charges",
+    "frag": "ced f"
+   },
+   {
+    "text": "Players gain Instability on Kill",
+    "frag": "insta"
+   },
+   {
+    "text": "Players have #% less Accuracy Rating",
+    "frag": "ss ac"
+   },
+   {
+    "text": "Players have #% less Area of Effect",
+    "frag": "ss are"
+   },
+   {
+    "text": "Players have #% less Armour",
+    "frag": "s arm"
+   },
+   {
+    "text": "Players have #% less Cooldown Recovery Rate",
+    "frag": "coold"
+   },
+   {
+    "text": "Players have #% less Defences",
+    "frag": "s def",
+    "t17": true
+   },
+   {
+    "text": "Players have #% less effect of Flasks applied to them",
+    "frag": "of fl",
+    "t17": true
+   },
+   {
+    "text": "Players have #% less Recovery Rate of Life and Energy Shield",
+    "frag": "of li"
+   },
+   {
+    "text": "Players have #% reduced Chance to Block",
+    "frag": "d chan"
+   },
+   {
+    "text": "Players have #% reduced Character Size",
+    "frag": "chara"
+   },
+   {
+    "text": "Players have #% reduced effect of Non-Curse Auras from Skills",
+    "frag": "of no"
+   },
+   {
+    "text": "Players have #% reduced Maximum total Life, Mana and Energy Shield Recovery per second from Leech",
+    "frag": "total",
+    "t17": true
+   },
+   {
+    "text": "Players have #% reduced Movement Speed",
+    "frag": "d mov"
+   },
+   {
+    "text": "Players have #% to all maximum Resistances",
+    "frag": "to al"
+   },
+   {
+    "text": "Players have #% to amount of Suppressed Spell Damage Prevented",
+    "frag": "to am"
+   },
+   {
+    "text": "Players have Shroud Walker",
+    "frag": "shrou"
+   },
+   {
+    "text": "Players in Area are #% Delirious",
+    "frag": "lirio"
+   },
+   {
+    "text": "Players' modifiers to Light Radius also apply to this range",
+    "frag": "to li"
+   },
+   {
+    "text": "Players' Travel Skills are Disabled",
+    "frag": "are d"
+   },
+   {
+    "text": "Rare and Unique Monsters in Area are Possessed by # to # Tormented Spirits and their Minions are Touched",
+    "frag": "and u"
+   },
+   {
+    "text": "Rare Monsters each have # additional Modifier",
+    "frag": "rs ea",
+    "also": 1,
+    "t17": true
+   },
+   {
+    "text": "Rare Monsters each have # additional Modifiers",
+    "frag": "l modifiers"
+   },
+   {
+    "text": "Rare Monsters have #% chance to spawn a Duplicate of Map Boss on Death",
+    "frag": "to sp"
+   },
+   {
+    "text": "Rare Monsters have Elemental Thorns reflecting # Elemental Damage",
+    "frag": "ve el"
+   },
+   {
+    "text": "Rare Monsters have Essence effects",
+    "frag": "essen"
+   },
+   {
+    "text": "Rare Monsters have Physical Thorns reflecting # Physical Damage",
+    "frag": "ave p"
+   },
+   {
+    "text": "Rare Monsters have Volatile Cores",
+    "frag": "cores",
+    "t17": true
+   },
+   {
+    "text": "Rare monsters in area are Shaper-Touched",
+    "frag": "are s",
+    "t17": true
+   },
+   {
+    "text": "Rare monsters in area Temporarily Revive on death",
+    "frag": "reviv",
+    "t17": true
+   },
+   {
+    "text": "Slaying Enemies close together can attract monsters from Beyond this realm",
+    "frag": "slayi"
+   },
+   {
+    "text": "The Maven interferes with Players",
+    "frag": "the m",
+    "t17": true
+   },
+   {
+    "text": "Unique Boss deals #% increased Damage",
+    "frag": "deals"
+   },
+   {
+    "text": "Unique Boss has #% increased Area of Effect",
+    "frag": "as .*% increased ar"
+   },
+   {
+    "text": "Unique Boss has #% increased Attack and Cast Speed",
+    "frag": "ed at"
+   },
+   {
+    "text": "Unique Boss has #% increased Life",
+    "frag": "sed l"
+   },
+   {
+    "text": "Unique Bosses are Possessed",
+    "frag": "es ar"
+   },
+   {
+    "text": "Unique Monsters have a random Shrine Buff",
+    "frag": "shrin",
+    "t17": true
+   },
+   {
+    "text": "Unstable Players eventually detonate",
+    "frag": "ble p"
+   },
+   {
+    "text": "When Hit, Players gain a random Movement Speed",
+    "frag": "it, p"
+   }
+  ],
+  "props": [
+   {
+    "id": "tier",
+    "label": "Map Tier",
+    "re": "tier {n}\\)",
+    "def": 16
+   },
+   {
+    "id": "iiq",
+    "label": "Item Quantity",
+    "re": "quantity: \\+{n}%",
+    "def": 80
+   },
+   {
+    "id": "iir",
+    "label": "Item Rarity",
+    "re": "rarity: \\+{n}%",
+    "def": 50
+   },
+   {
+    "id": "pack",
+    "label": "Monster Pack Size",
+    "re": "size: \\+{n}%",
+    "def": 25
+   },
+   {
+    "id": "maps",
+    "label": "More Maps",
+    "re": "maps: \\+{n}%",
+    "def": 20
+   },
+   {
+    "id": "currency",
+    "label": "More Currency",
+    "re": "currency: \\+{n}%",
+    "def": 20
+   },
+   {
+    "id": "scarabs",
+    "label": "More Scarabs",
+    "re": "scarabs: \\+{n}%",
+    "def": 20
+   },
+   {
+    "id": "scarab",
+    "label": "Converts to Scarab",
+    "re": "scarab: {n}%",
+    "def": 40
+   },
+   {
+    "id": "umap",
+    "label": "Converts to Unique Map",
+    "re": "unique map: {n}%",
+    "def": 5
+   },
+   {
+    "id": "conq",
+    "label": "Converts to Conqueror Map",
+    "re": "conqueror map: {n}%",
+    "def": 5
+   },
+   {
+    "id": "shaper",
+    "label": "Converts to Shaper Map",
+    "re": "shaper map: {n}%",
+    "def": 5
+   },
+   {
+    "id": "elder",
+    "label": "Converts to Elder Map",
+    "re": "elder map: {n}%",
+    "def": 5
+   }
+  ]
+ },
+ "vendor": {
+  "props": [
+   {
+    "id": "ms",
+    "label": "Movement Speed",
+    "re": "{n}% increased movement speed",
+    "def": 10
+   },
+   {
+    "id": "life",
+    "label": "Maximum Life",
+    "re": "\\+{n} to maximum life",
+    "def": 30
+   },
+   {
+    "id": "mana",
+    "label": "Maximum Mana",
+    "re": "\\+{n} to maximum mana",
+    "def": 30
+   },
+   {
+    "id": "es",
+    "label": "Maximum Energy Shield",
+    "re": "\\+{n} to maximum energy",
+    "def": 20
+   },
+   {
+    "id": "fire",
+    "label": "Fire Resistance",
+    "re": "\\+{n}% to fire",
+    "def": 15
+   },
+   {
+    "id": "cold",
+    "label": "Cold Resistance",
+    "re": "\\+{n}% to (cold|fire and cold)",
+    "def": 15
+   },
+   {
+    "id": "light",
+    "label": "Lightning Resistance",
+    "re": "\\+{n}% to (lightning|\\w+ and lightning)",
+    "def": 15
+   },
+   {
+    "id": "allres",
+    "label": "All Elemental Resistances",
+    "re": "\\+{n}% to all ele",
+    "def": 8
+   },
+   {
+    "id": "chaos",
+    "label": "Chaos Resistance",
+    "re": "\\+{n}% to chaos res",
+    "def": 10
+   },
+   {
+    "id": "str",
+    "label": "Strength",
+    "re": "\\+{n} to strength",
+    "def": 15
+   },
+   {
+    "id": "dex",
+    "label": "Dexterity",
+    "re": "\\+{n} to dexterity",
+    "def": 15
+   },
+   {
+    "id": "int",
+    "label": "Intelligence",
+    "re": "\\+{n} to intelligence",
+    "def": 15
+   },
+   {
+    "id": "phys",
+    "label": "Increased Physical Damage",
+    "re": "{n}% increased physical damage",
+    "def": 40
+   },
+   {
+    "id": "aspd",
+    "label": "Attack Speed",
+    "re": "{n}% increased attack speed",
+    "def": 8
+   },
+   {
+    "id": "spell",
+    "label": "Spell Damage",
+    "re": "{n}% increased spell damage",
+    "def": 20
+   },
+   {
+    "id": "cspd",
+    "label": "Cast Speed",
+    "re": "{n}% increased cast speed",
+    "def": 8
+   },
+   {
+    "id": "gems",
+    "label": "+ Level of Socketed Gems",
+    "re": "\\+{n} to level of socketed gems",
+    "def": 1
+   },
+   {
+    "id": "spellgems",
+    "label": "+ Level of Spell Skill Gems",
+    "re": "\\+{n} to level of all.*spell",
+    "def": 1
+   },
+   {
+    "id": "minion",
+    "label": "+ Level of Minion Gems",
+    "re": "\\+{n} to level of all minion",
+    "def": 1
+   },
+   {
+    "id": "addphys",
+    "label": "Adds Physical Damage",
+    "re": "adds \\d+ to \\d+ physical",
+    "def": null
+   },
+   {
+    "id": "addfire",
+    "label": "Adds Fire Damage",
+    "re": "adds \\d+ to \\d+ fire",
+    "def": null
+   },
+   {
+    "id": "addcold",
+    "label": "Adds Cold Damage",
+    "re": "adds \\d+ to \\d+ cold",
+    "def": null
+   },
+   {
+    "id": "addlight",
+    "label": "Adds Lightning Damage",
+    "re": "adds \\d+ to \\d+ lightning",
+    "def": null
+   }
+  ]
+ },
+ "heist": {
+  "mods": [
+   {
+    "text": "#% increased Magic Monsters",
+    "frag": "magic"
+   },
+   {
+    "text": "#% increased Monster Attack Speed",
+    "frag": "ter a"
+   },
+   {
+    "text": "#% increased Monster Cast Speed",
+    "frag": "er ca"
+   },
+   {
+    "text": "#% increased Monster Damage",
+    "frag": "d monster d"
+   },
+   {
+    "text": "#% increased Monster Movement Speed",
+    "frag": "ter m"
+   },
+   {
+    "text": "#% increased number of Rare Monsters",
+    "frag": "numbe"
+   },
+   {
+    "text": "#% increased Total Heist Fee",
+    "frag": "total"
+   },
+   {
+    "text": "#% less effect of Curses on Monsters",
+    "frag": "of cu"
+   },
+   {
+    "text": "#% maximum Player Resistances per #% Alert Level",
+    "frag": "mum p"
+   },
+   {
+    "text": "#% Monster Chaos Resistance",
+    "frag": "aos r"
+   },
+   {
+    "text": "#% Monster Elemental Resistances",
+    "frag": "ter e"
+   },
+   {
+    "text": "#% Monster Physical Damage Reduction",
+    "frag": "ter p"
+   },
+   {
+    "text": "#% more Monster Life",
+    "frag": "ore m"
+   },
+   {
+    "text": "#% Player Cold Resistance per #% Alert Level",
+    "frag": "yer c"
+   },
+   {
+    "text": "#% Player Fire Resistance per #% Alert Level",
+    "frag": "yer f"
+   },
+   {
+    "text": "#% Player Lightning Resistance per #% Alert Level",
+    "frag": "yer l"
+   },
+   {
+    "text": "#% reduced Job speed",
+    "frag": "job s"
+   },
+   {
+    "text": "#% to Monster Critical Strike Multiplier",
+    "frag": "to mo"
+   },
+   {
+    "text": "Alert Level increases by #% per second",
+    "frag": "per s"
+   },
+   {
+    "text": "All Monster Damage from Hits always Ignites",
+    "frag": "alway"
+   },
+   {
+    "text": "Area has patches of Burning Ground",
+    "frag": "of bu"
+   },
+   {
+    "text": "Area has patches of Chilled Ground",
+    "frag": "of ch"
+   },
+   {
+    "text": "Area has patches of Consecrated Ground",
+    "frag": "of co"
+   },
+   {
+    "text": "Area has patches of desecrated ground",
+    "frag": "of de"
+   },
+   {
+    "text": "Area has patches of Shocked Ground which increase Damage taken by #%",
+    "frag": "of sh"
+   },
+   {
+    "text": "Buffs on Players expire #% faster",
+    "frag": "buffs"
+   },
+   {
+    "text": "Guards deal #% increased Damage",
+    "frag": "rds d"
+   },
+   {
+    "text": "Guards take #% reduced Damage",
+    "frag": "rds t"
+   },
+   {
+    "text": "Lockdown occurs immediately when Alert Level is full",
+    "frag": "occur"
+   },
+   {
+    "text": "Monsters are Hexproof",
+    "frag": "are h"
+   },
+   {
+    "text": "Monsters Blind on Hit",
+    "frag": "blind"
+   },
+   {
+    "text": "Monsters cannot be Leeched from",
+    "frag": "be le"
+   },
+   {
+    "text": "Monsters cannot be Stunned",
+    "frag": "be st"
+   },
+   {
+    "text": "Monsters cannot be Taunted",
+    "frag": "be ta"
+   },
+   {
+    "text": "Monsters deal #% extra Physical Damage as Cold",
+    "frag": "as co"
+   },
+   {
+    "text": "Monsters deal #% extra Physical Damage as Fire",
+    "frag": "as fi"
+   },
+   {
+    "text": "Monsters deal #% extra Physical Damage as Lightning",
+    "frag": "s lig"
+   },
+   {
+    "text": "Monsters fire # additional Projectiles",
+    "frag": "proje"
+   },
+   {
+    "text": "Monsters gain #% of Maximum Life as Extra Maximum Energy Shield",
+    "frag": "of ma"
+   },
+   {
+    "text": "Monsters gain #% of their Physical Damage as Extra Chaos Damage",
+    "frag": "their"
+   },
+   {
+    "text": "Monsters gain a Frenzy Charge on Hit",
+    "frag": "s gain a f"
+   },
+   {
+    "text": "Monsters gain a Power Charge on Hit",
+    "frag": "s gain a p"
+   },
+   {
+    "text": "Monsters gain an Endurance Charge on Hit",
+    "frag": "s gain an"
+   },
+   {
+    "text": "Monsters have #% chance to Avoid Elemental Ailments",
+    "frag": "ailme"
+   },
+   {
+    "text": "Monsters have #% chance to gain a Frenzy Charge on Hit",
+    "frag": "o gain a f"
+   },
+   {
+    "text": "Monsters have #% chance to gain a Power Charge on Hit",
+    "frag": "o gain a p"
+   },
+   {
+    "text": "Monsters have #% chance to gain an Endurance Charge on Hit",
+    "frag": "o gain an"
+   },
+   {
+    "text": "Monsters have #% chance to Suppress Spell Damage",
+    "frag": "to su"
+   },
+   {
+    "text": "Monsters have #% increased Accuracy Rating",
+    "frag": "ed ac"
+   },
+   {
+    "text": "Monsters have #% increased Area of Effect",
+    "frag": "ed ar"
+   },
+   {
+    "text": "Monsters have #% increased Critical Strike Chance",
+    "frag": "ed cr"
+   },
+   {
+    "text": "Monsters have a #% chance to avoid Poison, Impale, and Bleeding",
+    "frag": "and b"
+   },
+   {
+    "text": "Monsters have a #% chance to Ignite, Freeze and Shock on Hit",
+    "frag": "to ig"
+   },
+   {
+    "text": "Monsters Hinder on Hit with Spells",
+    "frag": "hinde"
+   },
+   {
+    "text": "Monsters Inflict Withered for # seconds on Hit",
+    "frag": "withe"
+   },
+   {
+    "text": "Monsters Maim on Hit with Attacks",
+    "frag": "ers m"
+   },
+   {
+    "text": "Monsters Poison on Hit",
+    "frag": "ers p"
+   },
+   {
+    "text": "Monsters steal Power, Frenzy and Endurance charges on Hit",
+    "frag": "ers s"
+   },
+   {
+    "text": "Monsters take #% reduced Extra Damage from Critical Strikes",
+    "frag": "ed ex"
+   },
+   {
+    "text": "Monsters' Action Speed cannot be modified to below Base Value",
+    "frag": "actio"
+   },
+   {
+    "text": "Monsters' Attacks have #% chance to Impale on Hit",
+    "frag": "to im"
+   },
+   {
+    "text": "Monsters' Movement Speed cannot be modified to below Base Value",
+    "frag": "rs' m"
+   },
+   {
+    "text": "Monsters' skills Chain # additional times",
+    "frag": "times"
+   },
+   {
+    "text": "No Travel Cost",
+    "frag": "no tr"
+   },
+   {
+    "text": "Patrol Packs have #% increased chance to be replaced by an Elite Patrol Pack",
+    "frag": "be re"
+   },
+   {
+    "text": "Patrol Packs take #% reduced damage",
+    "frag": "cks t"
+   },
+   {
+    "text": "Patrolling Monsters deal #% increased Damage",
+    "frag": "troll"
+   },
+   {
+    "text": "Players are Cursed with Elemental Weakness",
+    "frag": "weakn"
+   },
+   {
+    "text": "Players are Cursed with Enfeeble",
+    "frag": "enfee"
+   },
+   {
+    "text": "Players are Cursed with Temporal Chains",
+    "frag": "tempo"
+   },
+   {
+    "text": "Players are Cursed with Vulnerability",
+    "frag": "vulne"
+   },
+   {
+    "text": "Players cannot inflict Exposure",
+    "frag": "expos"
+   },
+   {
+    "text": "Players cannot Regenerate Life, Mana or Energy Shield",
+    "frag": "regen"
+   },
+   {
+    "text": "Players gain #% reduced Flask Charges",
+    "frag": "flask",
+    "also": 1
+   },
+   {
+    "text": "Players gain #% reduced Flask Charges per #% Alert Level",
+    "frag": "ges p"
+   },
+   {
+    "text": "Players have #% less Accuracy Rating",
+    "frag": "ss ac"
+   },
+   {
+    "text": "Players have #% less Area of Effect",
+    "frag": "ss are"
+   },
+   {
+    "text": "Players have #% less Armour",
+    "frag": "armou",
+    "also": 1
+   },
+   {
+    "text": "Players have #% less Armour per #% Alert Level",
+    "frag": "our p"
+   },
+   {
+    "text": "Players have #% less Cooldown Recovery Rate",
+    "frag": "coold"
+   },
+   {
+    "text": "Players have #% less Energy Shield Recovery Rate per #% Alert Level",
+    "frag": "ss en"
+   },
+   {
+    "text": "Players have #% less Evasion per #% Alert Level",
+    "frag": "evasi"
+   },
+   {
+    "text": "Players have #% less Life Recovery Rate per #% Alert Level",
+    "frag": "ess l"
+   },
+   {
+    "text": "Players have #% less Mana Recovery Rate per #% Alert Level",
+    "frag": "ess m"
+   },
+   {
+    "text": "Players have #% less Recovery Rate of Life and Energy Shield",
+    "frag": "of li"
+   },
+   {
+    "text": "Players have #% reduced Chance to Block",
+    "frag": "to bl"
+   },
+   {
+    "text": "Players have #% reduced effect of Non-Curse Auras from Skills",
+    "frag": "of no"
+   },
+   {
+    "text": "Players have #% to all maximum Resistances",
+    "frag": "to al"
+   },
+   {
+    "text": "Rare Monsters have Elemental Thorns reflecting # Elemental Damage",
+    "frag": "ave e"
+   },
+   {
+    "text": "Rare Monsters have Physical Thorns reflecting # Physical Damage",
+    "frag": "ave p"
+   },
+   {
+    "text": "Reinforcements have #% increased Attack Speed",
+    "frag": "ed at"
+   },
+   {
+    "text": "Reinforcements have #% increased Cast Speed",
+    "frag": "d cas"
+   },
+   {
+    "text": "Reinforcements have #% increased Movement Speed",
+    "frag": "d mov"
+   },
+   {
+    "text": "Reward Room Monsters deal #% increased Damage",
+    "frag": "m monsters d"
+   },
+   {
+    "text": "Reward Room Monsters take #% reduced Damage",
+    "frag": "m monsters t"
+   },
+   {
+    "text": "Reward Rooms have #% increased Monsters",
+    "frag": "oms h"
+   },
+   {
+    "text": "The Ring takes no Cut",
+    "frag": "takes"
+   }
+  ],
+  "props": [
+   {
+    "id": "alvl",
+    "label": "Area Level",
+    "re": "area level: {n}",
+    "def": 81
+   },
+   {
+    "id": "iiq",
+    "label": "Item Quantity",
+    "re": "quantity: \\+{n}%",
+    "def": 50
+   },
+   {
+    "id": "iir",
+    "label": "Item Rarity",
+    "re": "rarity: \\+{n}%",
+    "def": 30
+   },
+   {
+    "id": "alert",
+    "label": "Alert Level Reduction",
+    "re": "reduction: \\+{n}%",
+    "def": 20
+   },
+   {
+    "id": "lockdown",
+    "label": "Time Before Lockdown",
+    "re": "lockdown: \\+{n}%",
+    "def": 20
+   },
+   {
+    "id": "precious",
+    "label": "Target: Precious or Priceless",
+    "re": "(precious|priceless)\\)",
+    "def": null
+   },
+   {
+    "id": "priceless",
+    "label": "Target: Priceless",
+    "re": "priceless\\)",
+    "def": null
+   },
+   {
+    "id": "job-lockpicking",
+    "label": "Lockpicking level",
+    "group": "job",
+    "re": "lockpicking \\(level {n}\\)",
+    "def": 1
+   },
+   {
+    "id": "job-brute-force",
+    "label": "Brute Force level",
+    "group": "job",
+    "re": "brute force \\(level {n}\\)",
+    "def": 1
+   },
+   {
+    "id": "job-perception",
+    "label": "Perception level",
+    "group": "job",
+    "re": "perception \\(level {n}\\)",
+    "def": 1
+   },
+   {
+    "id": "job-demolition",
+    "label": "Demolition level",
+    "group": "job",
+    "re": "demolition \\(level {n}\\)",
+    "def": 1
+   },
+   {
+    "id": "job-counter-thaumaturgy",
+    "label": "Counter-Thaumaturgy level",
+    "group": "job",
+    "re": "counter-thaumaturgy \\(level {n}\\)",
+    "def": 1
+   },
+   {
+    "id": "job-trap-disarmament",
+    "label": "Trap Disarmament level",
+    "group": "job",
+    "re": "trap disarmament \\(level {n}\\)",
+    "def": 1
+   },
+   {
+    "id": "job-agility",
+    "label": "Agility level",
+    "group": "job",
+    "re": "agility \\(level {n}\\)",
+    "def": 1
+   },
+   {
+    "id": "job-deception",
+    "label": "Deception level",
+    "group": "job",
+    "re": "deception \\(level {n}\\)",
+    "def": 1
+   },
+   {
+    "id": "job-engineering",
+    "label": "Engineering level",
+    "group": "job",
+    "re": "engineering \\(level {n}\\)",
+    "def": 1
+   }
+  ]
+ },
+ "logbook": {
+  "mods": [
+   {
+    "text": "Black Scythe Mercenaries",
+    "frag": "black",
+    "group": "faction"
+   },
+   {
+    "text": "Druids of the Broken Circle",
+    "frag": "druid",
+    "group": "faction"
+   },
+   {
+    "text": "Knights of the Sun",
+    "frag": "knigh",
+    "group": "faction"
+   },
+   {
+    "text": "Order of the Chalice",
+    "frag": "order",
+    "group": "faction"
+   },
+   {
+    "text": "#% increased Explosive Placement Range",
+    "frag": "place",
+    "group": "bonus"
+   },
+   {
+    "text": "#% increased Explosive Radius",
+    "frag": "radiu",
+    "group": "bonus"
+   },
+   {
+    "text": "#% increased number of Explosives",
+    "frag": "of ex",
+    "group": "bonus"
+   },
+   {
+    "text": "#% increased quantity of Artifacts dropped by Monsters",
+    "frag": "of ar",
+    "group": "bonus"
+   },
+   {
+    "text": "#% increased Quantity of Vendor Refresh Currencies dropped by Monsters in Area",
+    "frag": "of ve",
+    "group": "bonus"
+   },
+   {
+    "text": "Area contains # additional Afarud Commander Monster Marker",
+    "frag": "comma",
+    "group": "bonus"
+   },
+   {
+    "text": "Area contains # additional Afarud Monster Markers",
+    "frag": "rud m",
+    "group": "bonus"
+   },
+   {
+    "text": "Area contains # additional Chest Markers",
+    "frag": "nal c",
+    "group": "bonus"
+   },
+   {
+    "text": "Area contains #% increased number of Monster Markers",
+    "frag": "of mo",
+    "group": "bonus"
+   },
+   {
+    "text": "Area contains #% increased number of Remnants",
+    "frag": "of re",
+    "group": "bonus"
+   },
+   {
+    "text": "Area contains #% increased number of Runic Monster Markers",
+    "frag": "of ru",
+    "group": "bonus"
+   },
+   {
+    "text": "Area contains an additional Underground Area",
+    "frag": "ins a",
+    "group": "bonus"
+   },
+   {
+    "text": "Area contains Medved, Feller of Heroes",
+    "frag": "medve",
+    "group": "bonus"
+   },
+   {
+    "text": "Area contains Olroth, Origin of the Fall",
+    "frag": "olrot",
+    "group": "bonus"
+   },
+   {
+    "text": "Area contains Uhtred, Covetous Traitor",
+    "frag": "uhtre",
+    "group": "bonus"
+   },
+   {
+    "text": "Area contains Vorana, Last to Fall",
+    "frag": "voran",
+    "group": "bonus"
+   },
+   {
+    "text": "Excavated Chests have a #% chance to contain twice as many Items",
+    "frag": "excav",
+    "group": "bonus"
+   },
+   {
+    "text": "Remnants have #% chance to have an additional Suffix Modifier",
+    "frag": "to ha",
+    "group": "bonus"
+   },
+   {
+    "text": "#% increased Monster Attack Speed",
+    "frag": "ter a",
+    "group": "mod"
+   },
+   {
+    "text": "#% increased Monster Cast Speed",
+    "frag": "er ca",
+    "group": "mod"
+   },
+   {
+    "text": "#% increased Monster Damage",
+    "frag": "ter d",
+    "group": "mod"
+   },
+   {
+    "text": "#% increased Monster Movement Speed",
+    "frag": "r mov",
+    "group": "mod"
+   },
+   {
+    "text": "#% less effect of Curses on Monsters",
+    "frag": "of cu",
+    "group": "mod"
+   },
+   {
+    "text": "#% Monster Chaos Resistance",
+    "frag": "aos r",
+    "group": "mod"
+   },
+   {
+    "text": "#% Monster Elemental Resistances",
+    "frag": "ter e",
+    "group": "mod"
+   },
+   {
+    "text": "#% Monster Physical Damage Reduction",
+    "frag": "er ph",
+    "group": "mod"
+   },
+   {
+    "text": "#% more Monster Life",
+    "frag": "ore m",
+    "group": "mod"
+   },
+   {
+    "text": "#% to Monster Critical Strike Multiplier",
+    "frag": "to mo",
+    "group": "mod"
+   },
+   {
+    "text": "Area has patches of Burning Ground",
+    "frag": "of bu",
+    "group": "mod"
+   },
+   {
+    "text": "Area has patches of Chilled Ground",
+    "frag": "of ch",
+    "group": "mod"
+   },
+   {
+    "text": "Area has patches of Consecrated Ground",
+    "frag": "of co",
+    "group": "mod"
+   },
+   {
+    "text": "Area has patches of desecrated ground",
+    "frag": "of de",
+    "group": "mod"
+   },
+   {
+    "text": "Area has patches of Shocked Ground which increase Damage taken by #%",
+    "frag": "of sh",
+    "group": "mod"
+   },
+   {
+    "text": "Buffs on Players expire #% faster",
+    "frag": "buffs",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters Blind on Hit",
+    "frag": "ers b",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters cannot be Stunned",
+    "frag": "be st",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters cannot be Taunted",
+    "frag": "be ta",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters deal #% extra Physical Damage as Cold",
+    "frag": "as co",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters deal #% extra Physical Damage as Fire",
+    "frag": "as fi",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters deal #% extra Physical Damage as Lightning",
+    "frag": "as li",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters fire # additional Projectiles",
+    "frag": "proje",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters gain #% of Maximum Life as Extra Maximum Energy Shield",
+    "frag": "of ma",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters gain #% of their Physical Damage as Extra Chaos Damage",
+    "frag": "their",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters gain a Frenzy Charge on Hit",
+    "frag": "a fre",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters gain a Power Charge on Hit",
+    "frag": "a pow",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters gain an Endurance Charge on Hit",
+    "frag": "an en",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters have #% chance to Suppress Spell Damage",
+    "frag": "to su",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters have #% increased Accuracy Rating",
+    "frag": "ed ac",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters have #% increased Area of Effect",
+    "frag": "ed ar",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters have #% increased Critical Strike Chance",
+    "frag": "sed c",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters have a #% chance to avoid Poison, Impale, and Bleeding",
+    "frag": "to av",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters have a #% chance to Ignite, Freeze and Shock on Hit",
+    "frag": "to ig",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters Hinder on Hit with Spells",
+    "frag": "hinde",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters Maim on Hit with Attacks",
+    "frag": "ers m",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters Poison on Hit",
+    "frag": "ers p",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters steal Power, Frenzy and Endurance charges on Hit",
+    "frag": "steal",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters take #% reduced Extra Damage from Critical Strikes",
+    "frag": "ers t",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters' Action Speed cannot be modified to below Base Value",
+    "frag": "actio",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters' Attacks have #% chance to Impale on Hit",
+    "frag": "to im",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters' Movement Speed cannot be modified to below Base Value",
+    "frag": "rs' m",
+    "group": "mod"
+   },
+   {
+    "text": "Monsters' skills Chain # additional times",
+    "frag": "times",
+    "group": "mod"
+   },
+   {
+    "text": "Players are Cursed with Elemental Weakness",
+    "frag": "weakn",
+    "group": "mod"
+   },
+   {
+    "text": "Players are Cursed with Enfeeble",
+    "frag": "enfee",
+    "group": "mod"
+   },
+   {
+    "text": "Players are Cursed with Temporal Chains",
+    "frag": "tempo",
+    "group": "mod"
+   },
+   {
+    "text": "Players are Cursed with Vulnerability",
+    "frag": "vulne",
+    "group": "mod"
+   },
+   {
+    "text": "Players cannot inflict Exposure",
+    "frag": "infli",
+    "group": "mod"
+   },
+   {
+    "text": "Players cannot Regenerate Life, Mana or Energy Shield",
+    "frag": "regen",
+    "group": "mod"
+   },
+   {
+    "text": "Players gain #% reduced Flask Charges",
+    "frag": "flask",
+    "group": "mod"
+   },
+   {
+    "text": "Players have #% less Accuracy Rating",
+    "frag": "ss ac",
+    "group": "mod"
+   },
+   {
+    "text": "Players have #% less Area of Effect",
+    "frag": "ss are",
+    "group": "mod"
+   },
+   {
+    "text": "Players have #% less Armour",
+    "frag": "armou",
+    "group": "mod"
+   },
+   {
+    "text": "Players have #% less Cooldown Recovery Rate",
+    "frag": "coold",
+    "group": "mod"
+   },
+   {
+    "text": "Players have #% less Recovery Rate of Life and Energy Shield",
+    "frag": "of li",
+    "group": "mod"
+   },
+   {
+    "text": "Players have #% reduced Chance to Block",
+    "frag": "to bl",
+    "group": "mod"
+   },
+   {
+    "text": "Players have #% reduced effect of Non-Curse Auras from Skills",
+    "frag": "of no",
+    "group": "mod"
+   },
+   {
+    "text": "Players have #% to all maximum Resistances",
+    "frag": "to al",
+    "group": "mod"
+   },
+   {
+    "text": "Rare Monsters have Elemental Thorns reflecting # Elemental Damage",
+    "frag": "ave e",
+    "group": "mod"
+   },
+   {
+    "text": "Rare Monsters have Physical Thorns reflecting # Physical Damage",
+    "frag": "ave p",
+    "group": "mod"
+   }
+  ],
+  "props": [
+   {
+    "id": "alvl",
+    "label": "Area Level",
+    "re": "area level: {n}",
+    "def": 81
+   },
+   {
+    "id": "iiq",
+    "label": "Item Quantity",
+    "re": "quantity: \\+{n}%",
+    "def": 50
+   },
+   {
+    "id": "iir",
+    "label": "Item Rarity",
+    "re": "rarity: \\+{n}%",
+    "def": 30
+   },
+   {
+    "id": "pack",
+    "label": "Monster Pack Size",
+    "re": "size: \\+{n}%",
+    "def": 20
+   }
+  ]
+ }
 }

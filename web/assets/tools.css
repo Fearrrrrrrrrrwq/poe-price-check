@@ -218,3 +218,20 @@ button.emo[aria-pressed="true"] { background: var(--raise); box-shadow: inset 0 
 .tag-t17 { display: inline-block; font-size: 11px; font-weight: 600; letter-spacing: .04em; color: var(--accent);
   border: 1px solid var(--accent); border-radius: 4px; padding: 0 5px; margin-left: 6px; vertical-align: 1px; }
 .list-tools .field-inline { white-space: nowrap; font-size: 13px; color: var(--muted); }
+
+/* PoE1 regex: gniazda w zakladce Vendor, liczniki grup */
+.sockets { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; padding: 12px 14px;
+  border: 1px solid var(--border); border-radius: 10px; background: var(--panel); }
+.sockets.on { border-color: var(--accent); }
+.sockets select, .sock-colour input { background: var(--bg); color: var(--fg); border: 1px solid var(--border);
+  border-radius: 7px; font: inherit; padding: 5px 8px; }
+.sock-colour { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--muted); }
+.sock-colour input { width: 58px; text-align: right; font-variant-numeric: tabular-nums; }
+.sock-colour span::before { content: ""; display: inline-block; width: 10px; height: 10px; border-radius: 50%;
+  margin-right: 6px; vertical-align: 0; background: currentColor; }
+.sock-colour.r span::before { color: #c8553d; }
+.sock-colour.g span::before { color: #6aa84f; }
+.sock-colour.b span::before { color: #4f7fc8; }
+.sockets .note { flex-basis: 100%; margin: 0; }
+.sub .count { color: var(--muted); font-weight: 400; letter-spacing: 0; margin-left: 4px; }
+.out-actions { flex-wrap: wrap; }

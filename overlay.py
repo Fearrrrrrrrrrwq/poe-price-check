@@ -54,6 +54,17 @@ class _ModRow:
             tk.Label(self.frame, text=t("res.not_tradeable"), font=FONT_LABEL, fg=FG_MUTED,
                      bg=row_bg).pack(side="right", padx=(GAP, 8))
 
+        # Jakosc rolki w zakresie tieru (0-100%). Stoi przy progu, zeby od razu
+        # bylo widac, czy mod jest dobrze wyrollowany - to podpowiada, czy
+        # przedmiot warto sprzedac, czy jeszcze ulepszac.
+        pct = option.roll_percent() if hasattr(option, "roll_percent") else None
+        self._pct_colour = (FG_OK if pct is not None and pct >= 80
+                            else FG_WARN if pct is not None and pct < 34 else FG_MUTED)
+        self.pct = tk.Label(self.frame, text="" if pct is None else f"{pct}%",
+                            font=FONT_LABEL, fg=self._pct_colour, bg=row_bg,
+                            width=5, anchor="e")
+        self.pct.pack(side="right")
+
         self.text = tk.Label(self.frame, text=option.label(), font=FONT_BODY,
                              bg=row_bg, anchor="w", justify="left")
         self.text.pack(side="left", fill="x", expand=True)
@@ -82,6 +93,7 @@ class _ModRow:
         self.frame.config(bg=bg)
         self.text.config(bg=bg)
         self.badge.config(bg=bg)
+        self.pct.config(bg=bg)
         if not self.option.enabled:
             self.check.config(bg=bg)
 
@@ -96,6 +108,7 @@ class _ModRow:
                           bg=FG_ACCENT if on else self.row_bg)
         self.text.config(fg=FG if on else FG_MUTED)
         self.badge.config(fg=self._badge_colour if on else FG_MUTED)
+        self.pct.config(fg=self._pct_colour if on else FG_MUTED)
         if self.entry is not None:
             self.entry.config(fg=FG if on else FG_MUTED)
 

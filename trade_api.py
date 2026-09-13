@@ -343,6 +343,28 @@ class ModOption:
     def label(self) -> str:
         return self.mod.text
 
+    def roll_percent(self) -> int | None:
+        """Jak dobra jest rolka w swoim zakresie tieru: 0 = minimum, 100 = maksimum.
+
+        Zakres podaje zaawansowana kopia ("+75(70-84) to maximum Life"). Mod
+        z dwiema liczbami ("Adds 20(15-24) to 40(35-44)") liczymy po srednich,
+        tak jak porownuje go trade. Brak zakresu, sztywna wartosc (70-70) albo
+        suma pseudo - None, bo nie ma czego oceniac.
+        """
+        if self.sources:
+            return None
+        values, ranges = self.mod.values, self.mod.ranges
+        if not values or not ranges or len(values) != len(ranges):
+            return None
+        value = sum(values) / len(values)
+        low = sum(r[0] for r in ranges) / len(ranges)
+        high = sum(r[1] for r in ranges) / len(ranges)
+        if high == low:
+            return None
+        if high < low:  # zakresy ujemne zapisane odwrotnie
+            low, high = high, low
+        return round(max(0.0, min(100.0, (value - low) / (high - low) * 100)))
+
     def badge(self) -> str:
         """Dla sumy - afiksy skladowe, np. 'P2+S5'. Dla moda - jego wlasny tier."""
         if self.sources:
